@@ -1,53 +1,53 @@
 <x-layouts.app title="Purchase Request Details">
 
+    {{-- Flash Messages --}}
     @if(session('success'))
-
         <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
             {{ session('success') }}
         </div>
-
     @endif
 
-
     @if(session('error'))
-
         <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {{ session('error') }}
         </div>
-
     @endif
 
 
-    <div class="mb-6 flex items-center justify-between">
+    {{-- Header --}}
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
         <div>
+            <div class="flex items-center gap-2">
 
-            <h2 class="text-xl font-semibold text-gray-900">
-                Purchase Request
-                #{{ $purchaseRequest->request_number }}
-            </h2>
+
+                <h2 class="text-xl font-semibold text-gray-900">
+                    Purchase Request
+                </h2>
+            </div>
 
             <p class="mt-1 text-sm text-gray-500">
-                Raw material purchase request details.
+                PR-{{ $purchaseRequest->request_number }}
+                · Raw material purchase request details.
             </p>
-
         </div>
 
-
-        <div class="flex gap-2">
+        <div class="flex flex-wrap gap-2">
 
             <a
                 href="{{ route('purchase-requests.edit', $purchaseRequest) }}"
-                class="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
             >
+                <i class="bx bx-edit text-lg"></i>
                 Edit
             </a>
 
             <a
                 href="{{ route('purchase-requests.index') }}"
-                class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
             >
-                Back
+                <i class="bx bx-list-ul text-lg"></i>
+                All Requests
             </a>
 
         </div>
@@ -56,145 +56,201 @@
 
 
     {{-- Request Information --}}
-    <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div class="mb-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
+
+        <div class="border-b border-gray-200 px-5 py-4">
+            <h3 class="text-sm font-semibold text-gray-900">
+                Request Information
+            </h3>
+            <p class="mt-0.5 text-xs text-gray-500">
+                Overview of this purchase request.
+            </p>
+        </div>
 
         <div class="grid grid-cols-1 divide-y divide-gray-100 md:grid-cols-3 md:divide-x md:divide-y-0">
 
-            <div class="p-6">
+            {{-- Request Number --}}
+            <div class="p-5">
+                <div class="flex items-center gap-3">
 
-                <p class="text-sm text-gray-500">
-                    Request Number
-                </p>
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600">
+                        <i class="bx bx-receipt text-lg"></i>
+                    </div>
 
-                <p class="mt-1 font-semibold text-gray-900">
-                    PR-{{ $purchaseRequest->request_number }}
-                </p>
+                    <div>
+                        <p class="text-xs font-medium text-gray-500">
+                            Request Number
+                        </p>
 
-            </div>
-
-
-            <div class="p-6">
-
-                <p class="text-sm text-gray-500">
-                    Status
-                </p>
-
-                <div class="mt-2">
-
-                    @if($purchaseRequest->status === 'completed')
-
-                        <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
-                            Completed
-                        </span>
-
-                    @elseif($purchaseRequest->status === 'active')
-
-                           <span class="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-700">
-                            Active
-                        </span>
-
-
-                    @else
-                        
-                        <span class="rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-medium text-yellow-700">
-                            Pending
-                        </span>
-                 
-                    @endif
+                        <p class="mt-0.5 text-sm font-semibold text-gray-900">
+                            PR-{{ $purchaseRequest->request_number }}
+                        </p>
+                    </div>
 
                 </div>
-
             </div>
 
 
-            <div class="p-6">
+            {{-- Status --}}
+            <div class="p-5">
+                <div class="flex items-center gap-3">
 
-                <p class="text-sm text-gray-500">
-                    Created
-                </p>
+                    @php
+                        $status = $purchaseRequest->status;
 
-                <p class="mt-1 font-semibold text-gray-900">
-                    {{ $purchaseRequest->created_at->format('d M Y') }}
-                </p>
+                    $statusClass = match ($status) {
+                        'completed' => 'bg-green-50 text-green-600',
+                        'active' => 'bg-green-50 text-green-600',
+                        'pending' => 'bg-amber-50 text-amber-600',
+                        default => 'bg-gray-100 text-gray-600',
+                    };
 
+                    $statusDot = match ($status) {
+                        'completed' => 'bg-green-500',
+                        'active' => 'bg-green-500',
+                        'pending' => 'bg-amber-500',
+                        default => 'bg-gray-400',
+                    };
+
+                        $statusLabel = match ($status) {
+                            'completed' => 'Completed',
+                            'pending' => 'Pending',
+                            'active' => 'Active',
+                            default => ucfirst($status),
+                        };
+                    @endphp
+
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600">
+                        <i class="bx bx-check-circle text-lg"></i>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-medium text-gray-500">
+                            Status
+                        </p>
+
+                        <span class="{{ $statusClass }} mt-1 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium">
+                            <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
+                            {{ $statusLabel }}
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+
+
+            {{-- Created --}}
+            <div class="p-5">
+                <div class="flex items-center gap-3">
+
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600">
+                        <i class="bx bx-calendar text-lg"></i>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-medium text-gray-500">
+                            Created
+                        </p>
+
+                        <p class="mt-0.5 text-sm font-semibold text-gray-900">
+                            {{ $purchaseRequest->created_at->format('d M Y') }}
+                        </p>
+
+                        <p class="text-xs text-gray-500">
+                            {{ $purchaseRequest->created_at->format('h:i A') }}
+                        </p>
+                    </div>
+
+                </div>
             </div>
 
         </div>
 
 
+        {{-- Notes --}}
         @if($purchaseRequest->notes)
+            <div class="border-t border-gray-200 px-5 py-4">
 
-            <div class="border-t border-gray-100 p-6">
+                <div class="flex items-start gap-3">
 
-                <p class="text-sm text-gray-500">
-                    Notes
-                </p>
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600">
+                        <i class="bx bx-note text-lg"></i>
+                    </div>
 
-                <p class="mt-2 whitespace-pre-line text-sm text-gray-900">
-                    {{ $purchaseRequest->notes }}
-                </p>
+                    <div>
+                        <p class="text-xs font-medium text-gray-500">
+                            Notes
+                        </p>
+
+                        <p class="mt-1 whitespace-pre-line text-sm leading-6 text-gray-700">
+                            {{ $purchaseRequest->notes }}
+                        </p>
+                    </div>
+
+                </div>
 
             </div>
-
         @endif
 
     </div>
 
 
-    {{-- Items --}}
-    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    {{-- Raw Materials --}}
+    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
 
-        <div class="border-b px-6 py-4 flex items-center justify-between">
+        <div class="flex flex-col gap-3 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
 
-            <h3 class="font-semibold text-gray-900">
-                Raw Materials
-            </h3>
-            @if($purchaseRequest->status=='active')
-            <div class="flex gap-2">
+            <div>
+                <h3 class="text-sm font-semibold text-gray-900">
+                    Raw Materials
+                </h3>
 
-                <a href="{{ route('quotations.create', $purchaseRequest) }}" class="flex gap-2  items-center rounded-lg bg-blue-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800">
-                    <svg  xmlns="http://www.w3.org/2000/svg" width="24" height="24"  
-                    fill="currentColor" viewBox="0 0 24 24" >
-                    <!--Boxicons v3.0.8 https://boxicons.com | License  https://docs.boxicons.com/free-->
-                    <path d="M20 7h-.69a3.05 3.05 0 0 0-.21-4.1c-1.16-1.16-3.19-1.16-4.35 0l-2.04 2.04C12.07 3.23 10.44 2 8.5 2 6.02 2 4 4.02 4 6.5c0 .17 0 .34.03.5H4c-.52 0-.95.4-1 .92l-.91 10.92a2.007 2.007 0 0 0 1.99 2.17h15.83a2.007 2.007 0 0 0 1.99-2.17l-.91-10.92c-.04-.52-.48-.92-1-.92Zm-3.84-2.68c.41-.41 1.12-.41 1.53 0 .2.2.32.47.32.76s-.11.56-.32.76L16.53 7h-3.05zM6 6.5a2.5 2.5 0 0 1 5 0c0 .14-.01.29-.05.46 0 .01-.01.03-.01.04H6.05C6.02 6.84 6 6.67 6 6.5M4.09 19l.83-10h14.16l.83 10z"></path><path d="M12 14c-1.65 0-3-1.35-3-3H7c0 2.76 2.24 5 5 5s5-2.24 5-5h-2c0 1.65-1.35 3-3 3"></path>
-                    </svg>
-                   <span>
-                       Request for Quote
-                </span>
-                </a>
+                <p class="mt-0.5 text-xs text-gray-500">
+                    {{ $purchaseRequest->items->count() }}
+                    {{ Str::plural('item', $purchaseRequest->items->count()) }}
+                    requested
+                </p>
             </div>
+
+            @if($purchaseRequest->status === 'active')
+                <a
+                    href="{{ route('quotations.create', $purchaseRequest) }}"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+                >
+                    <i class="bx bx-file text-lg"></i>
+                    Request for Quote
+                </a>
             @endif
+
         </div>
 
 
         <div class="overflow-x-auto">
 
-            <table class="w-full text-left text-sm">
+            <table class="w-full min-w-[700px] text-left text-sm">
 
-                <thead class="border-b bg-gray-50 text-xs uppercase text-gray-500">
+                <thead class="border-b border-gray-200 bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
 
                     <tr>
-
-                        <th class="px-6 py-4">
+                        <th class="px-5 py-3.5 font-medium">
                             #
                         </th>
 
-                        <th class="px-6 py-4">
+                        <th class="px-5 py-3.5 font-medium">
                             Raw Material
                         </th>
 
-                        <th class="px-6 py-4">
+                        <th class="px-5 py-3.5 font-medium">
                             SKU
                         </th>
 
-                        <th class="px-6 py-4">
+                        <th class="px-5 py-3.5 font-medium">
                             Quantity
                         </th>
 
-                        <th class="px-6 py-4">
+                        <th class="px-5 py-3.5 font-medium">
                             Unit
                         </th>
-
                     </tr>
 
                 </thead>
@@ -202,34 +258,88 @@
 
                 <tbody class="divide-y divide-gray-100">
 
-                    @foreach($purchaseRequest->items as $item)
+                    @forelse($purchaseRequest->items as $item)
 
-                        <tr>
+                        <tr class="transition hover:bg-gray-50">
 
-                            <td class="px-6 py-4 text-gray-500">
+                            <td class="px-5 py-4 text-gray-400">
                                 {{ $loop->iteration }}
                             </td>
 
-                            <td class="px-6 py-4 font-medium text-gray-900">
-                                {{ $item->rawMaterial->name }}
+                            <td class="px-5 py-4">
+
+                                <div class="flex items-center gap-3">
+
+                                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600">
+                                        <i class="bx bx-package text-lg"></i>
+                                    </div>
+
+                                    <div>
+                                        <p class="font-medium text-gray-900">
+                                            {{ $item->rawMaterial->name }}
+                                        </p>
+                                    </div>
+
+                                </div>
+
                             </td>
 
-                            <td class="px-6 py-4 text-gray-500">
-                                {{ $item->rawMaterial->sku ?? '-' }}
+                            <td class="px-5 py-4">
+
+                                @if($item->rawMaterial->sku)
+                                    <span class="inline-flex rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                                        {{ $item->rawMaterial->sku }}
+                                    </span>
+                                @else
+                                    <span class="text-gray-400">
+                                        —
+                                    </span>
+                                @endif
+
                             </td>
 
-                            <td class="px-6 py-4">
-                                {{ $item->qty }}
+                            <td class="px-5 py-4">
+
+                                <span class="font-medium text-gray-900">
+                                    {{ rtrim(rtrim(number_format($item->qty, 4, '.', ''), '0'), '.') }}
+                                </span>
+
                             </td>
 
-                            <td class="px-6 py-4">
-                                {{ $item->unit->name }}
-                                ({{ $item->unit->short_name }})
+                            <td class="px-5 py-4">
+
+                                <span class="inline-flex items-center gap-1.5 rounded-md bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700">
+                                    {{ $item->unit->name }}
+                                    <span class="text-gray-400">
+                                        ({{ $item->unit->short_name }})
+                                    </span>
+                                </span>
+
                             </td>
 
                         </tr>
 
-                    @endforeach
+                    @empty
+
+                        <tr>
+                            <td colspan="5" class="px-5 py-12 text-center">
+
+                                <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+                                    <i class="bx bx-package text-2xl"></i>
+                                </div>
+
+                                <h4 class="mt-3 text-sm font-semibold text-gray-900">
+                                    No raw materials
+                                </h4>
+
+                                <p class="mt-1 text-sm text-gray-500">
+                                    This purchase request does not contain any items.
+                                </p>
+
+                            </td>
+                        </tr>
+
+                    @endforelse
 
                 </tbody>
 

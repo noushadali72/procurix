@@ -7,6 +7,7 @@
 
     <link rel="icon" href="{{ asset('storage/favicon.png') }}" type="image/x-icon">
 
+    {{-- Browser title only --}}
     <title>{{ $title ?? config('app.name') }}</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -27,7 +28,7 @@
     >
 </head>
 
-<body class="min-h-screen bg-gray-50 text-gray-900">
+<body class="min-h-screen bg-gray-50 text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100">
 
     <div class="flex min-h-screen">
 
@@ -35,12 +36,19 @@
         <aside class="w-64 shrink-0 bg-gray-950 text-white">
 
             {{-- Logo --}}
-            <div class="flex h-16 items-center border-b border-gray-800 px-6">
-                <img
-                    src="{{ asset('storage/logo.png') }}"
-                    alt="{{ config('app.name') }}"
-                    class="max-h-[90px] max-w-[300px] object-fill"
+            <div class="flex h-16 items-center border-b border-gray-800 px-5">
+
+                <a
+                    href="{{ route('admin.dashboard') }}"
+                    class="flex h-full items-center"
                 >
+                    <img
+                        src="{{ asset('storage/logo.png') }}"
+                        alt="{{ config('app.name') }}"
+                        class="max-h-10 max-w-[180px] object-contain"
+                    >
+                </a>
+
             </div>
 
 
@@ -67,13 +75,12 @@
                 {{-- Inventory --}}
                 <div class="mb-6">
 
-                    <p class="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <p class="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                         Inventory
                     </p>
 
                     <div class="space-y-1">
 
-                        {{-- Products --}}
                         <a
                             href="{{ route('products.index') }}"
                             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
@@ -85,8 +92,6 @@
                             <span>Products</span>
                         </a>
 
-
-                        {{-- Raw Materials --}}
                         <a
                             href="{{ route('raw-materials.index') }}"
                             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
@@ -98,8 +103,6 @@
                             <span>Raw Materials</span>
                         </a>
 
-
-                        {{-- Units --}}
                         <a
                             href="{{ route('units.index') }}"
                             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
@@ -118,13 +121,12 @@
                 {{-- Procurement --}}
                 <div class="mb-6">
 
-                    <p class="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <p class="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                         Procurement
                     </p>
 
                     <div class="space-y-1">
 
-                        {{-- Vendors --}}
                         <a
                             href="{{ route('vendors.index') }}"
                             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
@@ -136,8 +138,6 @@
                             <span>Vendors</span>
                         </a>
 
-
-                        {{-- Purchase Requests --}}
                         <a
                             href="{{ route('purchase-requests.index') }}"
                             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
@@ -149,8 +149,6 @@
                             <span>Purchase Requests</span>
                         </a>
 
-
-                        {{-- Quotations --}}
                         <a
                             href="{{ route('quotations.index') }}"
                             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
@@ -162,8 +160,6 @@
                             <span>Quotations</span>
                         </a>
 
-
-                        {{-- Purchase Orders --}}
                         <a
                             href="{{ route('purchase-orders.index') }}"
                             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
@@ -175,8 +171,6 @@
                             <span>Purchase Orders</span>
                         </a>
 
-
-                        {{-- Goods Receipts --}}
                         <a
                             href="{{ route('goods-receipts.index') }}"
                             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
@@ -195,13 +189,12 @@
                 {{-- Manufacturing --}}
                 <div class="mb-6">
 
-                    <p class="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <p class="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                         Manufacturing
                     </p>
 
                     <div class="space-y-1">
 
-                        {{-- Manufacture Product --}}
                         <a
                             href="{{ route('manufacturing.index') }}"
                             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
@@ -213,8 +206,6 @@
                             <span>Manufacture Product</span>
                         </a>
 
-
-                        {{-- Manufacturing Records --}}
                         <a
                             href="{{ route('manufacturing.records') }}"
                             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
@@ -226,8 +217,6 @@
                             <span>Manufacturing Records</span>
                         </a>
 
-
-                        {{-- Manufacturing Formulas --}}
                         <a
                             href="{{ route('manufacturing-formulas.index') }}"
                             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
@@ -249,35 +238,55 @@
         {{-- Main Content --}}
         <div class="flex min-w-0 flex-1 flex-col">
 
-            {{-- Header --}}
-            <header class="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-5 sm:px-6">
+            {{-- Global Header --}}
+            <header class="flex h-16 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-5 sm:px-6 dark:border-gray-800 dark:bg-gray-900">
 
-                <div>
-                    <h1 class="text-lg font-semibold text-gray-900">
-                        {{ $title ?? 'Dashboard' }}
-                    </h1>
+                {{-- Application Context --}}
+                <div class="flex items-center gap-3">
+
+                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                        <i class="bx bx-layer text-lg"></i>
+                    </div>
+
+                    <div class="hidden sm:block">
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                            {{ config('app.name') }}
+                        </p>
+
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            Management System
+                        </p>
+                    </div>
+
                 </div>
 
 
                 @auth
+
+                    {{-- User Area --}}
                     <div class="flex items-center gap-3">
 
-                        {{-- User Information --}}
                         <div class="hidden text-right sm:block">
-                            <p class="text-sm font-semibold text-gray-900">
+
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">
                                 {{ Auth::user()->name }}
                             </p>
 
-                            <p class="text-xs text-gray-500">
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
                                 {{ Auth::user()->email }}
                             </p>
+
                         </div>
 
 
                         {{-- Avatar --}}
-                        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-900 text-sm font-semibold text-white">
+                        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-900 text-sm font-semibold text-white dark:bg-white dark:text-gray-900">
                             {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                         </div>
+
+
+                        {{-- Divider --}}
+                        <div class="hidden h-7 w-px bg-gray-200 sm:block dark:bg-gray-700"></div>
 
 
                         {{-- Logout --}}
@@ -289,17 +298,16 @@
 
                             <button
                                 type="submit"
-                                class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-500 transition hover:bg-gray-100 hover:text-gray-900"
+                                title="Logout"
+                                class="inline-flex cursor-pointer items-center justify-center rounded-lg border border-gray-200 p-2 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-gray-700 dark:text-gray-400 dark:hover:border-red-800 dark:hover:bg-red-900/20 dark:hover:text-red-400"
                             >
                                 <i class="bx bx-log-out text-lg"></i>
-
-                                <span class="hidden md:inline">
-                                    Logout
-                                </span>
                             </button>
+
                         </form>
 
                     </div>
+
                 @endauth
 
             </header>
@@ -329,22 +337,22 @@
 
             const colors = {
                 success: {
-                    wrapper: 'border-green-200 bg-green-50 text-green-700',
+                    wrapper: 'border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400',
                     icon: 'bx-check-circle'
                 },
 
                 error: {
-                    wrapper: 'border-red-200 bg-red-50 text-red-700',
+                    wrapper: 'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400',
                     icon: 'bx-error-circle'
                 },
 
                 warning: {
-                    wrapper: 'border-yellow-200 bg-yellow-50 text-yellow-700',
+                    wrapper: 'border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
                     icon: 'bx-error'
                 },
 
                 info: {
-                    wrapper: 'border-blue-200 bg-blue-50 text-blue-700',
+                    wrapper: 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
                     icon: 'bx-info-circle'
                 }
             };
@@ -359,7 +367,7 @@
 
                     <button
                         type="button"
-                        class="ml-2 text-lg opacity-60 hover:opacity-100"
+                        class="ml-2 text-lg opacity-60 transition hover:opacity-100"
                     >
                         &times;
                     </button>
@@ -388,4 +396,3 @@
 </body>
 
 </html>
-
