@@ -12,6 +12,7 @@
             </p>
         </div>
 
+        <div>
         <a
             href="{{ route('products.create') }}"
             class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
@@ -19,6 +20,15 @@
             <i class="bx bx-plus text-lg"></i>
             Add Product
         </a>
+
+          <a
+            href="{{ route('manufacturing.index') }}"
+            class="inline-flex items-center gap-2 rounded-lg bg-blue-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-800"
+        >
+            <i class="bx bx-plus text-lg"></i>
+            Manufacture Product
+        </a>
+        </div>
     </div>
 
 

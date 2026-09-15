@@ -30,8 +30,12 @@ class Product extends Model
     {
         return $this->belongsTo(Unit::class);
     }
-    public function manufacturingFormulas(): HasMany
+    public function manufacturingFormula()
     {
-        return $this->hasMany(ManufacturingFormula::class);
+        return $this->hasOne(ManufacturingFormula::class);
+    }
+    public function manufacturingRecords(): HasMany
+    {
+        return $this->hasMany(ManufacturingRecord::class);
     }
 }

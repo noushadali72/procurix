@@ -25,4 +25,9 @@ class ManufacturingFormula extends Model
     {
         return $this->hasMany(ManufacturingFormulaItem::class);
     }
+    
+    public function manufacturingRecords(): HasMany
+    {
+        return $this->hasMany(ManufacturingRecord::class);
+    }
 }

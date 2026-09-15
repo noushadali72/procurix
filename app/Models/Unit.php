@@ -43,4 +43,9 @@ class Unit extends Model
         return $this->hasMany(PurchaseRequestItem::class);
     }
 
+    public function manufacturingRecords()
+    {
+        return $this->hasMany(ManufacturingRecord::class);
+    }
+
 }
