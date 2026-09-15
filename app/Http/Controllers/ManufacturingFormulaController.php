@@ -29,16 +29,10 @@ class ManufacturingFormulaController extends Controller
     public function create()
     {
         $products = Product::orderBy('name')->get();
-        $rawMaterials = RawMaterial::with('unit.unitCategory')
-            ->orderBy('name')
-            ->get();
-        $units = Unit::with('unitCategory')
-            ->orderBy('name')
-            ->get();
-        return view(
-            'manufacturing_formulas.create',
-            compact('products', 'rawMaterials', 'units')
-        );
+        $rawMaterials = RawMaterial::with('unit.unitCategory')->orderBy('name')->get();
+        $units = Unit::with('unitCategory')->orderBy('name')->get();
+        
+        return view('manufacturing_formulas.create',compact('products', 'rawMaterials', 'units'));
     }
 
     public function store(StoreManufacturingFormulaRequest $request)

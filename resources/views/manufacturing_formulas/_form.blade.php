@@ -398,8 +398,6 @@ $(document).ready(function () {
             .find("option:selected")
             .data("category-id");
 
-        const selectedUnit = unitSelect.val();
-
         unitSelect.find("option").each(function () {
 
             const option = $(this);
@@ -412,11 +410,11 @@ $(document).ready(function () {
             const optionCategoryId = option.data("category-id");
 
             option.toggle(
-                categoryId && Number(optionCategoryId) === Number(categoryId)
+                categoryId &&
+                Number(optionCategoryId) === Number(categoryId)
             );
         });
 
-        // Clear selected unit if it doesn't belong to the category
         const selectedOption = unitSelect.find("option:selected");
 
         if (
@@ -428,33 +426,65 @@ $(document).ready(function () {
     }
 
 
-    // Set units when raw material changes
+    // Hide already selected raw materials
+    function updateRawMaterials() {
+
+        const selected = [];
+
+        $(".raw-material").each(function () {
+
+            const value = $(this).val();
+
+            if (value) {
+                selected.push(value);
+            }
+        });
+
+        $(".raw-material").each(function () {
+
+            const currentValue = $(this).val();
+
+            $(this).find("option").each(function () {
+
+                const option = $(this);
+
+                if (!option.val()) {
+                    return;
+                }
+
+                option.toggle(
+                    option.val() === currentValue ||
+                    !selected.includes(option.val())
+                );
+            });
+        });
+    }
+
+
+    // Raw material changed
     container.on("change", ".raw-material", function () {
 
         const item = $(this).closest(".formula-item");
 
         filterUnits(item);
 
-        // If no unit is selected, use raw material's own unit
+        // Select raw material's own unit by default
         if (!item.find(".unit-select").val()) {
 
-            const rawMaterialOption = $(this)
-                .find("option:selected");
+            const unitId = $(this)
+                .find("option:selected")
+                .data("unit-id");
 
-            const rawMaterialUnitId = rawMaterialOption.data("unit-id");
-
-            item.find(".unit-select")
-                .val(rawMaterialUnitId);
+            item.find(".unit-select").val(unitId);
         }
 
+        updateRawMaterials();
     });
 
 
-    // Filter units on existing items
+    // Filter existing items
     container.find(".formula-item").each(function () {
-
         filterUnits($(this));
-
     });
 
 
@@ -468,6 +498,8 @@ $(document).ready(function () {
         container.append(html);
 
         index++;
+
+        updateRawMaterials();
     });
 
 
@@ -484,8 +516,30 @@ $(document).ready(function () {
             return;
         }
 
-        $(this).closest(".formula-item").remove();
+        $(this)
+            .closest(".formula-item")
+            .remove();
+
+        updateRawMaterials();
     });
+
+
+    // Quantity: decimal numbers only
+    $(document).on("input", 'input[name*="[quantity]"]', function () {
+
+        this.value = this.value.replace(/[^0-9.]/g, "");
+
+        const parts = this.value.split(".");
+
+        if (parts.length > 2) {
+            this.value =
+                parts[0] + "." + parts.slice(1).join("");
+        }
+    });
+
+
+    // Initial filtering
+    updateRawMaterials();
 
 });
 </script>

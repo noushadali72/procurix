@@ -13,6 +13,8 @@ return new class extends Migration
             $table->foreignId('goods_receipt_id')->constrained('goods_receipts')->cascadeOnDelete();
             $table->foreignId('purchase_order_item_id')->constrained('purchase_order_items')->restrictOnDelete();
             $table->decimal('qty', 20, 3);
+            $table->decimal('remaining_qty', 20, 3);
+        
             $table->foreignId('unit_id')->constrained('units')->restrictOnDelete();
             $table->timestamps();
         });

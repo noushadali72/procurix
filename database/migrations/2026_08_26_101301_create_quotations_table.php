@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('quotations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_request_id')->constrained('purchase_requests')->cascadeOnDelete();
+            $table->foreignId('purchase_request_id')->constrained('purchase_requests')->restrictOnDelete();
             $table->foreignId('vendor_id')->constrained('vendors')->restrictOnDelete();
-            $table->integer('quotation_number')->nullable();
+            $table->string('quotation_number')->nullable();
             $table->enum('status',['pending','accepted']);
             $table->date('quotation_date');
             $table->date('valid_until')->nullable();

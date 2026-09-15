@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('goods_receipts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_order_id')->constrained('purchase_orders')->cascadeOnDelete();
+            $table->foreignId('purchase_order_id')->constrained('purchase_orders')->restrictOnDelete();
             $table->string('grn_number')->unique();
             $table->date('received_date');
             $table->text('notes')->nullable();

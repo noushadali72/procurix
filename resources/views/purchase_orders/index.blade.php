@@ -129,22 +129,14 @@
 
                                     </a>
 
-                                    <form action="{{ route('purchase-orders.destroy', $order) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Are you sure you want to delete this purchase order?');">
+                                   <button type="button"
+                                        class="delete-order inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                                        data-url="{{ route('purchase-orders.destroy', $order) }}">
 
-                                        @csrf
-                                        @method('DELETE')
+                                        <i class="bx bx-trash"></i>
+                                        Delete
 
-                                        <button type="submit"
-                                            class="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50">
-
-                                            <i class="bx bx-trash"></i>
-                                            Delete
-
-                                        </button>
-
-                                    </form>
+                                    </button>
 
                                 </div>
 
@@ -182,5 +174,52 @@
         @endif
 
     </div>
+
+    @push('scripts')
+        <script>
+                 $(document).on('click', '.delete-order', function () {
+
+            const button = $(this);
+            const url = button.data('url');
+
+            if (!confirm('Are you sure you want to delete this purchase order?')) {
+                return;
+            }
+
+            button.prop('disabled', true);
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    _method: 'DELETE'
+                },
+                success: function (response) {
+
+                    showToast(
+                        'success',
+                        response.message || 'Purchase order deleted successfully.'
+                    );
+
+                    button.closest('tr').fadeOut(300, function () {
+                        $(this).remove();
+                    });
+                },
+
+                error: function (xhr) {
+
+                    button.prop('disabled', false);
+
+                    showToast(
+                        'error',
+                        xhr.responseJSON?.message || 'Unable to delete purchase order.'
+                    );
+                }
+            });
+
+        });    
+        </script>   
+    @endpush
 
 </x-layouts.app>

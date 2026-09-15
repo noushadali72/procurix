@@ -296,13 +296,21 @@ class QuotationController extends Controller
      */
     public function destroy(Quotation $quotation)
     {
-        DB::transaction(function () use ($quotation) {
-            $quotation->items()->delete();
-            $quotation->delete();
-        });
+        try{
 
-        return response()->json([
-            'message' => 'Quotation deleted successfully.',
-        ]);
+            DB::transaction(function () use ($quotation) {
+                $quotation->items()->delete();
+                $quotation->delete();
+                });
+                
+                return response()->json([
+                    'message' => 'Quotation deleted successfully.',
+                    ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to delete quotation. May be associated with a purchase order.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

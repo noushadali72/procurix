@@ -459,6 +459,30 @@
 
     @push('scripts')
 
+        {{-- Item Input Validation --}}
+        <script>
+            // Cost price: whole numbers only (including 0)
+            $('.item-price').on('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+            // Qty: decimal numbers only
+            $('.item-qty').on('input', function() {
+
+                // Remove letters, negative sign and other symbols
+                this.value = this.value.replace(/[^0-9.]/g, '');
+
+                // Allow only one decimal point
+                const parts = this.value.split('.');
+
+                if (parts.length > 2) {
+                    this.value = parts[0] + '.' + parts.slice(1).join('');
+                }
+
+            });
+        </script>
+
+
     {{-- Add Vendor Script  --}}
     <script>
         $(document).ready(function() {
@@ -472,9 +496,7 @@
             // Close modal
             function closeVendorModal() {
                 $('#vendorModal').addClass('hidden');
-
                 $('#vendorForm')[0].reset();
-
                 $('.text-red-600').text('');
             }
 
@@ -487,9 +509,7 @@
 
             // Submit vendor
             $('#vendorForm').on('submit', function(e) {
-
                 e.preventDefault();
-
                 const $form = $(this);
                 const $button = $('#saveVendorBtn');
                 const originalText = $('#saveVendorBtnText').text();
@@ -581,83 +601,86 @@
         });
     </script>
 
-
     <script>
+    $(document).ready(function () {
 
-        $(document).ready(function () {
-            $('#quotationForm').on('submit', function (e) {
-                    e.preventDefault();
-                    clearErrors();
-                    const form =$(this);
-                    const button = $('#submitBtn');
-                    const buttonText = $('#submitBtnText');
-                    button.prop('disabled', true);
-                    buttonText.text('Saving...');s
-                    $.ajax({
-                        url:form.attr('action'),
-                        type:'POST',
-                        data:form.serialize(),
-                        headers: {
-                            'Accept':
-                                'application/json'
-                        },
-                        success: function (response) {
-                            showToast('success', response.message);
-                            setTimeout(function () {
-                                window.location.href =
-                                    "{{ route('quotations.index') }}";
-                            }, 800);
+        $('#quotationForm').on('submit', function (e) {
+            e.preventDefault();
 
-                        },
-                        error: function (xhr) {
-                            button.prop('disabled',false);
-                            buttonText.text('Save Quotation');
-                            if (xhr.status === 422) {
-                                showErrors(xhr.responseJSON.errors);
-                                return;
-                            }
-                            showToast('error', xhr.responseJSON?.message ?? 'Unable to create quotation.');
-                        }
+            const form = $(this);
+            const button = $('#submitBtn');
+            const buttonText = $('#submitBtnText');
 
-                    });
+            clearErrors();
 
-                }
-            );
+            button.prop('disabled', true);
+            buttonText.text('Saving...');
 
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: form.serialize(),
+                headers: {
+                    Accept: 'application/json'
+                },
 
-            function clearErrors() {
-                $('#vendorIdErr').text('');
-                $('#quotationNumberErr').text('');
-                $('#quotationDateErr').text('');
-                $('#validUntilErr').text('');
-                $('#statusErr').text('');
-                $('#notesErr').text('');
+                success: function (response) {
+                    showToast(
+                        'success',
+                        response.message || 'Quotation created successfully.'
+                    );
 
-            }
+                    setTimeout(function () {
+                        window.location.href = "{{ route('quotations.index') }}";
+                    }, 800);
+                },
 
-            function showErrors(errors) {
+                error: function (xhr) {
+                    button.prop('disabled', false);
+                    buttonText.text('Save Quotation');
 
-                    $('#vendorIdErr').text(errors.vendor_id[0]||"");
-                    $('#quotationNumberErr').text(errors.quotation_number[0]||"");
-                    $('#quotationDateErr').text(errors.quotation_date[0]||"");
-                    $('#validUntilErr').text(errors.valid_until[0]||"");
-                    $('#statusErr').text(errors.status[0]||"");
-                    $('#notesErr').text(errors.notes[0]||"");
-                    
-                    let itemErrorShown = false;
-                $.each(errors, function (key, messages) {
-                        if (!itemErrorShown &&(key === 'items' || key.startsWith('items.'))) {
-                            showToast('error', messages[0]);
-                            itemErrorShown = true;
-                        }
+                    if (xhr.status === 422) {
+                        showErrors(xhr.responseJSON?.errors || {});
+                        return;
                     }
-                );
 
-            }
-
+                    showToast(
+                        'error',
+                        xhr.responseJSON?.message || 'Unable to create quotation.'
+                    );
+                }
+            });
         });
 
-    </script>
+
+        function clearErrors() {
+            $('#vendorIdErr').text('');
+            $('#quotationNumberErr').text('');
+            $('#quotationDateErr').text('');
+            $('#validUntilErr').text('');
+            $('#statusErr').text('');
+            $('#notesErr').text('');
+        }
+
+
+        function showErrors(errors) {
+            $('#vendorIdErr').text(errors.vendor_id?.[0] || '');
+            $('#quotationNumberErr').text(errors.quotation_number?.[0] || '');
+            $('#quotationDateErr').text(errors.quotation_date?.[0] || '');
+            $('#validUntilErr').text(errors.valid_until?.[0] || '');
+            $('#statusErr').text(errors.status?.[0] || '');
+            $('#notesErr').text(errors.notes?.[0] || '');
+
+            $.each(errors, function (key, messages) {
+                if (key === 'items' || key.startsWith('items.')) {
+                    showToast('error', messages[0]);
+                    return false;
+                }
+            });
+        }
+
+    });
+</script>
 
     @endpush
 

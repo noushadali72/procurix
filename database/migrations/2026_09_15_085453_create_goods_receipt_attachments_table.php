@@ -10,13 +10,8 @@ return new class extends Migration
     {
         Schema::create('goods_receipt_attachments', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('goods_receipt_id')
-                ->constrained('goods_receipts')
-                ->cascadeOnDelete();
-
+            $table->foreignId('goods_receipt_id')->constrained('goods_receipts')->cascadeOnDelete();
             $table->string('file_path');
-
             $table->timestamps();
         });
     }

@@ -37,13 +37,8 @@ class PurchaseRequestController extends Controller
      */
     public function create()
     {
-        $rawMaterials = RawMaterial::with('unit.unitCategory')
-            ->orderBy('name')
-            ->get();
-
-        $units = Unit::with('unitCategory')
-            ->orderBy('name')
-            ->get();
+        $rawMaterials = RawMaterial::with('unit.unitCategory')->orderBy('name')->get();
+        $units = Unit::with('unitCategory')->orderBy('name')->get();
 
         return view(
             'purchase_requests.create',

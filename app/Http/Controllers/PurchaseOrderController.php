@@ -42,13 +42,13 @@ class PurchaseOrderController extends Controller
      */
     public function destroy(PurchaseOrder $purchaseOrder)
     {
-        $purchaseOrder->delete();
+        try{
 
-        return redirect()
-            ->route('purchase-orders.index')
-            ->with(
-                'success',
-                'Purchase order deleted successfully.'
-            );
+            $purchaseOrder->delete();
+            return response()->json(['message' => 'Purchase order deleted successfully.'], 200);
+
+        }catch(\Exception $e){
+            return response()->json(['message' => 'Unable to delete purchase order.'], 500);
+        }
     }
 }

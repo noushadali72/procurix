@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('purchase_orders', function (Blueprint $table) {
             $table->id();
             $table->string('order_number');
-            $table->foreignId('quotation_id')->nullable()->constrained('quotations')->nullOnDelete();
+            $table->foreignId('quotation_id')->nullable()->constrained('quotations')->restrictOnDelete();
             $table->foreignId('vendor_id')->constrained('vendors')->restrictOnDelete();
             $table->enum('status',['received','placed','partially_received','cancelled'])->default('placed');
             $table->date('order_date');

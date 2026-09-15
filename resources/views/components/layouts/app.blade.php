@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{{ asset('storage/favicon.png') }}" type="image/x-icon">
 
     <title>{{ $title ?? config('app.name') }}</title>
 
@@ -24,14 +25,14 @@
     <div class="flex min-h-screen">
 
         {{-- Sidebar --}}
-        <aside class="w-64 shrink-0 bg-gray-950 text-white">
+        <aside class="w-64 shrink-0 bg-gray-950 text-white pt-3">
 
             {{-- Logo --}}
             <div class="flex h-16 items-center border-b border-gray-800 px-6">
                 <img
                     src="{{ asset('storage/logo.png') }}"
                     alt="{{ config('app.name') }}"
-                    class="max-h-9 max-w-[150px] object-contain"
+                    class="max-h-[90px] max-w-[300px] object-fill"
                 >
             </div>
 

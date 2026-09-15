@@ -45,10 +45,17 @@ class GoodsReceiptController extends Controller
             'vendor',
             'items.rawMaterial.unit.unitCategory',
             'items.unit.unitCategory',
-            'items.goodsReceiptItems',
+            'items.goodsReceiptItems.unit',
         ]);
 
-        return view('goods_receipts.create', compact('purchaseOrder'));
+        $units = Unit::with('unitCategory')
+            ->orderBy('name')
+            ->get();
+
+        return view(
+            'goods_receipts.create',
+            compact('purchaseOrder', 'units')
+        );
     }
 
     public function store(
@@ -84,18 +91,22 @@ class GoodsReceiptController extends Controller
             ]);
 
             foreach ($validated['items'] as $item) {
+
                 $orderItem = $purchaseOrder->items()
                     ->with([
                         'rawMaterial.unit',
                         'unit',
+                        'goodsReceiptItems.unit',
                     ])
                     ->findOrFail($item['purchase_order_item_id']);
 
                 $unit = Unit::findOrFail($item['unit_id']);
 
-                $receivedQty = $orderItem->goodsReceiptItems()
-                    ->with('unit')
-                    ->get()
+                /*
+                 * Total quantity already received,
+                 * converted to the purchase order item's unit.
+                 */
+                $receivedQty = $orderItem->goodsReceiptItems
                     ->sum(function ($receiptItem) use ($conversion, $orderItem) {
                         return $conversion->convert(
                             (float) $receiptItem->qty,
@@ -104,26 +115,53 @@ class GoodsReceiptController extends Controller
                         );
                     });
 
+                /*
+                 * Current received quantity,
+                 * converted to the purchase order item's unit.
+                 */
                 $currentReceivedQty = $conversion->convert(
                     (float) $item['qty'],
                     $unit,
                     $orderItem->unit
                 );
 
-                $remainingQty = (float) $orderItem->qty - $receivedQty;
+                /*
+                 * Quantity remaining before this receipt.
+                 */
+                $remainingBeforeReceipt = max(
+                    0,
+                    (float) $orderItem->qty - $receivedQty
+                );
 
-                if ($currentReceivedQty > $remainingQty) {
+                /*
+                 * Prevent receiving more than the ordered quantity.
+                 */
+                if ($currentReceivedQty > $remainingBeforeReceipt) {
                     throw new \RuntimeException(
                         "Received quantity for {$orderItem->rawMaterial->name} cannot exceed the remaining quantity."
                     );
                 }
 
+                /*
+                 * Quantity remaining after this receipt.
+                 * Stored in the purchase order item's unit.
+                 */
+                $remainingAfterReceipt = max(
+                    0,
+                    $remainingBeforeReceipt - $currentReceivedQty
+                );
+
                 $goodsReceipt->items()->create([
                     'purchase_order_item_id' => $orderItem->id,
                     'qty' => $item['qty'],
+                    'remaining_qty' => $remainingAfterReceipt,
                     'unit_id' => $unit->id,
                 ]);
 
+                /*
+                 * Add received quantity to raw material stock.
+                 * Stock is always stored in the raw material's stock unit.
+                 */
                 $stockQty = $conversion->convert(
                     (float) $item['qty'],
                     $unit,
@@ -136,6 +174,9 @@ class GoodsReceiptController extends Controller
                 $rawMaterial->increment('stock', $stockQty);
             }
 
+            /*
+             * Store attachments.
+             */
             if ($request->hasFile('attachments')) {
                 foreach ($request->file('attachments') as $file) {
                     $path = $file->store(
@@ -149,7 +190,13 @@ class GoodsReceiptController extends Controller
                 }
             }
 
-            $this->updatePurchaseOrderStatus($purchaseOrder);
+            /*
+             * Update purchase order status.
+             */
+            $this->updatePurchaseOrderStatus(
+                $purchaseOrder,
+                $conversion
+            );
 
             return $goodsReceipt;
         });
@@ -166,79 +213,55 @@ class GoodsReceiptController extends Controller
         $goodsReceipt->load([
             'purchaseOrder.vendor',
             'purchaseOrder.items.rawMaterial',
+            'purchaseOrder.items.unit',
             'items.purchaseOrderItem.rawMaterial',
+            'items.purchaseOrderItem.unit',
             'items.unit',
             'attachments',
         ]);
 
-        return view('goods_receipts.show', compact('goodsReceipt'));
+        return view(
+            'goods_receipts.show',
+            compact('goodsReceipt')
+        );
     }
 
-    public function destroy(
-        GoodsReceipt $goodsReceipt,
-        UnitConversionService $conversion
-    ): JsonResponse {
-        DB::transaction(function () use ($goodsReceipt, $conversion) {
-
-            $goodsReceipt->load([
-                'purchaseOrder',
-                'items.purchaseOrderItem.rawMaterial.unit',
-                'items.unit',
-                'attachments',
-            ]);
-
-            $purchaseOrder = $goodsReceipt->purchaseOrder;
-
-            foreach ($goodsReceipt->items as $item) {
-                $orderItem = $item->purchaseOrderItem;
-
-                if (!$orderItem || !$orderItem->rawMaterial) {
-                    continue;
-                }
-
-                $stockQty = $conversion->convert(
-                    (float) $item->qty,
-                    $item->unit,
-                    $orderItem->rawMaterial->unit
-                );
-
-                $orderItem->rawMaterial->decrement(
-                    'stock',
-                    $stockQty
-                );
-            }
-
-            foreach ($goodsReceipt->attachments as $attachment) {
-                if (Storage::disk('public')->exists($attachment->file_path)) {
-                    Storage::disk('public')->delete($attachment->file_path);
-                }
-            }
+    public function destroy(GoodsReceipt $goodsReceipt): JsonResponse
+    {
+        try {
+            $attachments = $goodsReceipt->attachments;
 
             $goodsReceipt->delete();
 
-            $this->updatePurchaseOrderStatus($purchaseOrder);
-        });
+            foreach ($attachments as $attachment) {
+                Storage::disk('public')->delete($attachment->file_path);
+            }
 
-        return response()->json([
-            'message' => 'Goods receipt deleted successfully.',
-            'redirect' => route('purchase-orders.show', $goodsReceipt->purchase_order_id),
-        ]);
+            return response()->json([
+                'message' => 'Goods receipt deleted successfully.',
+                'redirect' => route('goods-receipts.index')
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Unable to delete goods receipt.',
+            ], 500);
+        }
     }
-
     public function destroyAttachment(
         GoodsReceiptAttachment $attachment
     ): JsonResponse {
-        $goodsReceipt = $attachment->goodsReceipt;
-
         if (Storage::disk('public')->exists($attachment->file_path)) {
             Storage::disk('public')->delete($attachment->file_path);
         }
+
+        $attachmentId = $attachment->id;
 
         $attachment->delete();
 
         return response()->json([
             'message' => 'Attachment deleted successfully.',
-            'id' => $attachment->id,
+            'id' => $attachmentId,
         ]);
     }
 
@@ -253,7 +276,8 @@ class GoodsReceiptController extends Controller
     }
 
     private function updatePurchaseOrderStatus(
-        PurchaseOrder $purchaseOrder
+        PurchaseOrder $purchaseOrder,
+        UnitConversionService $conversion
     ): void {
         $purchaseOrder->load([
             'items.unit',
@@ -265,9 +289,13 @@ class GoodsReceiptController extends Controller
 
         foreach ($purchaseOrder->items as $orderItem) {
 
+            /*
+             * Sum actual received quantities,
+             * converting everything to the PO item's unit.
+             */
             $receivedQty = $orderItem->goodsReceiptItems
-                ->sum(function ($receiptItem) use ($orderItem) {
-                    return app(UnitConversionService::class)->convert(
+                ->sum(function ($receiptItem) use ($orderItem, $conversion) {
+                    return $conversion->convert(
                         (float) $receiptItem->qty,
                         $receiptItem->unit,
                         $orderItem->unit

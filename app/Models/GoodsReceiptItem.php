@@ -11,8 +11,10 @@ class GoodsReceiptItem extends Model
         'goods_receipt_id',
         'purchase_order_item_id',
         'qty',
+        'remaining_qty',
         'unit_id',
     ];
+    
 
     public function goodsReceipt(): BelongsTo
     {
