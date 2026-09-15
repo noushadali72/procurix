@@ -195,9 +195,12 @@
                                     Received Quantity
                                 </label>
 
-                                <input type="number" id="qty_{{ $index }}"
+                                <input type="text" id="qty_{{ $index }}"
+                                    inputmode="numeric"
                                     name="items[{{ $index }}][qty]" value="{{ old("items.$index.qty") }}"
-                                    min="0.0001" step="any" placeholder="Enter received quantity" required
+
+                                    step="any"
+                                    placeholder="Enter received quantity" required
                                     class="received-qty w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
 
                                 <span class="mt-1 hidden text-sm text-red-600"

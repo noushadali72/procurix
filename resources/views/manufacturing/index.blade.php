@@ -553,6 +553,8 @@
                                 response.message ||
                                 'Product manufactured successfully.'
                             );
+                            $('#manufacturingForm')[0].reset();
+                            resetManufacturing();
 
                             setTimeout(function () {
                                 window.location.reload();

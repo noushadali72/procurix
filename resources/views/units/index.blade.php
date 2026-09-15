@@ -333,6 +333,16 @@
 
 
     @push('scripts')
+
+    <script>
+        $(document).on(
+                'input',
+                '#conversion_factor',
+                function () {
+                    this.value = this.value.replace(/\D/g, '');
+                }
+            );
+    </script>
         <script>
             $(function() {
 

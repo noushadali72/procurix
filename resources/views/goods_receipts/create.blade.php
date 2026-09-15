@@ -55,6 +55,20 @@
 
     @push('scripts')
         <script>
+
+            $('.received-qty').on('input', function() {
+
+                // Remove letters, negative sign and other symbols
+                this.value = this.value.replace(/[^0-9.]/g, '');
+
+                // Allow only one decimal point
+                const parts = this.value.split('.');
+
+                if (parts.length > 2) {
+                    this.value = parts[0] + '.' + parts.slice(1).join('');
+                }
+
+            });
             $(document).ready(function () {
 
                 $('#goods-receipt-form').on('submit', function (e) {

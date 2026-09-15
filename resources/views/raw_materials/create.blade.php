@@ -46,7 +46,6 @@
                 this.value = this.value.replace(/[^0-9]/g, '');
             });
 
-
             // Stock & minimum stock: positive decimal numbers only
             $('#stock, #minimum_stock').on('input', function() {
 
