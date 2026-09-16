@@ -1,5 +1,6 @@
 <x-layouts.app title="Manufacture Product">
 
+   
     <div class="space-y-6">
 
         {{-- Header --}}
@@ -59,7 +60,7 @@
                                 for="product_id"
                                 class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
                             >
-                                Product
+                                Product<sup>*</sup>
                             </label>
 
                             <select
@@ -68,9 +69,8 @@
                                 class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-500 focus:ring-1 focus:ring-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-gray-400 dark:focus:ring-gray-400"
                             >
                                 <option value="">Select product</option>
-
                                 @foreach($products as $product)
-                                    <option value="{{ $product->id }}">
+                                    <option value="{{ $product->id }}" {{ ($draft?->product_id == $product->id) ? 'selected' : '' }}>
                                         {{ $product->name }}
                                     </option>
                                 @endforeach
@@ -88,13 +88,14 @@
                                 for="quantity"
                                 class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
                             >
-                                Quantity
+                                Quantity<sup>*</sup>
                             </label>
 
                             <input
                                 type="text"
                                 id="quantity"
                                 name="quantity"
+                                value="{{ $draft?->quantity??'' }}"
                                 inputmode="decimal"
                                 placeholder="Enter quantity"
                                 disabled
@@ -113,7 +114,7 @@
                                 for="unit_id"
                                 class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
                             >
-                                Unit
+                                Unit<sup>*</sup>
                             </label>
 
                             <select
@@ -128,6 +129,7 @@
                                     <option
                                         value="{{ $unit->id }}"
                                         data-category-id="{{ $unit->unit_category_id }}"
+                                        {{ $draft?->unit_id==$unit->id?'selected':'' }}
                                     >
                                         {{ $unit->name }} ({{ $unit->short_name }})
                                     </option>
@@ -593,6 +595,41 @@
                         }
                     });
                 });
+
+
+                // Drafting/Autosaving
+
+                let autoSaveTimer;
+
+                function autoSave() {
+                   
+                    clearTimeout(autoSaveTimer);
+                    
+                    autoSaveTimer = setTimeout(function() {
+                        let data = $("#manufacturingForm").serialize();
+                        
+                        $.ajax({
+                            url: "{{ route('manufacturing.autosave') }}",
+                            type: "POST",
+                            data: data,
+                            headers: {
+                                'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                            },
+                            success: function(res) {
+                                console.log('Autosaved:', res);
+                            },
+                            error: function(xhr) {
+                                console.log('Autosave Error:', xhr.responseJSON);
+                            }
+                        });
+                    }, 500);
+                }
+
+                $(document).on('input change', '#manufacturingForm', autoSave);
+
+                if (productSelect.val()) {
+                    productSelect.trigger('change');
+                }
             });
         </script>
     @endpush

@@ -30,6 +30,7 @@
                         <th class="px-6 py-3">Quantity</th>
                         <th class="px-6 py-3">Unit</th>
                         <th class="px-6 py-3">Manufactured At</th>
+                        <th class="px-6 py-3">Status</th>
                     </tr>
                 </thead>
 
@@ -44,11 +45,12 @@
                             </td>
 
                             <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                                
                                 {{ $record->product->name }}
                             </td>
 
                             <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
-                                {{ $record->manufacturingFormula->name }}
+                                {{ $record->manufacturingFormula?->name }}
                             </td>
 
                             <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
@@ -60,7 +62,11 @@
                             </td>
 
                             <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
-                                {{ $record->manufactured_at->format('d M Y, h:i A') }}
+                                {{ $record->manufactured_at?->format('d M Y, h:i A') }}
+                            </td>
+
+                             <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
+                                {{ strtoupper($record->status) }}
                             </td>
 
                         </tr>

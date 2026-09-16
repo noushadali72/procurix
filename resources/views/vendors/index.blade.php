@@ -208,6 +208,7 @@
                                         data-company="{{ $vendor->company_name ?? '—' }}"
                                         data-contact="{{ $vendor->contact_person ?? '—' }}"
                                         data-email="{{ $vendor->email ?? '—' }}"
+                                        data-ntn="{{ $vendor->ntn??'-' }}"
                                         data-phone="{{ $vendor->phone ?? '—' }}"
                                         data-address="{{ $vendor->address ?? '—' }}"
                                         data-status="{{ $vendor->is_active ? 'Active' : 'Inactive' }}"
@@ -379,6 +380,14 @@
 
                 <div>
                     <p class="text-xs font-medium uppercase tracking-wide text-gray-400">
+                        ntn
+                    </p>
+                    <p id="modalVendorntn" class="mt-1 text-sm font-medium text-gray-900"></p>
+                </div>
+
+
+                <div>
+                    <p class="text-xs font-medium uppercase tracking-wide text-gray-400">
                         Status
                     </p>
                     <p id="modalVendorStatus" class="mt-1 text-sm font-medium text-gray-900"></p>
@@ -434,6 +443,7 @@
                 $('#modalVendorContact').text(button.data('contact'));
                 $('#modalVendorEmail').text(button.data('email'));
                 $('#modalVendorPhone').text(button.data('phone'));
+                $('#modalVendorntn').text(button.data('ntn'));
                 $('#modalVendorStatus').text(button.data('status'));
                 $('#modalVendorCreated').text(button.data('created'));
                 $('#modalVendorAddress').text(button.data('address'));

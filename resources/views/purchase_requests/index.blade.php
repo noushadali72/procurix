@@ -13,10 +13,8 @@
             </p>
         </div>
 
-        <a
-            href="{{ route('purchase-requests.create') }}"
-            class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
-        >
+        <a href="{{ route('purchase-requests.create') }}"
+            class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
             <i class="bx bx-plus text-lg"></i>
             Add Purchase Request
         </a>
@@ -28,7 +26,8 @@
     <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
 
         {{-- Card Header --}}
-        <div class="flex flex-col gap-1 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+            class="flex flex-col gap-1 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
 
             <div>
                 <h3 class="text-sm font-semibold text-gray-900">
@@ -86,7 +85,6 @@
                 <tbody class="divide-y divide-gray-100">
 
                     @forelse ($purchaseRequests as $purchaseRequest)
-
                         <tr class="transition hover:bg-gray-50">
 
                             {{-- Request --}}
@@ -94,7 +92,8 @@
 
                                 <div class="flex items-center gap-3">
 
-                                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
+                                    <div
+                                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
                                         <i class="bx bx-clipboard text-lg"></i>
                                     </div>
 
@@ -134,8 +133,7 @@
                                 @endphp
 
                                 <span
-                                    class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}"
-                                >
+                                    class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
                                     <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
 
                                     {{ ucfirst($status) }}
@@ -147,7 +145,8 @@
                             {{-- Items --}}
                             <td class="px-5 py-4">
 
-                                <span class="inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                                <span
+                                    class="inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
                                     <i class="bx bx-package"></i>
                                     {{ $purchaseRequest->items->count() }}
                                 </span>
@@ -159,20 +158,13 @@
                             <td class="max-w-xs px-5 py-4">
 
                                 @if ($purchaseRequest->notes)
-
-                                    <div
-                                        class="truncate text-sm text-gray-600"
-                                        title="{{ $purchaseRequest->notes }}"
-                                    >
+                                    <div class="truncate text-sm text-gray-600" title="{{ $purchaseRequest->notes }}">
                                         {{ $purchaseRequest->notes }}
                                     </div>
-
                                 @else
-
                                     <span class="text-gray-400">
                                         —
                                     </span>
-
                                 @endif
 
                             </td>
@@ -198,32 +190,26 @@
                                 <div class="flex items-center justify-end gap-2">
 
                                     {{-- View --}}
-                                    <a
-                                        href="{{ route('purchase-requests.show', $purchaseRequest) }}"
-                                        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
-                                    >
+                                    <a href="{{ route('purchase-requests.show', $purchaseRequest) }}"
+                                        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white">
                                         <i class="bx bx-show"></i>
                                         View
                                     </a>
 
 
                                     {{-- Edit --}}
-                                    <a
-                                        href="{{ route('purchase-requests.edit', $purchaseRequest) }}"
-                                        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
-                                    >
+                                    <a href="{{ route('purchase-requests.edit', $purchaseRequest) }}"
+                                        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white">
                                         <i class="bx bx-edit-alt"></i>
                                         Edit
                                     </a>
 
 
                                     {{-- Delete --}}
-                                    <button
-                                        type="button"
+                                    <button type="button"
                                         class="delete-btn inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-500 hover:text-white"
                                         data-url="{{ route('purchase-requests.destroy', $purchaseRequest) }}"
-                                        data-name="{{ $purchaseRequest->request_number }}"
-                                    >
+                                        data-name="{{ $purchaseRequest->request_number }}">
                                         <i class="bx bx-trash"></i>
                                         Delete
                                     </button>
@@ -242,7 +228,8 @@
 
                                 <div class="mx-auto flex max-w-sm flex-col items-center">
 
-                                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+                                    <div
+                                        class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400">
                                         <i class="bx bx-clipboard text-2xl"></i>
                                     </div>
 
@@ -254,10 +241,8 @@
                                         Create your first purchase request to get started.
                                     </p>
 
-                                    <a
-                                        href="{{ route('purchase-requests.create') }}"
-                                        class="mt-4 inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
-                                    >
+                                    <a href="{{ route('purchase-requests.create') }}"
+                                        class="mt-4 inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800">
                                         <i class="bx bx-plus"></i>
                                         Add Purchase Request
                                     </a>
@@ -267,7 +252,6 @@
                             </td>
 
                         </tr>
-
                     @endforelse
 
                 </tbody>
@@ -279,20 +263,17 @@
 
         {{-- Pagination --}}
         @if ($purchaseRequests->hasPages())
-
             <div class="border-t border-gray-200 px-5 py-4">
                 {{ $purchaseRequests->links() }}
             </div>
-
         @endif
 
     </div>
 
 
     @push('scripts')
-
         <script>
-            $(document).on('click', '.delete-btn', function () {
+            $(document).on('click', '.delete-btn', function() {
 
                 const button = $(this);
                 const url = button.data('url');
@@ -313,20 +294,20 @@
                         'Accept': 'application/json'
                     },
 
-                    success: function (response) {
+                    success: function(response) {
 
                         showToast(
                             'success',
                             response.message || 'Purchase request deleted successfully.'
                         );
 
-                        setTimeout(function () {
+                        setTimeout(function() {
                             window.location.reload();
                         }, 800);
 
                     },
 
-                    error: function (xhr) {
+                    error: function(xhr) {
 
                         button.prop('disabled', false);
 
@@ -341,7 +322,6 @@
 
             });
         </script>
-
     @endpush
 
 </x-layouts.app>

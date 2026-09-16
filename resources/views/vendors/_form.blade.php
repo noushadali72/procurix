@@ -7,7 +7,7 @@
             for="name"
             class="mb-1 block text-sm font-medium text-gray-700"
         >
-            Name
+            Name<sup>*</sup>
         </label>
 
         <input
@@ -109,6 +109,29 @@
         >
 
         <span id="phoneErr" class="mt-1 block text-sm text-red-600"></span>
+    </div>
+
+
+
+    {{-- ntn --}}
+    <div>
+        <label
+            for="ntn"
+            class="mb-1 block text-sm font-medium text-gray-700"
+        >
+            NTN
+        </label>
+
+        <input
+            type="text"
+            id="ntn"
+            name="ntn"
+            value="{{ old('ntn', $vendor->ntn ?? '') }}"
+            placeholder="Enter NTN of vendor"
+            class="w-full rounded-lg border-gray-300 px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500"
+        >
+
+        <span id="ntnErr" class="mt-1 block text-sm text-red-600"></span>
     </div>
 
 

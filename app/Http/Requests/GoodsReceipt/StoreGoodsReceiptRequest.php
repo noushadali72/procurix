@@ -80,13 +80,10 @@ class StoreGoodsReceiptRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-
             $purchaseOrder = $this->route('purchaseOrder');
-
             if (!$purchaseOrder) {
                 return;
             }
-
             foreach ($this->items ?? [] as $index => $item) {
 
                 if (
@@ -95,41 +92,30 @@ class StoreGoodsReceiptRequest extends FormRequest
                 ) {
                     continue;
                 }
-
                 $orderItem = PurchaseOrderItem::with([
                     'rawMaterial.unit',
                 ])->find($item['purchase_order_item_id']);
-
                 $unit = Unit::find($item['unit_id']);
 
                 if (!$orderItem || !$unit) {
                     continue;
                 }
-
-                
                 // Make sure the item belongs to this purchase order
-    
-
                 if ($orderItem->purchase_order_id != $purchaseOrder->id) {
-
                     $validator->errors()->add(
                         "items.$index.purchase_order_item_id",
                         'The selected item does not belong to this purchase order.'
                     );
-
                     continue;
                 }
 
                 //Make sure the receiving unit has the same category
-               
-
                 if (
                     $orderItem->rawMaterial &&
                     $orderItem->rawMaterial->unit &&
                     $orderItem->rawMaterial->unit->unit_category_id
                         !== $unit->unit_category_id
                 ) {
-
                     $validator->errors()->add(
                         "items.$index.unit_id",
                         'The selected unit must belong to the same category as the raw material unit.'

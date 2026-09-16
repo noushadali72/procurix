@@ -12,6 +12,7 @@ class Vendor extends Model
         'contact_person',
         'email',
         'phone',
+        'ntn',
         'address',
         'is_active',
     ];

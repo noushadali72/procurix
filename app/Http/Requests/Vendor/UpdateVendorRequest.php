@@ -52,6 +52,11 @@ class UpdateVendorRequest extends FormRequest
                 'string',
                 'max:50',
             ],
+             'ntn'=>[
+                'nullable',
+                'string',
+                'max:50'
+            ],
 
             'address' => [
                 'nullable',

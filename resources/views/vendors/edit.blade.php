@@ -61,6 +61,12 @@ $(document).on('input', '#phone', function () {
 
     this.value = value;
 });
+// ntn number input validation
+$(document).on('input', '#ntn', function () {
+        let value = this.value;
+        value = value.replace(/\D/g, '');
+        this.value = value;
+});
 
 function clearVendorErrors() {
     $("#nameErr").text("");

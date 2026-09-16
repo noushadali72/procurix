@@ -16,22 +16,13 @@ class DashboardController extends Controller
     public function dashboard()
         {
             $productsCount = Product::count();
-
             $rawMaterialCount = RawMaterial::count();
-
-            $quotationsCount = Quotation::whereIn('status', [
-                'active',
-                'pending',
-            ])->count();
-
+            $quotationsCount = Quotation::whereIn('status', ['active','pending',])->count();
             $purchaseOrdersCount = PurchaseOrder::count();
-
             $purchaseRequestsCount = PurchaseRequest::count();
-
             $manufacturingCount = ManufacturingRecord::count();
 
-            $lowStockMaterials = RawMaterial::with('unit')
-                ->whereColumn('stock', '<=', 'minimum_stock')
+            $lowStockMaterials = RawMaterial::with('unit')->whereColumn('stock', '<=', 'minimum_stock')
                 ->latest()
                 ->take(5)
                 ->get();
@@ -40,10 +31,7 @@ class DashboardController extends Controller
                 'product',
                 'manufacturingFormula',
                 'unit',
-            ])
-                ->latest('manufactured_at')
-                ->take(5)
-                ->get();
+            ])->latest('manufactured_at')->take(5)->get();
 
             return view('admin.dashboard', compact(
                 'productsCount',

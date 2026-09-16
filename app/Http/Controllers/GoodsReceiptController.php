@@ -58,11 +58,7 @@ class GoodsReceiptController extends Controller
         );
     }
 
-    public function store(
-        StoreGoodsReceiptRequest $request,
-        PurchaseOrder $purchaseOrder,
-        UnitConversionService $conversion
-    ): JsonResponse {
+    public function store(StoreGoodsReceiptRequest $request, PurchaseOrder $purchaseOrder,UnitConversionService $conversion): JsonResponse {
         if ($purchaseOrder->status === 'received') {
             return response()->json([
                 'message' => 'This purchase order has already been fully received.',
@@ -102,10 +98,6 @@ class GoodsReceiptController extends Controller
 
                 $unit = Unit::findOrFail($item['unit_id']);
 
-                /*
-                 * Total quantity already received,
-                 * converted to the purchase order item's unit.
-                 */
                 $receivedQty = $orderItem->goodsReceiptItems
                     ->sum(function ($receiptItem) use ($conversion, $orderItem) {
                         return $conversion->convert(
@@ -114,11 +106,6 @@ class GoodsReceiptController extends Controller
                             $orderItem->unit
                         );
                     });
-
-                /*
-                 * Current received quantity,
-                 * converted to the purchase order item's unit.
-                 */
                 $currentReceivedQty = $conversion->convert(
                     (float) $item['qty'],
                     $unit,
@@ -128,10 +115,7 @@ class GoodsReceiptController extends Controller
                 /*
                  * Quantity remaining before this receipt.
                  */
-                $remainingBeforeReceipt = max(
-                    0,
-                    (float) $orderItem->qty - $receivedQty
-                );
+                $remainingBeforeReceipt = max(0,(float) $orderItem->qty - $receivedQty);
 
                 /*
                  * Prevent receiving more than the ordered quantity.
@@ -146,10 +130,7 @@ class GoodsReceiptController extends Controller
                  * Quantity remaining after this receipt.
                  * Stored in the purchase order item's unit.
                  */
-                $remainingAfterReceipt = max(
-                    0,
-                    $remainingBeforeReceipt - $currentReceivedQty
-                );
+                $remainingAfterReceipt = max(0,$remainingBeforeReceipt - $currentReceivedQty);
 
                 $goodsReceipt->items()->create([
                     'purchase_order_item_id' => $orderItem->id,
@@ -167,10 +148,7 @@ class GoodsReceiptController extends Controller
                     $unit,
                     $orderItem->rawMaterial->unit
                 );
-
-                $rawMaterial = RawMaterial::lockForUpdate()
-                    ->findOrFail($orderItem->raw_material_id);
-
+                $rawMaterial = RawMaterial::lockForUpdate()->findOrFail($orderItem->raw_material_id);
                 $rawMaterial->increment('stock', $stockQty);
             }
 
@@ -183,7 +161,6 @@ class GoodsReceiptController extends Controller
                         'goods-receipts/' . $goodsReceipt->id,
                         'public'
                     );
-
                     $goodsReceipt->attachments()->create([
                         'file_path' => $path,
                     ]);
@@ -193,11 +170,7 @@ class GoodsReceiptController extends Controller
             /*
              * Update purchase order status.
              */
-            $this->updatePurchaseOrderStatus(
-                $purchaseOrder,
-                $conversion
-            );
-
+            $this->updatePurchaseOrderStatus($purchaseOrder, $conversion);
             return $goodsReceipt;
         });
 

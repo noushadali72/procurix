@@ -15,7 +15,7 @@ class VendorController extends Controller
      */
     public function index()
     {
-        $vendors = Vendor::latest()->paginate(15);
+        $vendors = Vendor::latest()->paginate(10);
         return view('vendors.index', compact('vendors'));
     }
 
@@ -42,6 +42,7 @@ class VendorController extends Controller
                 'company_name' => $validated['company_name'],
                 'email' => $validated['email'],
                 'phone' => $validated['phone'],
+                'NTN'=>$validated['NTN'],
                 'contact_person' => $validated['contact_person'],
                 'address' => $validated['address'] ?? null,
                 'is_active' => $validated['is_active'],

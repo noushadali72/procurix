@@ -30,7 +30,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('raw-materials', RawMaterialController::class)->except(['show']);
     Route::resource('manufacturing-formulas', ManufacturingFormulaController::class)->except(['show']);
-    Route::resource('invoices', InvoiceController::class)->except(['show']);
     Route::resource('units', UnitController::class);
 
     Route::get('/purchase-requests/raw-material/{rawMaterial}', [PurchaseRequestController::class, 'rawMaterial'])->name('purchase-requests.raw-material');
@@ -86,6 +85,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::post('/manufacturing/manufacture', [ManufacturingController::class, 'manufacture'])
         ->name('manufacturing.manufacture');
+
+    Route::post('manufacturing/autosave',[ManufacturingController::class,'autoSave'])->name('manufacturing.autosave');
 
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });

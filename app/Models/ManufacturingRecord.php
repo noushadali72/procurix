@@ -12,6 +12,7 @@ class ManufacturingRecord extends Model
         'manufacturing_formula_id',
         'quantity',
         'unit_id',
+        'status',
         'manufactured_at',
     ];
 
