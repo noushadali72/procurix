@@ -24,6 +24,7 @@ class StorePurchaseRequest extends FormRequest
                     'completed',
                     'pending',
                     'active',
+                    'draft'
                 ]),
             ],
 

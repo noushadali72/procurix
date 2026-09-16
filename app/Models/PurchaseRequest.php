@@ -14,14 +14,37 @@ class PurchaseRequest extends Model
         'due_date'
     ];
 
+   protected static function booted(){
+    static::creating(function($pr){
+        $pr->request_number = static::generateRequestNumber();
+    });
+   }
+
 
     public function items()
-    {
-        return $this->hasMany(PurchaseRequestItem::class);
-    }
+        {
+            return $this->hasMany(PurchaseRequestItem::class);
+        }
 
-      public function quotations()
-    {
-        return $this->hasMany(Quotation::class);
-    }
+    public function quotations()
+        {
+            return $this->hasMany(Quotation::class);
+        }
+
+     private static function generateRequestNumber(): string
+        {
+            do {
+
+                $requestNumber =
+                    'PR-' . strtoupper(Str::random(7));
+            } while (
+                PurchaseRequest::where(
+                    'request_number',
+                    $requestNumber
+                )->exists()
+            );
+
+
+            return $requestNumber;
+        }
 }

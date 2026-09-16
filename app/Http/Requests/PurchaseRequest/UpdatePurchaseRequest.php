@@ -23,6 +23,7 @@ class UpdatePurchaseRequest extends FormRequest
                     'completed',
                     'pending',
                     'active',
+                    'draft'
                 ]),
             ],
 

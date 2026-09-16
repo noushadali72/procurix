@@ -31,8 +31,16 @@ class RawMaterial extends Model
         return $this->hasMany(ManufacturingFormulaItem::class);
     }
 
-        public function purchaseRequestItems()
-        {
-            return $this->hasMany(PurchaseRequestItem::class);
+    public function purchaseRequestItems()
+    {
+        return $this->hasMany(PurchaseRequestItem::class);
+    }
+
+    public function hasPurchaseRequest(){
+        $pr = PurchaseRequest::where('status','draft')->where('raw_material_id',$this->id)->first();    
+        if($pr){
+            return true;
         }
+        return false;
+    }
 }

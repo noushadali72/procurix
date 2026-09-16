@@ -121,13 +121,14 @@
                                     $statusClass = match ($status) {
                                         'completed' => 'bg-green-50 text-green-600',
                                         'pending' => 'bg-amber-50 text-amber-600',
-                                        'active' => 'bg-gray-100 text-gray-700',
+                                        'active' => 'bg-blue-100 text-blue-700',
                                         default => 'bg-gray-100 text-gray-600',
                                     };
 
                                     $statusDot = match ($status) {
                                         'completed' => 'bg-green-500',
                                         'pending' => 'bg-amber-500',
+                                        'active'=>'bg-blue-500',
                                         default => 'bg-gray-400',
                                     };
                                 @endphp
