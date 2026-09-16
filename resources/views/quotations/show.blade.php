@@ -18,17 +18,7 @@
                         Quotation #{{ $quotation->quotation_number ?? $quotation->id }}
                     </h2>
 
-                    @if($quotation->status === 'accepted')
-                        <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
-                            <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-                            Accepted
-                        </span>
-                    @else
-                        <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
-                            <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-                            Pending
-                        </span>
-                    @endif
+                 
                 </div>
 
                 <p class="mt-1 text-sm text-gray-500">
@@ -65,8 +55,11 @@
                     </button>
                 </form>
 
+            @elseif($quotation->status==='expired')
+                 <span class="inline-flex items-center rounded-lg bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700">
+                    Quotation Expired
+                </span>
             @else
-
                 <span class="inline-flex items-center rounded-lg bg-green-50 px-4 py-2.5 text-sm font-medium text-green-700">
                     Quotation Accepted
                 </span>
@@ -160,11 +153,18 @@
                             <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
                             Accepted
                         </span>
+                    @elseif($quotation->status==='expired')
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700">
+                            <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                            Expired
+                        </span>
                     @else
-                        <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
+
+                          <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
                             <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
                             Pending
                         </span>
+
                     @endif
                 </div>
             </div>

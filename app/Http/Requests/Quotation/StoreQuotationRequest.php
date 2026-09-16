@@ -42,7 +42,7 @@ class StoreQuotationRequest extends FormRequest
 
             'status' => [
                 'required',
-                'in:pending,accepted',
+                'in:pending,accepted,expired',
             ],
 
             'quotation_date' => [

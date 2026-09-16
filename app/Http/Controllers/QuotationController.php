@@ -86,7 +86,7 @@ class QuotationController extends Controller
                 'quotation_number' => $validated['quotation_number'] ?? null,
                 'status' => $validated['status'],
                 'quotation_date' => $validated['quotation_date'],
-                'valid_until' => $validated['valid_until'] ?? null,
+                'valid_until' => $validated['valid_until'] ?? now()->addDays(3)->toDateString(),
                 'notes' => $validated['notes'] ?? null,
             ]);
 
@@ -224,6 +224,13 @@ class QuotationController extends Controller
             return back()->with(
                 'error',
                 'This quotation has already been accepted.'
+            );
+        }
+
+        if ($quotation->status === 'expired') {
+            return back()->with(
+                'error',
+                'This quotation has been Expired.'
             );
         }
 

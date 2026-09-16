@@ -110,6 +110,11 @@
                 <option value="accepted" {{ old('status', $quotation->status ?? '') === 'accepted' ? 'selected' : '' }}>
                     Accepted
                 </option>
+
+                 <option value="expired" {{ old('status', $quotation->status ?? '') === 'expired' ? 'selected' : '' }}>
+                    Expired
+                </option>
+
             </select>
 
             <span id="statusErr" class="mt-1.5 block text-xs text-red-600"></span>

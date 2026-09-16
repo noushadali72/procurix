@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('purchase_request_id')->constrained('purchase_requests')->restrictOnDelete();
             $table->foreignId('vendor_id')->constrained('vendors')->restrictOnDelete();
             $table->string('quotation_number')->nullable();
-            $table->enum('status',['pending','accepted']);
+            $table->enum('status',['pending','accepted','expired']);
             $table->date('quotation_date');
             $table->date('valid_until')->nullable();
             $table->text('notes')->nullable();

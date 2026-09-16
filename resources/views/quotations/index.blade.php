@@ -90,16 +90,19 @@
 
                             $statusClass = match ($status) {
                                 'accepted' => 'bg-green-50 text-green-600',
+                                'expired'=>'bg-red-50 text-red-600',
                                 default => 'bg-amber-50 text-amber-600',
                             };
 
                             $statusDot = match ($status) {
                                 'accepted' => 'bg-green-500',
+                                'expired'=>'bg-red-500',
                                 default => 'bg-amber-500',
                             };
 
                             $statusLabel = match ($status) {
                                 'accepted' => 'Accepted',
+                                'expired'=>'Expired',
                                 default => 'Pending',
                             };
                         @endphp

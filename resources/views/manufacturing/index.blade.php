@@ -43,6 +43,13 @@
                         <div>
                             <h2 class="text-base font-semibold text-gray-900 dark:text-white">
                                 Manufacturing Details
+                                @if($draft)
+                                    <span
+                                        class="px-2 py-1 rounded-md text-xs font-medium inline-flex items-center gap-1.5 bg-gray-50 text-slate-600 border border-slate-200 dark:text-gray-400 dark:bg-gray-400/10 dark:border-gray-400/20">
+                                        <span class="h-1.5 w-1.5 bg-slate-600 rounded-full dark:bg-neutral-400"></span>
+                                        Draft
+                                    </span>
+                                @endif
                             </h2>
                             <p class="text-xs text-gray-500 dark:text-gray-400">
                                 Choose the product, quantity and manufacturing unit.
@@ -314,7 +321,7 @@
                 }
 
                 productSelect.on('change', function () {
-                    resetManufacturing();
+                    // resetManufacturing();
 
                     const productId = $(this).val();
 
@@ -602,7 +609,7 @@
                 let autoSaveTimer;
 
                 function autoSave() {
-                   
+                   console.log('autosave')
                     clearTimeout(autoSaveTimer);
                     
                     autoSaveTimer = setTimeout(function() {
