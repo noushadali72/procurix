@@ -88,7 +88,6 @@
                 <tbody class="divide-y divide-gray-100">
 
                     @forelse($orders as $order)
-
                         @php
                             $statusClass = match ($order->status) {
                                 'received' => 'bg-green-50 text-green-700',
@@ -118,8 +117,7 @@
                                 <div class="flex items-center gap-3">
 
                                     <div
-                                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600"
-                                    >
+                                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600">
                                         <i class="bx bx-receipt text-lg"></i>
                                     </div>
 
@@ -168,8 +166,7 @@
                             <td class="px-6 py-4">
 
                                 <span
-                                    class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}"
-                                >
+                                    class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
                                     <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
 
                                     {{ $statusLabel }}
@@ -194,32 +191,23 @@
                             <td class="px-6 py-4">
 
                                 @if ($order->vendorBill)
-
                                     <span
-                                        class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700"
-                                    >
+                                        class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
                                         <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
                                         Generated
                                     </span>
-
                                 @elseif ($order->status === 'received')
-
                                     <span
-                                        class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700"
-                                    >
+                                        class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
                                         <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
                                         Not Generated
                                     </span>
-
                                 @else
-
                                     <span
-                                        class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500"
-                                    >
+                                        class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500">
                                         <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>
                                         Not Available
                                     </span>
-
                                 @endif
 
                             </td>
@@ -229,42 +217,33 @@
 
                                 <div class="flex items-center justify-end gap-2">
 
-                                    <a
-                                        href="{{ route('purchase-orders.show', $order) }}"
-                                        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
-                                    >
+                                    <a href="{{ route('purchase-orders.show', $order) }}"
+                                        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white">
                                         <i class="bx bx-show"></i>
                                         View
                                     </a>
 
                                     @if ($order->vendorBill)
-
-                                        <a
-                                            href="{{ route('vendor-bills.generatepdf', $order->vendorBill) }}"
+                                        <a href="{{ route('vendor-bills.generatepdf', $order->vendorBill) }}"
                                             target="_blank"
-                                            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
-                                        >
+                                            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white">
                                             <i class="bx bx-file"></i>
                                             Bill
                                         </a>
-
                                     @elseif ($order->status === 'received')
+                                        <button type="button"
+                                            class="generate-bill inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
+                                            data-url="{{ route('vendor-bills.generate', $order) }}">
 
-                                        <a
-                                            href="{{ route('vendor-bills.show', $order) }}"
-                                            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
-                                        >
                                             <i class="bx bx-receipt"></i>
                                             Generate Bill
-                                        </a>
 
+                                        </button>
                                     @endif
 
-                                    <button
-                                        type="button"
+                                    <button type="button"
                                         class="delete-order inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-500 hover:text-white"
-                                        data-url="{{ route('purchase-orders.destroy', $order) }}"
-                                    >
+                                        data-url="{{ route('purchase-orders.destroy', $order) }}">
                                         <i class="bx bx-trash"></i>
                                         Delete
                                     </button>
@@ -284,8 +263,7 @@
                                 <div class="flex flex-col items-center justify-center text-center">
 
                                     <div
-                                        class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400"
-                                    >
+                                        class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400">
                                         <i class="bx bx-receipt text-2xl"></i>
                                     </div>
 
@@ -302,7 +280,6 @@
                             </td>
 
                         </tr>
-
                     @endforelse
 
                 </tbody>
@@ -333,7 +310,6 @@
 
                 button.prop('disabled', true);
                 button.text('Deleting...');
-
                 $.ajax({
                     url: url,
                     type: 'POST',
@@ -341,34 +317,77 @@
                         _token: '{{ csrf_token() }}',
                         _method: 'DELETE'
                     },
-
                     success: function(response) {
-
                         showToast(
                             'success',
                             response.message || 'Purchase order deleted successfully.'
                         );
-
                         button.closest('tr').fadeOut(300, function() {
                             $(this).remove();
                         });
 
                     },
-
                     error: function(xhr) {
-
                         button.prop('disabled', false);
                         button.html(`
                             <i class="bx bx-trash"></i>
                             Delete
                         `);
-
                         showToast(
                             'error',
                             xhr.responseJSON?.message || 'Unable to delete purchase order.'
                         );
-
                     }
+                });
+
+            });
+
+            $(document).on('click', '.generate-bill', function() {
+                const button = $(this);
+                const url = button.data('url');
+                if (!confirm('Do you want to generate the vendor bill?')) {
+                    return;
+                }
+
+                button.prop('disabled', true);
+
+                button.html(`
+                    <i class="bx bx-loader-alt bx-spin"></i>
+                    Generating...
+                `);
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    success: function(response) {
+                        showToast(
+                            'success',
+                            response.message || 'Vendor bill generated successfully.'
+                        );
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 800);
+                    },
+
+                    error: function(xhr) {
+                        button.prop('disabled', false);
+                        button.html(`
+                            <i class="bx bx-receipt"></i>
+                            Generate Bill
+                        `);
+                        showToast(
+                            'error',
+                            xhr.responseJSON?.message ||
+                            'Unable to generate vendor bill.'
+                        );
+                    }
+
                 });
 
             });

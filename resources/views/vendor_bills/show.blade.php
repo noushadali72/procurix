@@ -78,7 +78,7 @@
                     class="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
                 >
                     <i class="bx bx-money"></i>
-                    Make Payment
+                    Record Payment
                 </button>
             @endif
 
@@ -683,9 +683,7 @@
         }
 
         $('#openPaymentModal').on('click', openPaymentModal);
-
         $('#closePaymentModal, #cancelPayment').on('click', closePaymentModal);
-
         $('#paymentModal').on('click', function (e) {
             if (e.target === this) {
                 closePaymentModal();
@@ -713,7 +711,7 @@
                 data: form.serialize(),
 
                 success: function (response) {
-                    showToast('green', response.message);
+                    showToast('success', response.message);
 
                     setTimeout(function () {
                         window.location.reload();
@@ -729,11 +727,11 @@
                         }
 
                         if (response.message) {
-                            showToast('red', response.message);
+                            showToast('error', response.message);
                         }
                     } else {
                         showToast(
-                            'red',
+                            'error',
                             xhr.responseJSON?.message || 'Something went wrong.'
                         );
                     }

@@ -48,6 +48,7 @@ class VendorBillController extends Controller
             return response()->json([
                 'message' => 'Vendor bill can only be generated for a received purchase order.'
             ], 422);
+
         }
 
         if ($purchaseOrder->vendorBill) {

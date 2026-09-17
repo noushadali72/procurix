@@ -53,34 +53,27 @@
         </div>
 
 
-            {{-- Header Actions --}}
+        {{-- Header Actions --}}
         <div class="flex items-center gap-2">
 
             @if (in_array($purchaseOrder->status, ['placed', 'partially_received']))
-                <a
-                    href="{{ route('goods-receipts.create', $purchaseOrder) }}"
-                    class="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
-                >
+                <a href="{{ route('goods-receipts.create', $purchaseOrder) }}"
+                    class="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
                     Receive Materials
                 </a>
             @endif
 
             @if ($purchaseOrder->vendorBill)
-                <a
-                    href="{{ route('vendor-bills.show', $purchaseOrder) }}"
-                    class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-                >
+                <a href="{{ route('vendor-bills.show', $purchaseOrder->vendorBill) }}"
+                    class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
                     <i class="bx bx-receipt mr-1.5"></i>
                     View Vendor Bill
                 </a>
             @elseif ($purchaseOrder->status === 'received')
-                <a
-                    href="{{ route('vendor-bills.show', $purchaseOrder) }}"
-                    class="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
-                >
-                    <i class="bx bx-receipt mr-1.5"></i>
-                    Generate Vendor Bill
-                </a>
+                <button type="button" id="generateBill" data-url="{{ route('vendor-bills.generate', $purchaseOrder) }}"
+                    class="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white cursor-pointer transition hover:bg-gray-800">
+                    Generate Bill
+                </button>
             @endif
 
         </div>
@@ -318,7 +311,7 @@
                             </td>
 
                             <td class="px-6 py-4 font-medium text-gray-900">
-                                {{ $item->goodsReceiptItems->sum('qty')  }}
+                                {{ $item->goodsReceiptItems->sum('qty') }}
                             </td>
 
                             <td class="px-6 py-4 text-gray-600">
@@ -433,7 +426,7 @@
                                 Items
                             </th>
 
-                             <th class="px-6 py-3.5">
+                            <th class="px-6 py-3.5">
                                 Received Qty
                             </th>
 
@@ -478,7 +471,7 @@
 
                                 </td>
 
-                                 <td class="px-6 py-4">
+                                <td class="px-6 py-4">
 
                                     <span
                                         class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
@@ -541,4 +534,54 @@
 
     </div>
 
+    @push('scripts')
+        <script>
+            $(document).ready(function() {
+
+                $('#generateBill').on('click', function() {
+                    const button = $(this);
+                    const url = button.data('url');
+                    if (!confirm('Do you want to generate the vendor bill?')) {
+                        return;
+                    }
+                    button
+                        .prop('disabled', true)
+                        .text('Generating...');
+
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        headers: {
+                            'Accept': 'application/json'
+                        },
+                        success: function(response) {
+                            showToast(
+                                'success',
+                                response.message
+                            );
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 800);
+                        },
+                        error: function(xhr) {
+                            button
+                                .prop('disabled', false)
+                                .text('Generate Bill');
+
+                            showToast(
+                                'error',
+                                xhr.responseJSON?.message ??
+                                'Unable to generate vendor bill.'
+                            );
+                        }
+                    });
+
+                });
+
+            });
+        </script>
+    @endpush
 </x-layouts.app>
