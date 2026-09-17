@@ -356,6 +356,19 @@
                         </div>
 
 
+
+                          {{-- NTN --}}
+                        <div>
+                            <label for="vendor_ntn" class="mb-1 block text-sm font-medium text-gray-700">
+                                NTN
+                            </label>
+
+                            <input type="text" id="vendor_ntn" name="ntn" placeholder="Enter NTN"
+                                class="w-full rounded-lg border-gray-300 px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
+
+                            <span id="vendorNtnErr" class="mt-1 block text-sm text-red-600"></span>
+                        </div>
+
                         {{-- Active --}}
                         <div>
                             <label
@@ -531,7 +544,8 @@
                                         company_name: '#vendorCompanyNameErr',
                                         contact_person: '#vendorContactPersonErr',
                                         email: '#vendorEmailErr',
-                                        phone: '#vendorPhoneErr',
+                                        phone: '#vendorPhoneErr',,
+                                        ntn:'#vendorNtnErr',
                                         is_active: '#vendorIsActiveErr',
                                         address: '#vendorAddressErr'
                                     };

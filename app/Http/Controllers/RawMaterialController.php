@@ -6,6 +6,7 @@ use App\Http\Requests\RawMaterial\StoreRawMaterialRequest;
 use App\Http\Requests\RawMaterial\UpdateRawMaterialRequest;
 use App\Models\RawMaterial;
 use App\Models\Unit;
+use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
@@ -16,7 +17,7 @@ class RawMaterialController extends Controller
      */
     public function index(): View
     {
-        $rawMaterials = RawMaterial::with('unit')
+        $rawMaterials = RawMaterial::with(['unit','category'])
             ->latest()
             ->paginate(10);
 
@@ -30,8 +31,9 @@ class RawMaterialController extends Controller
     public function create(): View
     {
         $units = Unit::orderBy('name')->get();
+        $categories = Category::orderBy('name')->get();
 
-        return view('raw_materials.create', compact('units'));
+        return view('raw_materials.create', compact('units','categories'));
     }
 
 
@@ -56,10 +58,12 @@ class RawMaterialController extends Controller
     public function edit(RawMaterial $rawMaterial): View
     {
         $units = Unit::orderBy('name')->get();
+        $categories = Category::orderBy('name')->get();
+        $rawMaterial->load(['category','unit']);
 
         return view(
             'raw_materials.edit',
-            compact('rawMaterial', 'units')
+            compact('rawMaterial', 'units','categories')
         );
     }
 

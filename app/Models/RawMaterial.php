@@ -14,6 +14,7 @@ class RawMaterial extends Model
         'cost_price',
         'stock',
         'unit_id',
+        'category_id',
         'minimum_stock',
         'description',
     ];
@@ -25,6 +26,9 @@ class RawMaterial extends Model
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
+    }
+    public function category(){
+        return $this->belongsTo(Category::class);
     }
     public function manufacturingFormulaItems(): HasMany
     {

@@ -7,6 +7,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ManufacturingController;
 use App\Http\Controllers\ManufacturingFormulaController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\QuotationController;
@@ -31,7 +32,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('raw-materials', RawMaterialController::class)->except(['show']);
     Route::resource('manufacturing-formulas', ManufacturingFormulaController::class)->except(['show']);
     Route::resource('units', UnitController::class);
-
+    Route::resource('categories',CategoryController::class);
     Route::get('/purchase-requests/raw-material/{rawMaterial}', [PurchaseRequestController::class, 'rawMaterial'])->name('purchase-requests.raw-material');
     Route::resource('purchase-requests', PurchaseRequestController::class);
 

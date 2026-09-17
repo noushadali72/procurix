@@ -1,14 +1,11 @@
-
 <x-layouts.app title="Purchase Order">
 
     {{-- Header --}}
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
         <div>
-            <a
-                href="{{ route('purchase-orders.index') }}"
-                class="inline-flex items-center text-sm font-medium text-gray-500 transition hover:text-gray-900"
-            >
+            <a href="{{ route('purchase-orders.index') }}"
+                class="inline-flex items-center text-sm font-medium text-gray-500 transition hover:text-gray-900">
                 <i class="bx bx-arrow-back mr-1.5"></i>
                 Back to Orders
             </a>
@@ -41,7 +38,8 @@
                         };
                     @endphp
 
-                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
+                    <span
+                        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
                         <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
                         {{ $statusLabel }}
                     </span>
@@ -56,34 +54,30 @@
 
 
         {{-- Header Action --}}
-        @if(in_array($purchaseOrder->status, ['placed', 'partially_received']))
-
-            <a
-                href="{{ route('goods-receipts.create', $purchaseOrder) }}"
-                class="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
-            >
+        @if (in_array($purchaseOrder->status, ['placed', 'partially_received']))
+            <a href="{{ route('goods-receipts.create', $purchaseOrder) }}"
+                class="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
                 Receive Materials
             </a>
-
         @endif
 
     </div>
 
 
     {{-- Flash Messages --}}
-    @if(session('success'))
+    @if (session('success'))
         <div class="mb-6 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
             {{ session('success') }}
         </div>
     @endif
 
-    @if(session('error'))
+    @if (session('error'))
         <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {{ session('error') }}
         </div>
     @endif
 
-    @if($errors->any())
+    @if ($errors->any())
         <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4">
 
             <p class="mb-2 text-sm font-medium text-red-700">
@@ -92,7 +86,7 @@
 
             <ul class="list-inside list-disc space-y-1 text-sm text-red-700">
 
-                @foreach($errors->all() as $error)
+                @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
 
@@ -175,7 +169,8 @@
 
                 <div class="mt-1.5">
 
-                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
+                    <span
+                        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
                         <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
                         {{ $statusLabel }}
                     </span>
@@ -197,8 +192,7 @@
 
 
             {{-- Notes --}}
-            @if($purchaseOrder->notes)
-
+            @if ($purchaseOrder->notes)
                 <div class="border-t border-gray-100 pt-5 sm:col-span-2 lg:col-span-3">
 
                     <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
@@ -210,7 +204,6 @@
                     </p>
 
                 </div>
-
             @endif
 
         </div>
@@ -257,6 +250,10 @@
                         </th>
 
                         <th class="px-6 py-3.5">
+                            Received
+                        </th>
+
+                        <th class="px-6 py-3.5">
                             Unit
                         </th>
 
@@ -276,7 +273,6 @@
                 <tbody class="divide-y divide-gray-100">
 
                     @forelse($purchaseOrder->items as $item)
-
                         <tr class="transition hover:bg-gray-50">
 
                             <td class="px-6 py-4">
@@ -285,18 +281,20 @@
                                     {{ $item->rawMaterial->name }}
                                 </p>
 
-                                @if($item->rawMaterial->sku)
-
+                                @if ($item->rawMaterial->sku)
                                     <p class="mt-0.5 text-xs text-gray-500">
                                         {{ $item->rawMaterial->sku }}
                                     </p>
-
                                 @endif
 
                             </td>
 
                             <td class="px-6 py-4 font-medium text-gray-900">
                                 {{ $item->qty }}
+                            </td>
+
+                            <td class="px-6 py-4 font-medium text-gray-900">
+                                {{ $item->goodsReceiptItems->sum('qty')  }}
                             </td>
 
                             <td class="px-6 py-4 text-gray-600">
@@ -320,7 +318,6 @@
                                 No order items found.
                             </td>
                         </tr>
-
                     @endforelse
 
                 </tbody>
@@ -330,10 +327,7 @@
 
                     <tr>
 
-                        <td
-                            colspan="4"
-                            class="px-6 py-4 text-right text-sm font-semibold text-gray-700"
-                        >
+                        <td colspan="4" class="px-6 py-4 text-right text-sm font-semibold text-gray-700">
                             Grand Total
                         </td>
 
@@ -357,9 +351,10 @@
 
 
     {{-- Goods Receipts --}}
-    <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div class="rounded-xl border border-gray-200 bg-white shadow-sm mb-8">
 
-        <div class="flex flex-col gap-3 border-b border-gray-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+            class="flex flex-col gap-3 border-b border-gray-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
 
             <div>
 
@@ -380,15 +375,11 @@
                     {{ $purchaseOrder->goodsReceipts->count() }} Receipts
                 </span>
 
-                @if(in_array($purchaseOrder->status, ['placed', 'partially_received']))
-
-                    <a
-                        href="{{ route('goods-receipts.create', $purchaseOrder) }}"
-                        class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-                    >
+                @if (in_array($purchaseOrder->status, ['placed', 'partially_received']))
+                    <a href="{{ route('goods-receipts.create', $purchaseOrder) }}"
+                        class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
                         New Receipt
                     </a>
-
                 @endif
 
             </div>
@@ -398,7 +389,7 @@
 
         <div class="overflow-x-auto">
 
-            @if($purchaseOrder->goodsReceipts->count())
+            @if ($purchaseOrder->goodsReceipts->count())
 
                 <table class="w-full min-w-[750px] text-left text-sm">
 
@@ -418,6 +409,10 @@
                                 Items
                             </th>
 
+                             <th class="px-6 py-3.5">
+                                Received Qty
+                            </th>
+
                             <th class="px-6 py-3.5">
                                 Notes
                             </th>
@@ -433,8 +428,7 @@
 
                     <tbody class="divide-y divide-gray-100">
 
-                        @foreach($purchaseOrder->goodsReceipts as $receipt)
-
+                        @foreach ($purchaseOrder->goodsReceipts as $receipt)
                             <tr class="transition hover:bg-gray-50">
 
                                 <td class="px-6 py-4">
@@ -453,30 +447,32 @@
 
                                 <td class="px-6 py-4">
 
-                                    <span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+                                    <span
+                                        class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
                                         {{ $receipt->items->count() }} Items
                                     </span>
 
                                 </td>
 
+                                 <td class="px-6 py-4">
+
+                                    <span
+                                        class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+                                        {{ $receipt->items->sum('qty') }}
+                                    </span>
+
+                                </td>
 
                                 <td class="max-w-xs px-6 py-4 text-gray-600">
 
-                                    @if($receipt->notes)
-
-                                        <span
-                                            class="block truncate"
-                                            title="{{ $receipt->notes }}"
-                                        >
+                                    @if ($receipt->notes)
+                                        <span class="block truncate" title="{{ $receipt->notes }}">
                                             {{ $receipt->notes }}
                                         </span>
-
                                     @else
-
                                         <span class="text-gray-400">
                                             -
                                         </span>
-
                                     @endif
 
                                 </td>
@@ -484,28 +480,24 @@
 
                                 <td class="px-6 py-4 text-right">
 
-                                    <a
-                                        href="{{ route('goods-receipts.show', $receipt) }}"
-                                        class="rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-gray-50 transition hover:bg-gray-800"
-                                    >
+                                    <a href="{{ route('goods-receipts.show', $receipt) }}"
+                                        class="rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-gray-50 transition hover:bg-gray-800">
                                         View
                                     </a>
 
                                 </td>
 
                             </tr>
-
                         @endforeach
 
                     </tbody>
 
                 </table>
-
             @else
-
                 <div class="flex flex-col items-center justify-center px-6 py-12 text-center">
 
-                    <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+                    <div
+                        class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400">
                         <i class="bx bx-package text-2xl"></i>
                     </div>
 

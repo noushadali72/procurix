@@ -6,13 +6,14 @@ use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Product;
 use App\Models\Unit;
+use App\Models\Category;
 use Exception;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('unit')
+        $products = Product::with(['unit','category'])
             ->latest()
             ->paginate(15);
         return view('products.index', compact('products'));
@@ -21,7 +22,8 @@ class ProductController extends Controller
     public function create()
     {
         $units = Unit::orderBy('name')->get();
-        return view('products.create', compact('units'));
+        $categories = Category::orderBy('name')->get();
+        return view('products.create', compact('units','categories'));
     }
 
     public function store(StoreProductRequest $request)
@@ -46,6 +48,7 @@ class ProductController extends Controller
             'stock' => $product->stock,
             'minimum_stock' => $product->minimum_stock,
             'unit_id' => $product->unit_id,
+            'category_id'=>$product->category_id,
             'description' => $product->description,
         ]);
     }
@@ -53,7 +56,9 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $units = Unit::orderBy('name')->get();
-        return view('products.edit', compact('product', 'units'));
+        $categories = Category::orderBy('name')->get();
+        $product->load(['category','unit']);
+        return view('products.edit', compact('product', 'units','categories'));
     }
 
     public function update(UpdateProductRequest $request, Product $product)

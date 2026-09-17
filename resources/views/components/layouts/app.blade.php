@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="icon" href="{{ asset('storage/favicon.png') }}" type="image/x-icon">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- Browser title only --}}
     <title>{{ $title ?? config('app.name') }}</title>
@@ -95,7 +96,17 @@
                         <i class="bx bx-cube text-[20px]"></i>
                         <span>Raw Materials</span>
                     </a>
-
+                    <a
+                        href="{{ route('categories.index') }}"
+                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
+                        {{ request()->routeIs('units.*')
+                            ? 'bg-gray-800 text-white'
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
+                    >
+                        <i class="bx bx-category text-[20px]"></i>
+                     
+                        <span>Categories</span>
+                    </a>
                     <a
                         href="{{ route('units.index') }}"
                         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
@@ -137,7 +148,7 @@
                             : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
                     >
                         <i class="bx bx-file text-[20px]"></i>
-                        <span>Purchase Requests</span>
+                        <span>Purchase Requests <b>(RFQ)</b></span>
                     </a>
 
                     <a

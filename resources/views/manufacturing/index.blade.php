@@ -1,6 +1,6 @@
 <x-layouts.app title="Manufacture Product">
 
-   
+
     <div class="space-y-6">
 
         {{-- Header --}}
@@ -14,36 +14,30 @@
                 </p>
             </div>
 
-            <a
-                href="{{ route('manufacturing.records') }}"
-                class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white dark:border-gray-600 dark:text-gray-200 dark:hover:border-gray-400 dark:hover:bg-gray-700"
-            >
+            <a href="{{ route('manufacturing.records') }}"
+                class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white dark:border-gray-600 dark:text-gray-200 dark:hover:border-gray-400 dark:hover:bg-gray-700">
                 <i class="bx bx-history text-lg"></i>
                 Manufacturing Records
             </a>
         </div>
 
         {{-- Manufacturing Details --}}
-        <form
-            id="manufacturingForm"
-            action="{{ route('manufacturing.manufacture') }}"
-            method="POST"
-            class="space-y-6"
-        >
+        <form id="manufacturingForm" action="{{ route('manufacturing.manufacture') }}" method="POST" class="space-y-6">
             @csrf
 
             <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
 
                 <div class="border-b border-gray-200 px-5 py-4 dark:border-gray-700">
                     <div class="flex items-center gap-3">
-                        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                        <div
+                            class="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
                             <i class="bx bx-cog text-lg"></i>
                         </div>
 
                         <div>
                             <h2 class="text-base font-semibold text-gray-900 dark:text-white">
                                 Manufacturing Details
-                                @if($draft)
+                                @if ($draft)
                                     <span
                                         class="px-2 py-1 rounded-md text-xs font-medium inline-flex items-center gap-1.5 bg-gray-50 text-slate-600 border border-slate-200 dark:text-gray-400 dark:bg-gray-400/10 dark:border-gray-400/20">
                                         <span class="h-1.5 w-1.5 bg-slate-600 rounded-full dark:bg-neutral-400"></span>
@@ -63,99 +57,66 @@
 
                         {{-- Product --}}
                         <div>
-                            <label
-                                for="product_id"
-                                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                            >
+                            <label for="product_id"
+                                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Product<sup>*</sup>
                             </label>
 
-                            <select
-                                id="product_id"
-                                name="product_id"
-                                class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-500 focus:ring-1 focus:ring-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-gray-400 dark:focus:ring-gray-400"
-                            >
+                            <select id="product_id" name="product_id"
+                                class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-500 focus:ring-1 focus:ring-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-gray-400 dark:focus:ring-gray-400">
                                 <option value="">Select product</option>
-                                @foreach($products as $product)
-                                    <option value="{{ $product->id }}" {{ ($draft?->product_id == $product->id) ? 'selected' : '' }}>
+                                @foreach ($products as $product)
+                                    <option value="{{ $product->id }}"
+                                        {{ $draft?->product_id == $product->id ? 'selected' : '' }}>
                                         {{ $product->name }}
                                     </option>
                                 @endforeach
                             </select>
 
-                            <span
-                                id="product_idErr"
-                                class="mt-1 block text-sm text-red-500"
-                            ></span>
+                            <span id="product_idErr" class="mt-1 block text-sm text-red-500"></span>
                         </div>
 
                         {{-- Quantity --}}
                         <div>
-                            <label
-                                for="quantity"
-                                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                            >
+                            <label for="quantity"
+                                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Quantity<sup>*</sup>
                             </label>
 
-                            <input
-                                type="text"
-                                id="quantity"
-                                name="quantity"
-                                value="{{ $draft?->quantity??'' }}"
-                                inputmode="decimal"
-                                placeholder="Enter quantity"
-                                disabled
-                                class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-500 focus:ring-1 focus:ring-gray-500 disabled:cursor-not-allowed disabled:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-gray-400 dark:focus:ring-gray-400 dark:disabled:bg-gray-800"
-                            >
+                            <input type="text" id="quantity" name="quantity" value="{{ $draft?->quantity ?? '' }}"
+                                inputmode="decimal" placeholder="Enter quantity" disabled
+                                class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-500 focus:ring-1 focus:ring-gray-500 disabled:cursor-not-allowed disabled:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-gray-400 dark:focus:ring-gray-400 dark:disabled:bg-gray-800">
 
-                            <span
-                                id="quantityErr"
-                                class="mt-1 block text-sm text-red-500"
-                            ></span>
+                            <span id="quantityErr" class="mt-1 block text-sm text-red-500"></span>
                         </div>
 
                         {{-- Unit --}}
                         <div>
-                            <label
-                                for="unit_id"
-                                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                            >
+                            <label for="unit_id"
+                                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Unit<sup>*</sup>
                             </label>
 
-                            <select
-                                id="unit_id"
-                                name="unit_id"
-                                disabled
-                                class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-500 focus:ring-1 focus:ring-gray-500 disabled:cursor-not-allowed disabled:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-gray-400 dark:focus:ring-gray-400 dark:disabled:bg-gray-800"
-                            >
+                            <select id="unit_id" name="unit_id" disabled
+                                class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-500 focus:ring-1 focus:ring-gray-500 disabled:cursor-not-allowed disabled:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-gray-400 dark:focus:ring-gray-400 dark:disabled:bg-gray-800">
                                 <option value="">Select unit</option>
 
-                                @foreach($units as $unit)
-                                    <option
-                                        value="{{ $unit->id }}"
-                                        data-category-id="{{ $unit->unit_category_id }}"
-                                        {{ $draft?->unit_id==$unit->id?'selected':'' }}
-                                    >
+                                @foreach ($units as $unit)
+                                    <option value="{{ $unit->id }}" data-category-id="{{ $unit->unit_category_id }}"
+                                        {{ $draft?->unit_id == $unit->id ? 'selected' : '' }}>
                                         {{ $unit->name }} ({{ $unit->short_name }})
                                     </option>
                                 @endforeach
                             </select>
 
-                            <span
-                                id="unit_idErr"
-                                class="mt-1 block text-sm text-red-500"
-                            ></span>
+                            <span id="unit_idErr" class="mt-1 block text-sm text-red-500"></span>
                         </div>
 
                     </div>
 
                     {{-- No Formula --}}
-                    <div
-                        id="noFormula"
-                        class="mt-5 hidden rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
-                    >
+                    <div id="noFormula"
+                        class="mt-5 hidden rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div class="flex items-start gap-3">
                                 <i class="bx bx-error-circle mt-0.5 text-xl text-amber-600 dark:text-amber-400"></i>
@@ -170,11 +131,8 @@
                                 </div>
                             </div>
 
-                            <a
-                                id="createFormulaBtn"
-                                href="{{ route('manufacturing-formulas.create') }}"
-                                class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-600 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-amber-700"
-                            >
+                            <a id="createFormulaBtn" href="{{ route('manufacturing-formulas.create') }}"
+                                class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-600 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-amber-700">
                                 <i class="bx bx-plus"></i>
                                 Create Formula
                             </a>
@@ -184,10 +142,8 @@
             </div>
 
             {{-- Required Materials --}}
-            <div
-                id="materialsSection"
-                class="hidden overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900"
-            >
+            <div id="materialsSection"
+                class="hidden overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
                 <div class="border-b border-gray-200 px-5 py-4 dark:border-gray-700">
                     <div class="flex items-center justify-between gap-4">
                         <div>
@@ -214,26 +170,28 @@
                             </tr>
                         </thead>
 
-                        <tbody
-                            id="materialsBody"
-                            class="divide-y divide-gray-100 dark:divide-gray-700"
-                        ></tbody>
+                        <tbody id="materialsBody" class="divide-y divide-gray-100 dark:divide-gray-700"></tbody>
                     </table>
                 </div>
 
-                <div class="flex justify-end border-t border-gray-200 px-5 py-4 dark:border-gray-700">
-                    <button
-                        type="submit"
-                        id="manufactureBtn"
-                        disabled
-                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
-                    >
-                        <i class="bx bx-cog text-lg"></i>
+                <div class="flex justify-end border-t border-gray-200 px-5 py-4 dark:border-gray-700 gap-3">
 
+                    {{-- Replenish --}}
+                    <a href="{{ route('purchase-requests.create') }}" id="replenishBtn"
+                        class="hidden items-center justify-center gap-2 rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-700">
+                        <i class="bx bx-package text-lg"></i>
+                        Replenish Materials
+                    </a>
+
+                    {{-- Manufacture --}}
+                    <button type="submit" id="manufactureBtn" disabled
+                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100">
+                        <i class="bx bx-cog text-lg"></i>
                         <span id="manufactureBtnText">
                             Manufacture Product
                         </span>
                     </button>
+
                 </div>
             </div>
 
@@ -242,7 +200,7 @@
 
     @push('scripts')
         <script>
-            $(document).ready(function () {
+            $(document).ready(function() {
                 const products = @json($products);
                 const units = @json($units);
 
@@ -255,6 +213,7 @@
                 const materialsBody = $('#materialsBody');
                 const manufactureBtn = $('#manufactureBtn');
                 const manufactureBtnText = $('#manufactureBtnText');
+                const replenishBtn = $('#replenishBtn');
 
                 let selectedProduct = null;
 
@@ -277,7 +236,7 @@
                 }
 
                 function filterUnits(categoryId) {
-                    unitSelect.find('option').each(function () {
+                    unitSelect.find('option').each(function() {
                         const option = $(this);
 
                         if (!option.val()) {
@@ -320,7 +279,7 @@
                     return selectedProduct?.unit ?? null;
                 }
 
-                productSelect.on('change', function () {
+                productSelect.on('change', function() {
                     // resetManufacturing();
 
                     const productId = $(this).val();
@@ -363,7 +322,7 @@
                     calculateMaterials();
                 });
 
-                quantityInput.on('input', function () {
+                quantityInput.on('input', function() {
                     let value = this.value.replace(/[^0-9.]/g, '');
                     const parts = value.split('.');
 
@@ -381,6 +340,7 @@
                 function calculateMaterials() {
                     materialsBody.empty();
                     manufactureBtn.prop('disabled', true);
+                    replenishBtn.addClass('hidden').removeClass('inline-flex');
 
                     if (!selectedProduct) {
                         materialsSection.addClass('hidden');
@@ -413,7 +373,7 @@
                     let allAvailable = true;
                     const productUnit = getProductUnit();
 
-                    formula.items.forEach(function (item) {
+                    formula.items.forEach(function(item) {
                         const rawMaterial = item.raw_material;
                         const formulaUnit = item.unit;
 
@@ -512,9 +472,13 @@
 
                     materialsSection.removeClass('hidden');
                     manufactureBtn.prop('disabled', !allAvailable);
+                    
+                    if (!allAvailable) {
+                        replenishBtn.removeClass('hidden').addClass('inline-flex');
+                    }
                 }
 
-                $('#manufacturingForm').on('submit', function (e) {
+                $('#manufacturingForm').on('submit', function(e) {
                     e.preventDefault();
 
                     clearErrors();
@@ -556,7 +520,7 @@
                         headers: {
                             Accept: 'application/json'
                         },
-                        success: function (response) {
+                        success: function(response) {
                             showToast(
                                 'success',
                                 response.message ||
@@ -565,11 +529,11 @@
                             $('#manufacturingForm')[0].reset();
                             resetManufacturing();
 
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 window.location.reload();
                             }, 800);
                         },
-                        error: function (xhr) {
+                        error: function(xhr) {
                             manufactureBtn.prop('disabled', false);
                             manufactureBtnText.text('Manufacture Product');
 
@@ -577,7 +541,7 @@
                                 const errors =
                                     xhr.responseJSON?.errors || {};
 
-                                Object.keys(errors).forEach(function (field) {
+                                Object.keys(errors).forEach(function(field) {
                                     const message = errors[field]?.[0];
 
                                     if ($('#' + field + 'Err').length) {
@@ -609,12 +573,12 @@
                 let autoSaveTimer;
 
                 function autoSave() {
-                   console.log('autosave')
+                    console.log('autosave')
                     clearTimeout(autoSaveTimer);
-                    
+
                     autoSaveTimer = setTimeout(function() {
                         let data = $("#manufacturingForm").serialize();
-                        
+
                         $.ajax({
                             url: "{{ route('manufacturing.autosave') }}",
                             type: "POST",

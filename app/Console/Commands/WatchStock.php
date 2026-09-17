@@ -24,7 +24,7 @@ class WatchStock extends Command
        
         foreach ($raw_materials as $material) {
             try {
-                $exists = PurchaseRequest::where('status','draft')->whereHas('items',function($query) use($material){
+                $exists = PurchaseRequest::whereIn('status',['draft','pending','active'])->whereHas('items',function($query) use($material){
                     $query->where('raw_material_id',$material->id);
                 })->exists();
                 if($exists){

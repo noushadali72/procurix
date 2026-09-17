@@ -42,14 +42,14 @@ class VendorController extends Controller
                 'company_name' => $validated['company_name'],
                 'email' => $validated['email'],
                 'phone' => $validated['phone'],
-                'NTN'=>$validated['NTN'],
+                'ntn'=>$validated['ntn'],
                 'contact_person' => $validated['contact_person'],
                 'address' => $validated['address'] ?? null,
                 'is_active' => $validated['is_active'],
             ]);
             return response()->json(['message' => 'Vendor created successfully.'], 201);
         }catch(\Exception $e){
-            return response()->json(['message' => 'Unable to create vendor.'], 500);
+            return response()->json(['success'=>false,'message' => 'Unable to create vendor.', 'error'=>$e->getMessage()], 500);
         }
 
     }

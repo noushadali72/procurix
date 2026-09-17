@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('cost_price',20,2);
             $table->decimal('stock',15,3)->default(0);
             $table->foreignId('unit_id')->constrained('units')->restrictOnDelete();
+            $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
             $table->decimal('minimum_stock',15,3)->default(5);
             $table->text('description')->nullable();
             $table->timestamps();

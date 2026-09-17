@@ -64,6 +64,44 @@
         <span id="unitIdErr" class="mt-1.5 block text-xs text-red-600"></span>
     </div>
 
+    {{-- Category --}}
+    <div>
+        <div class="mb-1.5 flex items-center justify-between">
+            <label for="category_id" class="block text-sm font-medium text-gray-700">
+                Category
+            </label>
+
+            <button
+                type="button"
+                id="openCategoryModal"
+                class="inline-flex cursor-pointer items-center gap-1 text-xs font-medium text-gray-700 transition hover:text-gray-900"
+            >
+                <i class="bx bx-plus"></i>
+                Add Category
+            </button>
+        </div>
+
+        <select
+            id="category_id"
+            name="category_id"
+            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
+        >
+            <option value="">Select Category</option>
+
+            @foreach ($categories as $category)
+                <option
+                    value="{{ $category->id }}"
+                    @selected(old('category_id', $product->category_id ?? '') == $category->id)
+                >
+                    {{ $category->name }}
+                </option>
+            @endforeach
+        </select>
+
+        <span id="categoryIdErr" class="mt-1.5 block text-xs text-red-600"></span>
+    </div>
+
+
 
     {{-- Cost Price --}}
     <div>

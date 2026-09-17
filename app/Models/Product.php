@@ -12,6 +12,7 @@ class Product extends Model
         'name',
         'sku',
         'unit_id',
+        'category_id',
         'cost_price',
         'sale_price',
         'stock',
@@ -30,6 +31,10 @@ class Product extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+    
+    public function category(){
+        return $this->belongsTo(Category::class);
+    }
     public function manufacturingFormula()
     {
         return $this->hasOne(ManufacturingFormula::class);
@@ -38,4 +43,5 @@ class Product extends Model
     {
         return $this->hasMany(ManufacturingRecord::class);
     }
+  
 }

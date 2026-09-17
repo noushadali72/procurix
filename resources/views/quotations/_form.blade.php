@@ -43,9 +43,9 @@
             <button
                 type="button"
                 id="openVendorModal"
-                class="rounded-md border border-[#333] bg-[#333] px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#222] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#444]"
+                class="rounded-md border border-[#333] bg-[#333] px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#222] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#444]"
             >
-                Add Vendor
+                 Add Vendor
             </button>
 
             <span id="vendorIdErr" class="mt-1.5 block text-xs text-red-600"></span>
@@ -93,6 +93,8 @@
 
             <span id="validUntilErr" class="mt-1.5 block text-xs text-red-600"></span>
         </div>
+
+        
 
         {{-- Status --}}
         <div>

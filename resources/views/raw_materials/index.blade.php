@@ -73,7 +73,7 @@
                         </th>
 
                         <th class="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                            SKU
+                            Category
                         </th>
 
                         <th class="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -135,19 +135,19 @@
                             </td>
 
 
-                            {{-- SKU --}}
+                            {{-- Category --}}
                             <td class="px-5 py-4">
 
-                                @if ($rawMaterial->sku)
+                                @if ($rawMaterial->category_id)
 
                                     <span class="rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
-                                        {{ $rawMaterial->sku }}
+                                        {{ $rawMaterial->category->name }}
                                     </span>
 
                                 @else
-
-                                    <span class="text-gray-400">—</span>
-
+                                     <span class="rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                                       Uncategorized
+                                    </span>
                                 @endif
 
                             </td>
