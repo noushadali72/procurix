@@ -71,6 +71,17 @@
                 Generate PDF
             </a>
 
+            @if ($vendorBill->due_amount > 0)
+                <button
+                    type="button"
+                    id="openPaymentModal"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+                >
+                    <i class="bx bx-money"></i>
+                    Make Payment
+                </button>
+            @endif
+
         </div>
 
     </div>
@@ -431,5 +442,315 @@
         </div>
 
     @endif
+
+    {{-- Payment Modal --}}
+<div
+    id="paymentModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 px-4"
+>
+    <div class="w-full max-w-lg rounded-xl bg-white shadow-xl">
+
+        {{-- Header --}}
+        <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+            <div>
+                <h3 class="font-semibold text-gray-900">
+                    Make Payment
+                </h3>
+
+                <p class="mt-1 text-sm text-gray-500">
+                    Record a payment for this vendor bill.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                id="closePaymentModal"
+                class="text-gray-400 transition hover:text-gray-700"
+            >
+                <i class="bx bx-x text-2xl"></i>
+            </button>
+        </div>
+
+        {{-- Form --}}
+        <form
+            id="paymentForm"
+            action="{{ route('vendor-payments.store', $vendorBill) }}"
+            method="POST"
+            class="p-6"
+        >
+            @csrf
+
+
+
+            <div class="space-y-5">
+
+                {{-- Outstanding --}}
+                <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-500">
+                            Outstanding Amount
+                        </span>
+
+                        <span class="font-semibold text-gray-900">
+                            {{ number_format($vendorBill->due_amount, 2) }}
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Amount --}}
+                <div>
+                    <label
+                        for="payment_amount"
+                        class="mb-1 block text-sm font-medium text-gray-700"
+                    >
+                        Payment Amount
+                    </label>
+
+                    <input
+                        type="number"
+                        step="0.01"
+                        min="0.01"
+                        max="{{ $vendorBill->due_amount }}"
+                        id="payment_amount"
+                        name="amount"
+                        placeholder="Enter payment amount"
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                    >
+
+                    <p
+                        data-error="amount"
+                        class="mt-1 hidden text-sm text-red-600"
+                    ></p>
+                </div>
+
+                {{-- Payment Method --}}
+                <div>
+                    <label
+                        for="payment_method"
+                        class="mb-1 block text-sm font-medium text-gray-700"
+                    >
+                        Payment Method
+                    </label>
+
+                    <select
+                        id="payment_method"
+                        name="payment_method"
+                        class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                    >
+                        <option value="">Select payment method</option>
+                        <option value="cash">Cash</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="cheque">Cheque</option>
+                        <option value="card">Card</option>
+                        <option value="other">Other</option>
+                    </select>
+
+                    <p
+                        data-error="payment_method"
+                        class="mt-1 hidden text-sm text-red-600"
+                    ></p>
+                </div>
+
+                {{-- Payment Date --}}
+                <div>
+                    <label
+                        for="payment_date"
+                        class="mb-1 block text-sm font-medium text-gray-700"
+                    >
+                        Payment Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="payment_date"
+                        name="payment_date"
+                        value="{{ now()->toDateString() }}"
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                    >
+
+                    <p
+                        data-error="payment_date"
+                        class="mt-1 hidden text-sm text-red-600"
+                    ></p>
+                </div>
+
+                {{-- Transaction ID --}}
+                <div>
+                    <label
+                        for="transaction_id"
+                        class="mb-1 block text-sm font-medium text-gray-700"
+                    >
+                        Transaction ID
+                        <span class="font-normal text-gray-400">(Optional)</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="transaction_id"
+                        name="transaction_id"
+                        placeholder="Enter transaction ID"
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                    >
+
+                    <p
+                        data-error="transaction_id"
+                        class="mt-1 hidden text-sm text-red-600"
+                    ></p>
+                </div>
+
+                {{-- Notes --}}
+                <div>
+                    <label
+                        for="payment_notes"
+                        class="mb-1 block text-sm font-medium text-gray-700"
+                    >
+                        Notes
+                        <span class="font-normal text-gray-400">(Optional)</span>
+                    </label>
+
+                    <textarea
+                        id="payment_notes"
+                        name="notes"
+                        rows="3"
+                        placeholder="Enter payment notes"
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                    ></textarea>
+
+                    <p
+                        data-error="notes"
+                        class="mt-1 hidden text-sm text-red-600"
+                    ></p>
+                </div>
+
+            </div>
+
+            {{-- Actions --}}
+            <div class="mt-6 flex justify-end gap-3 border-t border-gray-200 pt-5">
+
+                <button
+                    type="button"
+                    id="cancelPayment"
+                    class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    id="submitPayment"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+                >
+                    <i class="bx bx-check"></i>
+                    Record Payment
+                </button>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@push('scripts')
+<script>
+    $(function () {
+
+        function openPaymentModal() {
+            $('#paymentModal')
+                .removeClass('hidden')
+                .addClass('flex');
+        }
+
+        function closePaymentModal() {
+            $('#paymentModal')
+                .removeClass('flex')
+                .addClass('hidden');
+        }
+
+        function clearPaymentErrors() {
+            $('[data-error]').addClass('hidden').text('');
+        }
+
+        function showPaymentErrors(errors) {
+            $.each(errors, function (field, messages) {
+                const error = $('[data-error="' + field + '"]');
+
+                if (error.length) {
+                    error
+                        .removeClass('hidden')
+                        .text(messages[0]);
+                }
+            });
+        }
+
+        $('#openPaymentModal').on('click', openPaymentModal);
+
+        $('#closePaymentModal, #cancelPayment').on('click', closePaymentModal);
+
+        $('#paymentModal').on('click', function (e) {
+            if (e.target === this) {
+                closePaymentModal();
+            }
+        });
+
+        $('#paymentForm').on('submit', function (e) {
+            e.preventDefault();
+
+            const form = $(this);
+            const button = $('#submitPayment');
+
+            clearPaymentErrors();
+
+            button
+                .prop('disabled', true)
+                .html(`
+                    <i class="bx bx-loader-alt bx-spin"></i>
+                    Processing...
+                `);
+
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: form.serialize(),
+
+                success: function (response) {
+                    showToast('green', response.message);
+
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 500);
+                },
+
+                error: function (xhr) {
+                    if (xhr.status === 422) {
+                        const response = xhr.responseJSON;
+
+                        if (response.errors) {
+                            showPaymentErrors(response.errors);
+                        }
+
+                        if (response.message) {
+                            showToast('red', response.message);
+                        }
+                    } else {
+                        showToast(
+                            'red',
+                            xhr.responseJSON?.message || 'Something went wrong.'
+                        );
+                    }
+
+                    button
+                        .prop('disabled', false)
+                        .html(`
+                            <i class="bx bx-check"></i>
+                            Record Payment
+                        `);
+                }
+            });
+        });
+
+    });
+</script>
+@endpush
+
 
 </x-layouts.app>

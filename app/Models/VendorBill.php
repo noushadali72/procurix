@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-#[Fillable(['purchase_order_id','vendor_id','bill_number','bill_date','due_date','subtotal','subtotal','tax','total','status','notes'])]
+#[Fillable(['purchase_order_id','vendor_id','bill_number','bill_date','due_date','subtotal','tax','total','status','notes'])]
 class VendorBill extends Model
 {
     protected static function booted(){
@@ -24,8 +24,16 @@ class VendorBill extends Model
     public function purchaseOrder(){
         return $this->belongsTo(PurchaseOrder::class);
     }
-    public function vendorPayment(){
-        return $this->hasOne(VendorPayment::class);
+    public function vendorPayments(){
+        return $this->hasMany(VendorPayment::class);
+    }
+
+    public function getPaidAmountAttribute(){
+        return $this->vendorPayments()->where('status','successful')->sum('amount');
+    }
+    public function getDueAmountAttribute(){
+        $paidAmount = $this->paid_amount;
+        return max(($this->total - $paidAmount),0);
     }
 
     private static function generateBillNumber(){

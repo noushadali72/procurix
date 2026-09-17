@@ -98,7 +98,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('vendor-bills/{vendorBill}',[VendorBillController::class,'show'])->name('vendor-bills.show');
     Route::post('vendors-bills/generate/{purchaseOrder}',[VendorBillController::class,'generate'])->name('vendor-bills.generate');
     Route::get('vendor-bills/generate-pdf/{vendorBill}',[VendorBillController::class,'generatePdf'])->name('vendor-bills.generatepdf');
-    Route::resource('vendor-payments',VendorPaymentController::class);
+    Route::resource('vendor-payments',VendorPaymentController::class)->except('store');
+    Route::post('vendor-payments/{vendorBill}',[VendorPaymentController::class,'store'])->name('vendor-payments.store');
+
 
 
 

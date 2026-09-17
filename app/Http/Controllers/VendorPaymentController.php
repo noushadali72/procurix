@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\VendorPayment\StoreVendorPaymentRequest;
+use App\Models\VendorBill;
 use App\Models\VendorPayment;
+use Exception;
 use Illuminate\Http\Request;
 
 class VendorPaymentController extends Controller
@@ -26,9 +29,58 @@ class VendorPaymentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreVendorPaymentRequest $request, VendorBill $vendorBill)
     {
-        //
+        $validated = $request->validated();
+        
+        $paidAmount = $vendorBill->vendorPayments()
+            ->where('status', 'successful')
+            ->sum('amount');
+
+        $dueAmount = max($vendorBill->total - $paidAmount, 0);
+
+        if ($validated['amount'] > $dueAmount) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment amount cannot exceed the outstanding amount.',
+                'errors' => [
+                    'amount' => [
+                        'Amount cannot exceed the due amount: ' . number_format($dueAmount, 2),
+                    ],
+                ],
+            ], 422);
+        }
+
+        try {
+            $vendorBill->vendorPayments()->create([
+                'transaction_id' => $validated['transaction_id'] ?? null,
+                'amount' => $validated['amount'],
+                'payment_method' => $validated['payment_method'],
+                'payment_date' => $validated['payment_date'] ?? now()->toDateString(),
+                'status' => 'successful',
+                'references' => $validated['references'] ?? null,
+                'notes' => $validated['notes'] ?? null,
+            ]);
+
+            $paidAmount += $validated['amount'];
+
+            $vendorBill->update([
+                'status' => $paidAmount >= $vendorBill->total
+                    ? 'paid'
+                    : 'partially_paid',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment recorded successfully.',
+            ], 201);
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to make payment.',
+            ], 500);
+        }
     }
 
     /**
