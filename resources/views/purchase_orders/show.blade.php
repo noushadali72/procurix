@@ -53,13 +53,37 @@
         </div>
 
 
-        {{-- Header Action --}}
-        @if (in_array($purchaseOrder->status, ['placed', 'partially_received']))
-            <a href="{{ route('goods-receipts.create', $purchaseOrder) }}"
-                class="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
-                Receive Materials
-            </a>
-        @endif
+            {{-- Header Actions --}}
+        <div class="flex items-center gap-2">
+
+            @if (in_array($purchaseOrder->status, ['placed', 'partially_received']))
+                <a
+                    href="{{ route('goods-receipts.create', $purchaseOrder) }}"
+                    class="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+                >
+                    Receive Materials
+                </a>
+            @endif
+
+            @if ($purchaseOrder->vendorBill)
+                <a
+                    href="{{ route('vendor-bills.show', $purchaseOrder) }}"
+                    class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                >
+                    <i class="bx bx-receipt mr-1.5"></i>
+                    View Vendor Bill
+                </a>
+            @elseif ($purchaseOrder->status === 'received')
+                <a
+                    href="{{ route('vendor-bills.show', $purchaseOrder) }}"
+                    class="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+                >
+                    <i class="bx bx-receipt mr-1.5"></i>
+                    Generate Vendor Bill
+                </a>
+            @endif
+
+        </div>
 
     </div>
 

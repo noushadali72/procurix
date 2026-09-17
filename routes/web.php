@@ -13,7 +13,9 @@ use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\UnitController;
+use App\Http\Controllers\VendorBillController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\VendorPaymentController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -88,6 +90,17 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         ->name('manufacturing.manufacture');
 
     Route::post('manufacturing/autosave',[ManufacturingController::class,'autoSave'])->name('manufacturing.autosave');
+
+
+    // Vendor Billing
+    Route::resource('vendor-bills',VendorBillController::class)->except('create','show');
+    Route::get('vendor-bills/{purchaseOrder}/create',[VendorBillController::class,'create'])->name('vendor-bills.create');
+    Route::get('vendor-bills/{vendorBill}',[VendorBillController::class,'show'])->name('vendor-bills.show');
+    Route::post('vendors-bills/generate/{purchaseOrder}',[VendorBillController::class,'generate'])->name('vendor-bills.generate');
+    Route::get('vendor-bills/generate-pdf/{vendorBill}',[VendorBillController::class,'generatePdf'])->name('vendor-bills.generatepdf');
+    Route::resource('vendor-payments',VendorPaymentController::class);
+
+
 
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });

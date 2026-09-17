@@ -10,16 +10,16 @@ class UnitCategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
+            'Quantity',
             'Weight',
             'Length',
             'Volume',
             'Area',
-            'Quantity'
         ];
 
-        foreach ($categories as $category) {
+        foreach ($categories as $name) {
             UnitCategory::firstOrCreate([
-                'name' => $category,
+                'name' => $name,
             ]);
         }
     }

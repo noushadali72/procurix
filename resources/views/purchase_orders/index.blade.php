@@ -2,7 +2,6 @@
 
     {{-- Header --}}
     <div class="mb-6">
-
         <h2 class="text-xl font-semibold text-gray-900">
             Purchase Orders
         </h2>
@@ -10,9 +9,7 @@
         <p class="mt-1 text-sm text-gray-500">
             View and manage purchase orders.
         </p>
-
     </div>
-
 
     {{-- Flash Messages --}}
     @if (session('success'))
@@ -26,7 +23,6 @@
             {{ session('error') }}
         </div>
     @endif
-
 
     {{-- Purchase Order List --}}
     <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -50,14 +46,12 @@
 
         </div>
 
-
         {{-- Table --}}
         <div class="overflow-x-auto">
 
-            <table class="w-full min-w-[900px] text-left text-sm">
+            <table class="w-full min-w-[1050px] text-left text-sm">
 
                 <thead class="border-b border-gray-200 bg-gray-50">
-
                     <tr class="text-xs font-medium uppercase tracking-wide text-gray-500">
 
                         <th class="px-6 py-3.5">
@@ -80,18 +74,21 @@
                             Received Date
                         </th>
 
+                        <th class="px-6 py-3.5">
+                            Bill Status
+                        </th>
+
                         <th class="px-6 py-3.5 text-right">
                             Actions
                         </th>
 
                     </tr>
-
                 </thead>
-
 
                 <tbody class="divide-y divide-gray-100">
 
                     @forelse($orders as $order)
+
                         @php
                             $statusClass = match ($order->status) {
                                 'received' => 'bg-green-50 text-green-700',
@@ -121,7 +118,8 @@
                                 <div class="flex items-center gap-3">
 
                                     <div
-                                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600">
+                                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600"
+                                    >
                                         <i class="bx bx-receipt text-lg"></i>
                                     </div>
 
@@ -142,7 +140,6 @@
 
                             </td>
 
-
                             {{-- Vendor --}}
                             <td class="px-6 py-4">
 
@@ -152,9 +149,9 @@
 
                             </td>
 
-
                             {{-- Order Date --}}
                             <td class="px-6 py-4 text-gray-600">
+
                                 <div>
                                     <p>
                                         {{ $order->order_date->format('d M Y') }}
@@ -164,20 +161,21 @@
                                         {{ $order->order_date->format('h:i A') }}
                                     </p>
                                 </div>
-                            </td>
 
+                            </td>
 
                             {{-- Status --}}
                             <td class="px-6 py-4">
 
                                 <span
-                                    class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
+                                    class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}"
+                                >
                                     <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
+
                                     {{ $statusLabel }}
                                 </span>
 
                             </td>
-
 
                             {{-- Received Date --}}
                             <td class="px-6 py-4 text-gray-600">
@@ -192,29 +190,88 @@
 
                             </td>
 
-                        {{-- Actions --}}
-                        <td class="px-5 py-4">
-                            <div class="flex items-center justify-end gap-2">
+                            {{-- Bill Status --}}
+                            <td class="px-6 py-4">
 
-                                <a
-                                    href="{{ route('purchase-orders.show', $order) }}"
-                                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
-                                >
-                                    <i class="bx bx-show"></i>
-                                    View
-                                </a>
+                                @if ($order->vendorBill)
 
-                                <button
-                                    type="button"
-                                    class="delete-order inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-500 hover:text-white"
-                                    data-url="{{ route('purchase-orders.destroy', $order) }}"
-                                >
-                                    <i class="bx bx-trash"></i>
-                                    Delete
-                                </button>
+                                    <span
+                                        class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700"
+                                    >
+                                        <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+                                        Generated
+                                    </span>
 
-                            </div>
-                        </td>
+                                @elseif ($order->status === 'received')
+
+                                    <span
+                                        class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700"
+                                    >
+                                        <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                                        Not Generated
+                                    </span>
+
+                                @else
+
+                                    <span
+                                        class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500"
+                                    >
+                                        <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>
+                                        Not Available
+                                    </span>
+
+                                @endif
+
+                            </td>
+
+                            {{-- Actions --}}
+                            <td class="px-5 py-4">
+
+                                <div class="flex items-center justify-end gap-2">
+
+                                    <a
+                                        href="{{ route('purchase-orders.show', $order) }}"
+                                        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
+                                    >
+                                        <i class="bx bx-show"></i>
+                                        View
+                                    </a>
+
+                                    @if ($order->vendorBill)
+
+                                        <a
+                                            href="{{ route('vendor-bills.generatepdf', $order->vendorBill) }}"
+                                            target="_blank"
+                                            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
+                                        >
+                                            <i class="bx bx-file"></i>
+                                            Bill
+                                        </a>
+
+                                    @elseif ($order->status === 'received')
+
+                                        <a
+                                            href="{{ route('vendor-bills.show', $order) }}"
+                                            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
+                                        >
+                                            <i class="bx bx-receipt"></i>
+                                            Generate Bill
+                                        </a>
+
+                                    @endif
+
+                                    <button
+                                        type="button"
+                                        class="delete-order inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-500 hover:text-white"
+                                        data-url="{{ route('purchase-orders.destroy', $order) }}"
+                                    >
+                                        <i class="bx bx-trash"></i>
+                                        Delete
+                                    </button>
+
+                                </div>
+
+                            </td>
 
                         </tr>
 
@@ -222,12 +279,13 @@
 
                         <tr>
 
-                            <td colspan="6" class="px-6 py-12">
+                            <td colspan="7" class="px-6 py-12">
 
                                 <div class="flex flex-col items-center justify-center text-center">
 
                                     <div
-                                        class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+                                        class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400"
+                                    >
                                         <i class="bx bx-receipt text-2xl"></i>
                                     </div>
 
@@ -244,6 +302,7 @@
                             </td>
 
                         </tr>
+
                     @endforelse
 
                 </tbody>
@@ -251,7 +310,6 @@
             </table>
 
         </div>
-
 
         {{-- Pagination --}}
         @if ($orders->hasPages())
@@ -261,7 +319,6 @@
         @endif
 
     </div>
-
 
     @push('scripts')
         <script>
@@ -301,7 +358,10 @@
                     error: function(xhr) {
 
                         button.prop('disabled', false);
-                        button.text('Delete');
+                        button.html(`
+                            <i class="bx bx-trash"></i>
+                            Delete
+                        `);
 
                         showToast(
                             'error',

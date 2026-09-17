@@ -23,14 +23,21 @@
 
         {{-- Vendor --}}
         <div>
-            <label class="mb-2 block text-sm font-medium text-gray-700">
-                Vendor <span class="text-red-500">*</span>
-            </label>
+            <div class="mb-2 flex items-center justify-between">
+                <label class="block text-sm font-medium text-gray-700">
+                    Vendor <span class="text-red-500">*</span>
+                </label>
+
+                <button type="button" id="openVendorModal"
+                    class="inline-flex cursor-pointer items-center gap-1 text-xs font-medium text-gray-700 transition hover:text-gray-900">
+                    <i class="bx bx-plus"></i>
+                    Add Vendor
+                </button>
+            </div>
 
             <select name="vendor_id" id="vendor_id"
-                class="mb-4 block w-full rounded-lg border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:ring-gray-900">
+                class="block w-full rounded-lg border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:ring-gray-900">
                 <option value="">Select Vendor</option>
-
 
                 @foreach ($vendors as $vendor)
                     <option value="{{ $vendor->id }}"
@@ -39,14 +46,6 @@
                     </option>
                 @endforeach
             </select>
-
-            <button
-                type="button"
-                id="openVendorModal"
-                class="rounded-md border border-[#333] bg-[#333] px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#222] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#444]"
-            >
-                 Add Vendor
-            </button>
 
             <span id="vendorIdErr" class="mt-1.5 block text-xs text-red-600"></span>
         </div>
@@ -94,7 +93,7 @@
             <span id="validUntilErr" class="mt-1.5 block text-xs text-red-600"></span>
         </div>
 
-        
+
 
         {{-- Status --}}
         <div>
@@ -113,7 +112,7 @@
                     Accepted
                 </option>
 
-                 <option value="expired" {{ old('status', $quotation->status ?? '') === 'expired' ? 'selected' : '' }}>
+                <option value="expired" {{ old('status', $quotation->status ?? '') === 'expired' ? 'selected' : '' }}>
                     Expired
                 </option>
 

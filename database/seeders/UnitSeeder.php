@@ -11,31 +11,34 @@ class UnitSeeder extends Seeder
     public function run(): void
     {
         $units = [
+            'Quantity' => [
+                ['name' => 'Piece', 'short_name' => 'pcs', 'is_base' => true, 'conversion_factor' => 1],
+                ['name' => 'Dozen', 'short_name' => 'doz', 'is_base' => false, 'conversion_factor' => 12],
+            ],
+
             'Weight' => [
-                ['name' => 'Gram', 'short_name' => 'g', 'conversion_factor' => 1, 'is_base' => true],
-                ['name' => 'Kilogram', 'short_name' => 'kg', 'conversion_factor' => 1000, 'is_base' => false],
-                ['name' => 'Milligram', 'short_name' => 'mg', 'conversion_factor' => 0.001, 'is_base' => false],
+                ['name' => 'Kilogram', 'short_name' => 'kg', 'is_base' => true, 'conversion_factor' => 1],
+                ['name' => 'Gram', 'short_name' => 'g', 'is_base' => false, 'conversion_factor' => 0.001],
+                ['name' => 'Milligram', 'short_name' => 'mg', 'is_base' => false, 'conversion_factor' => 0.0001],
+                ['name' => 'Ton', 'short_name' => 't', 'is_base' => false, 'conversion_factor' => 1000],
             ],
 
             'Length' => [
-                ['name' => 'Meter', 'short_name' => 'm', 'conversion_factor' => 1, 'is_base' => true],
-                ['name' => 'Kilometer', 'short_name' => 'km', 'conversion_factor' => 1000, 'is_base' => false],
-                ['name' => 'Centimeter', 'short_name' => 'cm', 'conversion_factor' => 0.01, 'is_base' => false],
-                ['name' => 'Millimeter', 'short_name' => 'mm', 'conversion_factor' => 0.001, 'is_base' => false],
+                ['name' => 'Meter', 'short_name' => 'm', 'is_base' => true, 'conversion_factor' => 1],
+                ['name' => 'Centimeter', 'short_name' => 'cm', 'is_base' => false, 'conversion_factor' => 0.01],
+                ['name' => 'Millimeter', 'short_name' => 'mm', 'is_base' => false, 'conversion_factor' => 0.001],
+                ['name' => 'Kilometer', 'short_name' => 'km', 'is_base' => false, 'conversion_factor' => 1000],
             ],
 
             'Volume' => [
-                ['name' => 'Liter', 'short_name' => 'L', 'conversion_factor' => 1, 'is_base' => true],
-                ['name' => 'Milliliter', 'short_name' => 'ml', 'conversion_factor' => 0.001, 'is_base' => false],
+                ['name' => 'Liter', 'short_name' => 'L', 'is_base' => true, 'conversion_factor' => 1],
+                ['name' => 'Milliliter', 'short_name' => 'ml', 'is_base' => false, 'conversion_factor' => 0.001],
             ],
 
             'Area' => [
-                ['name' => 'Square Meter', 'short_name' => 'm²', 'conversion_factor' => 1, 'is_base' => true],
-                ['name' => 'Square Centimeter', 'short_name' => 'cm²', 'conversion_factor' => 0.0001, 'is_base' => false],
-                ['name' => 'Square Millimeter', 'short_name' => 'mm²', 'conversion_factor' => 0.000001, 'is_base' => false],
-            ],
-            'Quantity' => [
-                ['name' => 'Piece', 'short_name' => 'pcs', 'conversion_factor' => 1, 'is_base' => true],
+                ['name' => 'Square Meter', 'short_name' => 'm²', 'is_base' => true, 'conversion_factor' => 1],
+                ['name' => 'Square Centimeter', 'short_name' => 'cm²', 'is_base' => false, 'conversion_factor' => 0.0001],
+                ['name' => 'Square Millimeter', 'short_name' => 'mm²', 'is_base' => false, 'conversion_factor' => 0.000001],
             ],
         ];
 
@@ -43,15 +46,13 @@ class UnitSeeder extends Seeder
             $category = UnitCategory::where('name', $categoryName)->firstOrFail();
 
             foreach ($categoryUnits as $unit) {
-                Unit::firstOrCreate(
+                Unit::updateOrCreate(
+                    ['short_name' => $unit['short_name']],
                     [
                         'name' => $unit['name'],
-                        'short_name' => $unit['short_name'],
-                    ],
-                    [
                         'unit_category_id' => $category->id,
-                        'conversion_factor' => $unit['conversion_factor'],
                         'is_base' => $unit['is_base'],
+                        'conversion_factor' => $unit['conversion_factor'],
                     ]
                 );
             }

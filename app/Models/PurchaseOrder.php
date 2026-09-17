@@ -41,5 +41,9 @@ class PurchaseOrder extends Model
         return $this->hasMany(GoodsReceipt::class);
     }
 
+    public function vendorBill(){
+        return $this->hasOne(VendorBill::class);
+    }
+
 
 }

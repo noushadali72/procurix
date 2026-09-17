@@ -75,31 +75,57 @@
 
                 <div class="space-y-1">
 
-                    <a
-                        href="{{ route('products.index') }}"
-                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
-                        {{ request()->routeIs('products.*')
-                            ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
+                    {{-- Inventory --}}
+                 <div class="mb-6">
+                    <button
+                        type="button"
+                        id="inventoryMenuBtn"
+                        class="flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-gray-900 hover:text-white"
                     >
-                        <i class="bx bx-package text-[20px]"></i>
-                        <span>Products</span>
-                    </a>
+                        <span class="flex items-center gap-3">
+                            <i class="bx bx-package text-[20px]"></i>
+                            <span>Inventory</span>
+                        </span>
 
-                    <a
-                        href="{{ route('raw-materials.index') }}"
-                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
-                        {{ request()->routeIs('raw-materials.*')
-                            ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
-                    >
-                        <i class="bx bx-cube text-[20px]"></i>
-                        <span>Raw Materials</span>
-                    </a>
+                        <i
+                            id="inventoryMenuIcon"
+                            class="bx bx-chevron-down text-lg transition-transform"
+                        ></i>
+                    </button>
+
+                    <div id="inventoryMenu" class="mt-1 hidden space-y-1 pl-3">
+
+                        {{-- Products --}}
+                        <a
+                            href="{{ route('products.index') }}"
+                            class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
+                            {{ request()->routeIs('products.*')
+                                ? 'bg-gray-800 text-white'
+                                : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
+                        >
+                            <i class="bx bx-package text-[19px]"></i>
+                            <span>Products</span>
+                        </a>
+
+                        {{-- Raw Materials --}}
+                        <a
+                            href="{{ route('raw-materials.index') }}"
+                            class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
+                            {{ request()->routeIs('raw-materials.*')
+                                ? 'bg-gray-800 text-white'
+                                : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
+                        >
+                            <i class="bx bx-cube text-[19px]"></i>
+                            <span>Raw Materials</span>
+                        </a>
+
+                    </div>
+                </div>
+
                     <a
                         href="{{ route('categories.index') }}"
                         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
-                        {{ request()->routeIs('units.*')
+                        {{ request()->routeIs('categories.*')
                             ? 'bg-gray-800 text-white'
                             : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
                     >
@@ -182,6 +208,17 @@
                     >
                         <i class="bx bx-package text-[20px]"></i>
                         <span>Goods Receipts</span>
+                    </a>
+
+                    <a
+                        href="{{ route('vendor-bills.index') }}"
+                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
+                        {{ request()->routeIs('vendor-bills.*')
+                            ? 'bg-gray-800 text-white'
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
+                    >
+                        <i class="bx bx-package text-[20px]"></i>
+                        <span>Vendor Bills</span>
                     </a>
 
                 </div>
@@ -302,12 +339,36 @@
             {{ $slot }}
         </main>
 
+    
     </div>
+
+
     {{-- jQuery --}}
     <script
         src="https://cdn.jsdelivr.net/npm/jquery@4.0.0/dist/jquery.min.js"
         integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao="
         crossorigin="anonymous">
+    </script>
+
+        <script>
+        $(document).ready(function () {
+            const inventoryMenu = $('#inventoryMenu');
+            const inventoryMenuIcon = $('#inventoryMenuIcon');
+
+            const inventoryActive = @json(
+                request()->routeIs('products.*', 'raw-materials.*')
+            );
+
+            if (inventoryActive) {
+                inventoryMenu.removeClass('hidden');
+                inventoryMenuIcon.addClass('rotate-180');
+            }
+
+            $('#inventoryMenuBtn').on('click', function () {
+                inventoryMenu.toggleClass('hidden');
+                inventoryMenuIcon.toggleClass('rotate-180');
+            });
+        });
     </script>
 
     {{-- Toast --}}

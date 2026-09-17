@@ -16,4 +16,14 @@ class Vendor extends Model
         'address',
         'is_active',
     ];
+
+    public function quotations(){
+        return $this->hasMany(Quotation::class);
+    }
+    public function vendorBills(){
+        return $this->hasMany(VendorBill::class);
+    } 
+    public function vendorPayments(){
+        return $this->hasManyThrough(VendorPayment::class, VendorBill::class);
+    }
 }
