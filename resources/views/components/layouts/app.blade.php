@@ -23,10 +23,7 @@
         }
     </style>
 
-    <link
-        href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
-        rel="stylesheet"
-    >
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 </head>
 
 <body class="min-h-screen bg-gray-50 text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100">
@@ -37,15 +34,9 @@
         {{-- Logo --}}
         <div class="flex h-16 items-center border-b border-gray-800 px-5">
 
-            <a
-                href="{{ route('admin.dashboard') }}"
-                class="flex h-full items-center"
-            >
-                <img
-                    src="{{ asset('storage/logo.png') }}"
-                    alt="{{ config('app.name') }}"
-                    class="max-h-10 max-w-[180px] object-contain"
-                >
+            <a href="{{ route('admin.dashboard') }}" class="flex h-full items-center">
+                <img src="{{ asset('storage/logo.png') }}" alt="{{ config('app.name') }}"
+                    class="max-h-10 max-w-[180px] object-contain">
             </a>
 
         </div>
@@ -55,217 +46,276 @@
 
             {{-- Dashboard --}}
             <div class="mb-6">
-                <a
-                    href="{{ route('admin.dashboard') }}"
+
+                <a href="{{ route('admin.dashboard') }}"
                     class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
                     {{ request()->routeIs('admin.dashboard')
                         ? 'bg-gray-800 text-white'
-                        : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
-                >
+                        : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
                     <i class="bx bx-grid-alt text-[20px]"></i>
                     <span>Dashboard</span>
                 </a>
             </div>
+
 
             {{-- Inventory --}}
             <div class="mb-6">
                 <p class="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                     Inventory
                 </p>
-
                 <div class="space-y-1">
-
-                    {{-- Inventory --}}
-                 <div class="mb-6">
-                    <button
-                        type="button"
-                        id="inventoryMenuBtn"
-                        class="flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-gray-900 hover:text-white"
-                    >
+                    {{-- Inventory Dropdown --}}
+                    <button type="button" id="inventoryMenuBtn"
+                        class="flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-gray-900 hover:text-white">
                         <span class="flex items-center gap-3">
                             <i class="bx bx-package text-[20px]"></i>
-                            <span>Inventory</span>
+                            <span>Items</span>
                         </span>
 
-                        <i
-                            id="inventoryMenuIcon"
-                            class="bx bx-chevron-down text-lg transition-transform"
-                        ></i>
+                        <i id="inventoryMenuIcon" class="bx bx-chevron-down text-lg transition-transform"></i>
+
                     </button>
+
 
                     <div id="inventoryMenu" class="mt-1 hidden space-y-1 pl-3">
 
                         {{-- Products --}}
-                        <a
-                            href="{{ route('products.index') }}"
+                        <a href="{{ route('products.index') }}"
                             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
                             {{ request()->routeIs('products.*')
                                 ? 'bg-gray-800 text-white'
-                                : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
-                        >
-                            <i class="bx bx-package text-[19px]"></i>
+                                : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
+                            <i class="bx bx-box text-[19px]"></i>
                             <span>Products</span>
+
                         </a>
 
+
                         {{-- Raw Materials --}}
-                        <a
-                            href="{{ route('raw-materials.index') }}"
+                        <a href="{{ route('raw-materials.index') }}"
                             class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
                             {{ request()->routeIs('raw-materials.*')
                                 ? 'bg-gray-800 text-white'
-                                : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
-                        >
+                                : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
                             <i class="bx bx-cube text-[19px]"></i>
                             <span>Raw Materials</span>
+
                         </a>
 
                     </div>
-                </div>
 
-                    <a
-                        href="{{ route('categories.index') }}"
+
+                    {{-- Categories --}}
+                    <a href="{{ route('categories.index') }}"
                         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
                         {{ request()->routeIs('categories.*')
                             ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
-                    >
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
                         <i class="bx bx-category text-[20px]"></i>
-                     
                         <span>Categories</span>
+
                     </a>
-                    <a
-                        href="{{ route('units.index') }}"
+
+
+                    {{-- Units --}}
+                    <a href="{{ route('units.index') }}"
                         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
                         {{ request()->routeIs('units.*')
                             ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
-                    >
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
                         <i class="bx bx-ruler text-[20px]"></i>
                         <span>Units</span>
+
                     </a>
 
                 </div>
+
             </div>
+
 
             {{-- Procurement --}}
             <div class="mb-6">
+
                 <p class="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                     Procurement
                 </p>
 
                 <div class="space-y-1">
 
-                    <a
-                        href="{{ route('vendors.index') }}"
+                    {{-- Vendors --}}
+                    <a href="{{ route('vendors.index') }}"
                         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
                         {{ request()->routeIs('vendors.*')
                             ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
-                    >
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
                         <i class="bx bx-store text-[20px]"></i>
                         <span>Vendors</span>
+
                     </a>
 
-                    <a
-                        href="{{ route('purchase-requests.index') }}"
+
+                    {{-- Purchase Requests --}}
+                    <a href="{{ route('purchase-requests.index') }}"
                         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
                         {{ request()->routeIs('purchase-requests.*')
                             ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
-                    >
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
                         <i class="bx bx-file text-[20px]"></i>
                         <span>Purchase Requests <b>(RFQ)</b></span>
+
                     </a>
 
-                    <a
-                        href="{{ route('quotations.index') }}"
+
+                    {{-- Quotations --}}
+                    <a href="{{ route('quotations.index') }}"
                         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
                         {{ request()->routeIs('quotations.*')
                             ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
-                    >
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
                         <i class="bx bx-file-find text-[20px]"></i>
                         <span>Quotations</span>
+
                     </a>
 
-                    <a
-                        href="{{ route('purchase-orders.index') }}"
+
+                    {{-- Purchase Orders --}}
+                    <a href="{{ route('purchase-orders.index') }}"
                         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
                         {{ request()->routeIs('purchase-orders.*')
                             ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
-                    >
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
                         <i class="bx bx-cart text-[20px]"></i>
                         <span>Purchase Orders</span>
-                    </a>
 
-                    <a
-                        href="{{ route('goods-receipts.index') }}"
-                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
-                        {{ request()->routeIs('goods-receipts.*')
-                            ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
-                    >
-                        <i class="bx bx-package text-[20px]"></i>
-                        <span>Goods Receipts</span>
-                    </a>
-
-                    <a
-                        href="{{ route('vendor-bills.index') }}"
-                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
-                        {{ request()->routeIs('vendor-bills.*')
-                            ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
-                    >
-                        <i class="bx bx-package text-[20px]"></i>
-                        <span>Vendor Bills</span>
                     </a>
 
                 </div>
+
             </div>
+
+
+            {{-- Receiving --}}
+            <div class="mb-6">
+
+                <p class="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+                    Receiving
+                </p>
+
+                <div class="space-y-1">
+
+                    {{-- Goods Receipts --}}
+                    <a href="{{ route('goods-receipts.index') }}"
+                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
+                        {{ request()->routeIs('goods-receipts.*')
+                            ? 'bg-gray-800 text-white'
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
+                        <i class="bx bx-package text-[20px]"></i>
+                        <span>Goods Receipts</span>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            {{-- Finance --}}
+            <div class="mb-6">
+
+                <p class="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+                    Finance
+                </p>
+
+                <div class="space-y-1">
+
+                    {{-- Vendor Bills --}}
+                    <a href="{{ route('vendor-bills.index') }}"
+                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
+                        {{ request()->routeIs('vendor-bills.*')
+                            ? 'bg-gray-800 text-white'
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
+                        <i class="bx bx-receipt text-[20px]"></i>
+                        <span>Vendor Bills</span>
+
+                    </a>
+
+
+                    {{-- Vendor Payments --}}
+                    <a href="{{ route('vendor-payments.index') }}"
+                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
+                        {{ request()->routeIs('vendor-payments.*')
+                            ? 'bg-gray-800 text-white'
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
+                        <i class="bx bx-money text-[20px]"></i>
+                        <span>Vendor Payments</span>
+
+                    </a>
+
+                </div>
+
+            </div>
+
 
             {{-- Manufacturing --}}
             <div class="mb-6">
+
                 <p class="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                     Manufacturing
                 </p>
 
                 <div class="space-y-1">
 
-                    <a
-                        href="{{ route('manufacturing.index') }}"
+                    {{-- Manufacture Product --}}
+                    <a href="{{ route('manufacturing.index') }}"
                         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
                         {{ request()->routeIs('manufacturing.index')
                             ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
-                    >
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
                         <i class="bx bx-cog text-[20px]"></i>
                         <span>Manufacture Product</span>
+
                     </a>
 
-                    <a
-                        href="{{ route('manufacturing.records') }}"
+
+                    {{-- Manufacturing Records --}}
+                    <a href="{{ route('manufacturing.records') }}"
                         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
                         {{ request()->routeIs('manufacturing.records')
                             ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
-                    >
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
                         <i class="bx bx-history text-[20px]"></i>
                         <span>Manufacturing Records</span>
+
                     </a>
 
-                    <a
-                        href="{{ route('manufacturing-formulas.index') }}"
+
+                    {{-- Manufacturing Formulas --}}
+                    <a href="{{ route('manufacturing-formulas.index') }}"
                         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
                         {{ request()->routeIs('manufacturing-formulas.*')
                             ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}"
-                    >
-                        <i class="bx bx-receipt text-[20px]"></i>
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
+                        <i class="bx bx-list-check text-[20px]"></i>
                         <span>Manufacturing Formulas</span>
+
                     </a>
 
                 </div>
+
             </div>
 
         </nav>
@@ -276,12 +326,14 @@
     <div class="ml-64 flex min-h-screen min-w-0 flex-col">
 
         {{-- Global Header --}}
-        <header class="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-5 sm:px-6 dark:border-gray-800 dark:bg-gray-900">
+        <header
+            class="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-5 sm:px-6 dark:border-gray-800 dark:bg-gray-900">
 
             {{-- Application Context --}}
             <div class="flex items-center gap-3">
 
-                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                <div
+                    class="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
                     <i class="bx bx-layer text-lg"></i>
                 </div>
 
@@ -310,7 +362,8 @@
                         </p>
                     </div>
 
-                    <div class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-900 text-sm font-semibold text-white dark:bg-white dark:text-gray-900">
+                    <div
+                        class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-900 text-sm font-semibold text-white dark:bg-white dark:text-gray-900">
                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                     </div>
 
@@ -319,11 +372,8 @@
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
 
-                        <button
-                            type="submit"
-                            title="Logout"
-                            class="inline-flex cursor-pointer items-center justify-center rounded-lg border border-gray-200 p-2 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-gray-700 dark:text-gray-400 dark:hover:border-red-800 dark:hover:bg-red-900/20 dark:hover:text-red-400"
-                        >
+                        <button type="submit" title="Logout"
+                            class="inline-flex cursor-pointer items-center justify-center rounded-lg border border-gray-200 p-2 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-gray-700 dark:text-gray-400 dark:hover:border-red-800 dark:hover:bg-red-900/20 dark:hover:text-red-400">
                             <i class="bx bx-log-out text-lg"></i>
                         </button>
                     </form>
@@ -339,32 +389,27 @@
             {{ $slot }}
         </main>
 
-    
+
     </div>
 
 
     {{-- jQuery --}}
-    <script
-        src="https://cdn.jsdelivr.net/npm/jquery@4.0.0/dist/jquery.min.js"
-        integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao="
-        crossorigin="anonymous">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@4.0.0/dist/jquery.min.js"
+        integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
 
-        <script>
-        $(document).ready(function () {
+    <script>
+        $(document).ready(function() {
             const inventoryMenu = $('#inventoryMenu');
             const inventoryMenuIcon = $('#inventoryMenuIcon');
 
-            const inventoryActive = @json(
-                request()->routeIs('products.*', 'raw-materials.*')
-            );
+            const inventoryActive = @json(request()->routeIs('products.*', 'raw-materials.*'));
 
             if (inventoryActive) {
                 inventoryMenu.removeClass('hidden');
                 inventoryMenuIcon.addClass('rotate-180');
             }
 
-            $('#inventoryMenuBtn').on('click', function () {
+            $('#inventoryMenuBtn').on('click', function() {
                 inventoryMenu.toggleClass('hidden');
                 inventoryMenuIcon.toggleClass('rotate-180');
             });
@@ -418,12 +463,12 @@
 
             $('body').append(toast);
 
-            toast.find('button').on('click', function () {
+            toast.find('button').on('click', function() {
                 toast.remove();
             });
 
-            setTimeout(function () {
-                toast.fadeOut(300, function () {
+            setTimeout(function() {
+                toast.fadeOut(300, function() {
                     $(this).remove();
                 });
             }, 3000);

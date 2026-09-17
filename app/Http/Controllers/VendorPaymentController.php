@@ -15,16 +15,25 @@ class VendorPaymentController extends Controller
      */
     public function index()
     {
-        //
+        $unpaidBills = VendorBill::with([
+            'vendor',
+            'vendorPayments',
+        ])->where('status', '!=', 'paid')->latest()->get();
+
+        $vendorPayments = VendorPayment::with([
+            'vendorBill',
+            'vendorBill.vendor',
+        ])->latest()->paginate(10);
+        
+        return view(
+            'vendor_payments.index',
+            compact('vendorPayments', 'unpaidBills'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        //
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -32,7 +41,7 @@ class VendorPaymentController extends Controller
     public function store(StoreVendorPaymentRequest $request, VendorBill $vendorBill)
     {
         $validated = $request->validated();
-        
+
         $paidAmount = $vendorBill->vendorPayments()
             ->where('status', 'successful')
             ->sum('amount');
@@ -74,7 +83,6 @@ class VendorPaymentController extends Controller
                 'success' => true,
                 'message' => 'Payment recorded successfully.',
             ], 201);
-
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
