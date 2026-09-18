@@ -43,12 +43,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('quotations/{quotation}/accept', [QuotationController::class, 'accept'])->name('quotations.accept');
     Route::resource('purchase-orders', PurchaseOrderController::class)->only(['index', 'show', 'destroy']);
     Route::post('purchase-orders/{purchaseOrder}/receive',[PurchaseOrderController::class, 'receive'])->name('purchase-orders.receive');
-    Route::get('purchase-orders/{purchaseOrder}/goods-receipts/create', [GoodsReceiptController::class, 'create'])->name('goods-receipts.create');
-    Route::post('purchase-orders/{purchaseOrder}/goods-receipts',[GoodsReceiptController::class, 'store'])->name('goods-receipts.store');
+   
 
     // Receiving
     Route::get('goods-receipts', [GoodsReceiptController::class, 'index'])->name('goods-receipts.index');
     Route::get('goods-receipts/{goodsReceipt}', [GoodsReceiptController::class, 'show'])->name('goods-receipts.show');
+    Route::get('purchase-orders/{purchaseOrder}/goods-receipts/create', [GoodsReceiptController::class, 'create'])->name('goods-receipts.create');
+    Route::post('purchase-orders/{purchaseOrder}/goods-receipts',[GoodsReceiptController::class, 'store'])->name('goods-receipts.store');
+    Route::get('materials/receive-materials',[PurchaseOrderController::class,'receiveMaterials'])->name('materials.receive');
     Route::delete('goods-receipts/{goodsReceipt}',[GoodsReceiptController::class, 'destroy'])->name('goods-receipts.destroy');
     Route::delete('goods-receipt-attachments/{attachment}',[GoodsReceiptController::class, 'destroyAttachment'])->name('goods-receipt-attachments.destroy');
 
@@ -69,6 +71,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('vendor-payments',VendorPaymentController::class)->except('store');
     Route::post('vendor-payments/{vendorBill}',[VendorPaymentController::class,'store'])->name('vendor-payments.store');
     
+    Route::view('test','test.index');
     // Logout
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });

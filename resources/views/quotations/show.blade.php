@@ -103,9 +103,9 @@
                     Purchase Request
                 </p>
 
-                <p class="mt-1.5 font-semibold text-gray-900">
+                <a href="{{ route('purchase-requests.show',$quotation->purchaseRequest) }}" class="mt-1.5 font-semibold text-blue-900 underline">
                     PR-{{ $quotation->purchaseRequest->request_number }}
-                </p>
+                </a>
             </div>
 
             {{-- Vendor --}}

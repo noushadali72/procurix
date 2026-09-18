@@ -140,9 +140,9 @@
                             {{-- PO Number --}}
                             <td class="px-6 py-4">
 
-                                <p class="font-medium text-gray-900">
+                                <a href="{{ route('purchase-orders.show',$vendorBill->purchaseOrder) }}" class="font-medium text-blue-900 underline">
                                     {{ $vendorBill->purchaseOrder->order_number ?? '-' }}
-                                </p>
+                                </a>
 
                             </td>
 

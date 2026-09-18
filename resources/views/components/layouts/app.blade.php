@@ -69,7 +69,7 @@
                         class="flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-gray-900 hover:text-white">
                         <span class="flex items-center gap-3">
                             <i class="bx bx-package text-[20px]"></i>
-                            <span>Items</span>
+                            <span>Inventories</span>
                         </span>
 
                         <i id="inventoryMenuIcon" class="bx bx-chevron-down text-lg transition-transform"></i>
@@ -100,7 +100,7 @@
                                 : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
 
                             <i class="bx bx-cube text-[19px]"></i>
-                            <span>Raw Materials</span>
+                            <span>Materials</span>
 
                         </a>
 
@@ -210,6 +210,18 @@
                 </p>
 
                 <div class="space-y-1">
+
+                    {{-- Goods Receipts --}}
+                    <a href="{{ route('materials.receive') }}"
+                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
+                        {{ request()->routeIs('materials.receive')
+                            ? 'bg-gray-800 text-white'
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
+                        <i class="bx bx-package text-[20px]"></i>
+                        <span>Receive Materials</span>
+
+                    </a>
 
                     {{-- Goods Receipts --}}
                     <a href="{{ route('goods-receipts.index') }}"

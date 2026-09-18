@@ -54,9 +54,9 @@
                     Purchase Order
                 </p>
 
-                <p class="mt-1 font-medium text-gray-900 dark:text-white">
+                <a href="{{ route('purchase-orders.show',$goodsReceipt->purchaseOrder) }}" class="mt-1 font-medium text-blue-900 dark:text-white underline">
                     {{ $goodsReceipt->purchaseOrder->order_number }}
-                </p>
+                </a>
             </div>
 
             <div>

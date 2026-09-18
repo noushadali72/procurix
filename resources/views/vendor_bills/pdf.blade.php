@@ -153,8 +153,7 @@
             border-bottom: 1px solid #e5e7eb;
             vertical-align: top;
         }
-P::
-        .text-right {
+        P::.text-right {
             text-align: right !important;
         }
 
@@ -318,7 +317,7 @@ P::
             <div class="info-row">
                 <span class="label">Contact:</span>
                 <span class="value">
-                    {{ $vendorBill->vendor->contact_no ?? '-' }}
+                    {{ $vendorBill->vendor->phone ?? '-' }}
                 </span>
             </div>
 

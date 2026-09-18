@@ -97,14 +97,17 @@
                         <td class="px-5 py-4">
                             @if($goodsReceipt->purchaseOrder)
                                 <div>
-                                    <p class="font-medium text-gray-900 dark:text-white">
+                                    <a href="{{ route('purchase-orders.show',$goodsReceipt->purchaseOrder) }}" class="font-medium text-blue-900 dark:text-white underline">
                                         {{ $goodsReceipt->purchaseOrder->order_number }}
-                                    </p>
+                                    </a>
 
                                     @if($goodsReceipt->purchaseOrder->quotation)
-                                        <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                                    <br>
+                                        <p  class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                                             Quotation:
-                                            {{ $goodsReceipt->purchaseOrder->quotation->quotation_number }}
+                                            <a href="{{ route('quotations.show',$goodsReceipt->purchaseOrder->quotation) }}" class="underline">
+                                                {{ $goodsReceipt->purchaseOrder->quotation->quotation_number }}
+                                            </a>
                                         </p>
                                     @endif
                                 </div>

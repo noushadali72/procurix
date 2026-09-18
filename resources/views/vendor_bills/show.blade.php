@@ -132,9 +132,9 @@
                     Purchase Order
                 </p>
 
-                <p class="mt-1.5 font-semibold text-gray-900">
+                <a href="{{ route('purchase-orders.show',$vendorBill->purchaseOrder) }}" class="mt-1.5 font-semibold text-blue-900 underline">
                     {{ $vendorBill->purchaseOrder->order_number ?? '-' }}
-                </p>
+                </a>
             </div>
 
             {{-- Bill Date --}}

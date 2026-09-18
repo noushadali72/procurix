@@ -111,7 +111,7 @@
 
                             {{-- Serial Number --}}
                             <td class="px-5 py-4 text-gray-400">
-                                {{ $quotations->firstItem() + $index }}
+                                {{ $quotation->quotation_number??$index+1 }}
                             </td>
 
 
@@ -120,8 +120,10 @@
 
                                 <span
                                     class="inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
-                                    <i class="bx bx-receipt text-sm"></i>
-                                    PR-{{ $quotation->purchaseRequest->request_number }}
+                                    <a href="{{ route('purchase-requests.show',$quotation->purchaseRequest) }}">
+                                        <i class="bx bx-receipt text-sm"></i>
+                                        PR-{{ $quotation->purchaseRequest->request_number }}
+                                    </a>
                                 </span>
 
                             </td>

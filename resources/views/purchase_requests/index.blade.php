@@ -73,6 +73,10 @@
                             Date
                         </th>
 
+                          <th class="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            Quotations Received
+                        </th>
+
                         <th class="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Actions
                         </th>
@@ -181,6 +185,18 @@
                                 <div class="mt-0.5 text-xs text-gray-400">
                                     {{ $purchaseRequest->created_at->format('h:i A') }}
                                 </div>
+
+                            </td>
+
+
+                            {{-- Items --}}
+                            <td class="px-5 py-4">
+
+                                <span
+                                    class="inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                                    <i class="bx bx-file-find text-[15px]"></i>
+                                    {{ $purchaseRequest->quotations->count() }}
+                                </span>
 
                             </td>
 

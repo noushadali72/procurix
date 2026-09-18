@@ -51,4 +51,9 @@ class PurchaseOrderController extends Controller
             return response()->json(['message' => 'Unable to delete purchase order.'], 500);
         }
     }
+
+    public function receiveMaterials(){
+        $purchaseOrders = PurchaseOrder::whereIn('status',['partially_received','placed'])->latest()->paginate(10);
+        return view('raw_materials.receive_materials',compact('purchaseOrders'));
+    }
 }

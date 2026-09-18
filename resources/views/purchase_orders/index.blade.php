@@ -129,7 +129,10 @@
                                         @if ($order->quotation)
                                             <p class="mt-0.5 text-xs text-gray-500">
                                                 Quotation
-                                                #{{ $order->quotation->quotation_number ?? $order->quotation->id }}
+                                               
+                                               <a href="{{ route('quotations.show',$order->quotation) }}" class="underline">
+                                                   #{{ $order->quotation->quotation_number ?? $order->quotation->id }}
+                                                </a>
                                             </p>
                                         @endif
                                     </div>
@@ -224,8 +227,8 @@
                                     </a>
 
                                     @if ($order->vendorBill)
-                                        <a href="{{ route('vendor-bills.generatepdf', $order->vendorBill) }}"
-                                            target="_blank"
+                                        <a href="{{ route('vendor-bills.show', $order->vendorBill) }}"
+                                           
                                             class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white">
                                             <i class="bx bx-file"></i>
                                             Bill

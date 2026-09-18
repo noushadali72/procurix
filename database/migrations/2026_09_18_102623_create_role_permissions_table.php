@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('purchase_requests', function (Blueprint $table) {
+        Schema::create('role_permissions', function (Blueprint $table) {
             $table->id();
-            $table->string('request_number');
-            $table->enum('status',['completed','pending','active','partially_closed','draft'])->default('active');
-            $table->text('notes')->nullable();
-            $table->date('due_date')->nullable();
+            $table->foreignId('permission_id')->constrained('permissions')->cascadeOnDelete();
+            $table->foreignId('role_id')->constrained('roles')->cascadeOnDelete();
+            $table->primary(['role_id','permission_id']);
+    
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('purchase_requests');
+        Schema::dropIfExists('role_permissions');
     }
 };

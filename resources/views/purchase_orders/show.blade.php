@@ -160,9 +160,9 @@
                     Purchase Request
                 </p>
 
-                <p class="mt-1.5 font-semibold text-gray-900">
+                <a href="{{ route('purchase-requests.show',$purchaseOrder->quotation->purchaseRequest) }}" class="mt-1.5 font-semibold text-blue-900 underline">
                     PR-{{ $purchaseOrder->quotation->purchaseRequest->request_number }}
-                </p>
+                </a>
             </div>
 
 
@@ -193,6 +193,19 @@
                     </span>
 
                 </div>
+            </div>
+
+
+
+            {{-- Received Date --}}
+            <div>
+                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
+                    Quotation Number
+                </p>
+
+                <a href="{{ route('quotations.show',$purchaseOrder->quotation) }}" class="mt-1.5 font-semibold text-blue-900 underline">
+                    {{ $purchaseOrder->quotation->quotation_number ?? '-' }}
+                </a>
             </div>
 
 

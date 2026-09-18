@@ -133,8 +133,9 @@
 
                             {{-- Bill --}}
                             <td class="px-6 py-4 text-slate-600">
-
-                                {{ $payment->vendorBill->bill_number ?: 'Bill #' . $payment->vendorBill->id }}
+                                <a href="{{ route('vendor-bills.show',$payment->vendorBill) }}" class="mt-1.5 font-semibold text-blue-900 underline">
+                                    {{ $payment->vendorBill->bill_number ?: 'Bill #' . $payment->vendorBill->id }}
+                                </a>
 
                             </td>
 

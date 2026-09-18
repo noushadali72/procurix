@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+use Override;
 
 class Quotation extends Model
 {
@@ -41,5 +43,22 @@ class Quotation extends Model
     public function purchaseOrder()
     {
         return $this->hasOne(PurchaseOrder::class);
+    }
+
+    #[Override]
+    protected static function booted()
+    {
+        static::creating(function(Quotation $q){
+            $q->quotation_number = static::generateQuotationNumber();
+        });
+    }
+
+    private static function generateQuotationNumber():string{
+        do{
+            $temp = 'QN-'.strtoupper(Str::random(5));
+        }while(Quotation::where('quotation_number',$temp)->exists());
+    
+        return $temp;
+        
     }
 }

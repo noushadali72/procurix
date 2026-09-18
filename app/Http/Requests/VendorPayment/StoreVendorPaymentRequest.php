@@ -29,7 +29,7 @@ class StoreVendorPaymentRequest extends FormRequest
             'amount'=>['required','numeric','gt:0'],
             'payment_method'=>['required','string','max:255'],
             'payment_date'=>['nullable','date'],
-            'payment_proof'=>['nullable','image','mimes:png,jpg,jpeg','max:1024'],
+            'payment_proof'=>['nullable','image','mimes:png,jpg,jpeg','max:4096'],
             'status'=>['nullable','in:successful,failed,refunded'],
             'references'=>['nullable','string','max:255'],
             'notes'=>['nullable','string','max:255'],

@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('purchase_requests', function (Blueprint $table) {
+        Schema::create('permissions', function (Blueprint $table) {
             $table->id();
-            $table->string('request_number');
-            $table->enum('status',['completed','pending','active','partially_closed','draft'])->default('active');
-            $table->text('notes')->nullable();
-            $table->date('due_date')->nullable();
+            $table->string('name')->unique();
+            $table->string('label')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('purchase_requests');
+        Schema::dropIfExists('permissions');
     }
 };
