@@ -83,6 +83,11 @@
                         </th>
 
                         <th class="px-6 py-3.5">
+                            Proof
+                        </th>
+
+
+                        <th class="px-6 py-3.5">
                             Reference
                         </th>
 
@@ -178,6 +183,17 @@
                             </td>
 
 
+                            {{-- Payment Proof --}}
+                            <td class="px-6 py-4 font-semibold text-slate-900">
+
+                                @if ($payment->payment_proof)
+                                <a class="text-blue-700" href="{{asset('storage/'.$payment->payment_proof)}}">View</a>
+                                @endif
+                               
+
+                            </td>
+
+
                             {{-- Reference --}}
                             <td class="max-w-[200px] px-6 py-4 text-slate-600">
 
@@ -234,7 +250,7 @@
     {{-- Record Payment Modal --}}
     <div id="paymentModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4">
 
-        <div class="w-[1/1.5] max-w-2xl rounded-xl bg-white shadow-xl">
+        <div class="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-xl bg-white shadow-xl">
 
             {{-- Modal Header --}}
             <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
@@ -257,7 +273,7 @@
             </div>
 
 
-            <form id="paymentForm">
+            <form id="paymentForm" enctype="multipart/form-data">
 
                 @csrf
 
@@ -477,6 +493,23 @@
 
                     </div>
 
+                     {{-- Payment proof --}}
+                        <div>
+
+                            <label for="payment_proof" class="mb-1.5 block text-sm font-medium text-slate-700">
+                                Payment Proof
+                            
+                            </label>
+
+                            <input type="file" accept="image/png, image/jpeg, image/jpg" id="payment_proof" name="payment_proof"
+                                placeholder="0.00"
+                                class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
+
+                            <span id="paymentProofErr" class="mt-1 block text-xs text-red-600">
+                            </span>
+
+                        </div>
+
                 </div>
 
 
@@ -621,48 +654,36 @@
                         .text('Recording...');
 
 
+                    
+                    const formData = new FormData(form[0]);
                     $.ajax({
 
                         url: "{{ route('vendor-payments.store', ':vendorBill') }}"
                             .replace(':vendorBill', billId),
-
                         type: 'POST',
-
-                        data: form.serialize(),
-
+                        data: formData,
+                        processData: false,
+                        contentType: false,
                         headers: {
                             'Accept': 'application/json'
                         },
-
-
                         success: function(response) {
-
                             showToast(
                                 'success',
                                 response.message ||
                                 'Payment recorded successfully.'
                             );
-
-
                             closeModal();
-
-
                             setTimeout(function() {
-
                                 window.location.reload();
 
                             }, 800);
 
                         },
-
-
                         error: function(xhr) {
-
                             button
                                 .prop('disabled', false)
                                 .text('Record Payment');
-
-
                             if (xhr.status === 422) {
 
                                 showValidationErrors(
@@ -699,6 +720,7 @@
                     $('#paymentMethodErr').text('');
                     $('#transactionIdErr').text('');
                     $('#paymentDateErr').text('');
+                    $('#paymentProofErr').text('');
                     $('#referencesErr').text('');
                     $('#notesErr').text('');
 
@@ -740,6 +762,11 @@
                     if (errors.notes) {
                         $('#notesErr')
                             .text(errors.notes[0]);
+                    }
+
+                    if (errors.payment_proof) {
+                        $('#paymentProofErr')
+                            .text(errors.payment_proof[0]);
                     }
 
                 }

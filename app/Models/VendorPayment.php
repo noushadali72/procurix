@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
-#[Fillable(['vendor_bill_id','transaction_id','amount','payment_method','payment_date','status','references','notes'])]
+#[Fillable(['vendor_bill_id','transaction_id','amount','payment_method','payment_date','status','payment_proof','references','notes'])]
 class VendorPayment extends Model
 {
     

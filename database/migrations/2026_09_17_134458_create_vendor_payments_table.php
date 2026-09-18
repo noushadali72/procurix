@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('amount',20,2)->default(0);
             $table->string('payment_method')->nullable();
             $table->date('payment_date')->nullable();
+            $table->text('payment_proof')->nullable();
             $table->enum('status',['successful','failed','refunded'])->default('successful');
             $table->text('references')->nullable();
             $table->text('notes')->nullable();

@@ -24,7 +24,7 @@ class VendorPaymentController extends Controller
             'vendorBill',
             'vendorBill.vendor',
         ])->latest()->paginate(10);
-        
+
         return view(
             'vendor_payments.index',
             compact('vendorPayments', 'unpaidBills'));
@@ -61,11 +61,17 @@ class VendorPaymentController extends Controller
         }
 
         try {
+            $path = null;
+            if($request->hasFile('payment_proof')){
+                $path = $request->file('payment_proof')->store('images/payment_proof','public');
+            }
+
             $vendorBill->vendorPayments()->create([
                 'transaction_id' => $validated['transaction_id'] ?? null,
                 'amount' => $validated['amount'],
                 'payment_method' => $validated['payment_method'],
                 'payment_date' => $validated['payment_date'] ?? now()->toDateString(),
+                'payment_proof'=>$path,
                 'status' => 'successful',
                 'references' => $validated['references'] ?? null,
                 'notes' => $validated['notes'] ?? null,
@@ -87,6 +93,7 @@ class VendorPaymentController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Unable to make payment.',
+                'error'=>$e->getMessage()
             ], 500);
         }
     }

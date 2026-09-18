@@ -476,6 +476,7 @@
             id="paymentForm"
             action="{{ route('vendor-payments.store', $vendorBill) }}"
             method="POST"
+            enctype="multipart/form-data"
             class="p-6"
         >
             @csrf
@@ -529,7 +530,7 @@
                         for="payment_method"
                         class="mb-1 block text-sm font-medium text-gray-700"
                     >
-                        Payment Method
+                        Payment Method<sup>*</sup>
                     </label>
 
                     <select
@@ -622,6 +623,31 @@
                     ></p>
                 </div>
 
+                   {{-- Amount --}}
+                <div>
+                    <label
+                        for="payment_proof"
+                        class="mb-1 block text-sm font-medium text-gray-700"
+                    >
+                        Payment Proof
+                    </label>
+
+                    <input
+                        type="file"
+                        accept="image/png, image/jpg, image/jpeg"
+                        id="payment_proof"
+                        name="payment_proof"
+                        placeholder="Select Payment Proof"
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+                    >
+
+                    <p
+                        data-error="payment_proof"
+                        class="mt-1 hidden text-sm text-red-600"
+                    ></p>
+                </div>
+
+
             </div>
 
             {{-- Actions --}}
@@ -705,14 +731,17 @@
                     Processing...
                 `);
 
+            var formData = new FormData(form[0]);
             $.ajax({
                 url: form.attr('action'),
                 type: 'POST',
-                data: form.serialize(),
+                data: formData,
+                processData: false,
+                contentType: false,
 
                 success: function (response) {
+                    $('#paymentForm')[0].reset();
                     showToast('success', response.message);
-
                     setTimeout(function () {
                         window.location.reload();
                     }, 500);
