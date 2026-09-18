@@ -184,12 +184,27 @@
 
 
                             {{-- Payment Proof --}}
-                            <td class="px-6 py-4 font-semibold text-slate-900">
+                            <td class="px-6 py-4">
 
                                 @if ($payment->payment_proof)
-                                <a class="text-blue-700" href="{{asset('storage/'.$payment->payment_proof)}}">View</a>
+
+                                    <button type="button"
+                                        class="view-proof-btn inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 transition hover:text-slate-900"
+                                        data-image="{{ asset('storage/' . $payment->payment_proof) }}">
+
+                                        <i class="bx bx-image text-lg"></i>
+
+                                        View
+
+                                    </button>
+
+                                @else
+
+                                    <span class="text-slate-400">
+                                        -
+                                    </span>
+
                                 @endif
-                               
 
                             </td>
 
@@ -535,6 +550,110 @@
     </div>
 
 
+        {{-- Payment Proof Preview Modal --}}
+        <div id="proofModal"
+            class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-950/70 p-4 backdrop-blur-[2px]">
+
+            {{-- Modal Container --}}
+            <div
+                class="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden
+                    rounded-2xl border border-slate-200 bg-white
+                    shadow-[0_25px_70px_-15px_rgba(15,23,42,0.45)]">
+
+                {{-- Header --}}
+                <div
+                    class="flex shrink-0 items-center justify-between
+                        border-b border-slate-200 bg-white px-5 py-4
+                        shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
+
+                    <div class="flex items-center gap-3">
+
+                        {{-- Icon --}}
+                        <div
+                            class="flex h-10 w-10 items-center justify-center
+                                rounded-xl border border-slate-200 bg-slate-50
+                                shadow-sm">
+
+                            <i class="bx bx-image text-xl text-slate-700"></i>
+
+                        </div>
+
+                        <div>
+                            <h3 class="text-sm font-semibold text-slate-900">
+                                Payment Proof
+                            </h3>
+
+                            <p class="mt-0.5 text-xs text-slate-500">
+                                Uploaded payment receipt or proof
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    {{-- Close --}}
+                    <button type="button"
+                        id="closeProofModal"
+                        class="flex h-9 w-9 items-center justify-center
+                            rounded-lg border border-slate-200 bg-white
+                            text-slate-500 shadow-sm transition
+                            hover:border-slate-300 hover:bg-slate-50
+                            hover:text-slate-900">
+
+                        <i class="bx bx-x text-2xl"></i>
+
+                    </button>
+
+                </div>
+
+
+                {{-- Preview Area --}}
+                <div class="min-h-0 flex-1 overflow-auto bg-slate-100 p-5 sm:p-6">
+
+                    {{-- Image Frame --}}
+                    <div
+                        class="flex min-h-[350px] items-center justify-center
+                            rounded-xl border border-slate-200 bg-white p-3
+                            shadow-[0_4px_18px_rgba(15,23,42,0.10)]">
+
+                        <img id="proofPreviewImage"
+                            src=""
+                            alt="Payment Proof"
+                            class="max-h-[68vh] max-w-full rounded-lg
+                                border border-slate-200 object-contain
+                                shadow-md">
+
+                    </div>
+
+                </div>
+
+
+                {{-- Footer --}}
+                <div
+                    class="flex shrink-0 items-center justify-between
+                        border-t border-slate-200 bg-white px-5 py-3">
+
+                    <p class="flex items-center gap-1.5 text-xs text-slate-500">
+                        <i class="bx bx-check-shield text-base"></i>
+                        Payment attachment
+                    </p>
+
+                    <button type="button"
+                        id="closeProofModalFooter"
+                        class="rounded-lg border border-slate-300 bg-white
+                            px-4 py-2 text-sm font-medium text-slate-700
+                            shadow-sm transition
+                            hover:bg-slate-50 hover:text-slate-900">
+                        Close
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
     @push('scripts')
         <script>
             $(document).ready(function() {
@@ -795,6 +914,48 @@
                 }
 
             });
+        
+                
+                // Open payment proof preview
+        $('.view-proof-btn').on('click', function () {
+
+            const image = $(this).data('image');
+
+            $('#proofPreviewImage').attr('src', image);
+
+            $('#proofModal')
+                .removeClass('hidden')
+                .addClass('flex');
+
+        });
+
+
+        // Close payment proof preview
+        $('#closeProofModal, #closeProofModalFooter').on('click', function () {
+            closeProofModal();
+        });
+
+
+        // Close when clicking outside image modal
+        $('#proofModal').on('click', function (e) {
+
+            if (e.target === this) {
+                closeProofModal();
+            }
+
+        });
+
+
+        function closeProofModal() {
+
+            $('#proofModal')
+                .addClass('hidden')
+                .removeClass('flex');
+
+            $('#proofPreviewImage').attr('src', '');
+
+        }
+                
         </script>
     @endpush
 

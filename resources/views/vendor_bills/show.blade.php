@@ -443,16 +443,23 @@
 
     @endif
 
-    {{-- Payment Modal --}}
-<div
-    id="paymentModal"
-    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 px-4"
->
-    <div class="w-full max-w-lg rounded-xl bg-white shadow-xl">
+{{-- Payment Modal --}}
+<div id="paymentModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4">
+
+    {{-- Modal Container --}}
+    <div
+        class="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden
+               rounded-xl border border-gray-200 bg-white
+               shadow-[0_20px_60px_-15px_rgba(0,0,0,0.30)]">
 
         {{-- Header --}}
-        <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+        <div
+            class="flex shrink-0 items-center justify-between
+                   border-b border-gray-200 bg-white px-5 py-4">
+
             <div>
+
                 <h3 class="font-semibold text-gray-900">
                     Make Payment
                 </h3>
@@ -460,219 +467,285 @@
                 <p class="mt-1 text-sm text-gray-500">
                     Record a payment for this vendor bill.
                 </p>
+
             </div>
 
-            <button
-                type="button"
+            <button type="button"
                 id="closePaymentModal"
-                class="text-gray-400 transition hover:text-gray-700"
-            >
+                class="flex h-9 w-9 items-center justify-center
+                       rounded-lg border border-gray-200
+                       text-gray-400 shadow-sm transition
+                       hover:bg-gray-50 hover:text-gray-700">
+
                 <i class="bx bx-x text-2xl"></i>
+
             </button>
+
         </div>
 
+
         {{-- Form --}}
-        <form
-            id="paymentForm"
+        <form id="paymentForm"
             action="{{ route('vendor-payments.store', $vendorBill) }}"
             method="POST"
             enctype="multipart/form-data"
-            class="p-6"
-        >
+            class="flex min-h-0 flex-1 flex-col">
+
             @csrf
 
 
+            {{-- Scrollable Form Body --}}
+            <div class="flex-1 overflow-y-auto px-5 py-4">
 
-            <div class="space-y-5">
+                <div class="space-y-4">
 
-                {{-- Outstanding --}}
-                <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-500">
-                            Outstanding Amount
-                        </span>
+                    {{-- Outstanding --}}
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
 
-                        <span class="font-semibold text-gray-900">
-                            {{ number_format($vendorBill->due_amount, 2) }}
-                        </span>
+                        <div class="flex items-center justify-between">
+
+                            <span class="text-sm text-gray-500">
+                                Outstanding Amount
+                            </span>
+
+                            <span class="font-semibold text-gray-900">
+                                {{ number_format($vendorBill->due_amount, 2) }}
+                            </span>
+
+                        </div>
+
                     </div>
+
+
+                    {{-- Amount + Payment Method --}}
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                        {{-- Amount --}}
+                        <div>
+
+                            <label for="payment_amount"
+                                class="mb-1.5 block text-sm font-medium text-gray-700">
+                                Payment Amount
+                            </label>
+
+                            <input type="number"
+                                step="0.01"
+                                min="0.01"
+                                max="{{ $vendorBill->due_amount }}"
+                                id="payment_amount"
+                                name="amount"
+                                placeholder="Enter amount"
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+
+                            <p data-error="amount"
+                                class="mt-1 hidden text-xs text-red-600">
+                            </p>
+
+                        </div>
+
+
+                        {{-- Payment Method --}}
+                        <div>
+
+                            <label for="payment_method"
+                                class="mb-1.5 block text-sm font-medium text-gray-700">
+
+                                Payment Method
+                                <span class="text-red-500">*</span>
+
+                            </label>
+
+                            <select id="payment_method"
+                                name="payment_method"
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+
+                                <option value="">
+                                    Select Method
+                                </option>
+
+                                <option value="cash">
+                                    Cash
+                                </option>
+
+                                <option value="bank_transfer">
+                                    Bank Transfer
+                                </option>
+
+                                <option value="cheque">
+                                    Cheque
+                                </option>
+
+                                <option value="card">
+                                    Card
+                                </option>
+
+                                <option value="other">
+                                    Other
+                                </option>
+
+                            </select>
+
+                            <p data-error="payment_method"
+                                class="mt-1 hidden text-xs text-red-600">
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- Payment Date + Transaction ID --}}
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                        {{-- Payment Date --}}
+                        <div>
+
+                            <label for="payment_date"
+                                class="mb-1.5 block text-sm font-medium text-gray-700">
+                                Payment Date
+                            </label>
+
+                            <input type="date"
+                                id="payment_date"
+                                name="payment_date"
+                                value="{{ now()->toDateString() }}"
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+
+                            <p data-error="payment_date"
+                                class="mt-1 hidden text-xs text-red-600">
+                            </p>
+
+                        </div>
+
+
+                        {{-- Transaction ID --}}
+                        <div>
+
+                            <label for="transaction_id"
+                                class="mb-1.5 block text-sm font-medium text-gray-700">
+
+                                Transaction ID
+
+                                <span class="font-normal text-gray-400">
+                                    (Optional)
+                                </span>
+
+                            </label>
+
+                            <input type="text"
+                                id="transaction_id"
+                                name="transaction_id"
+                                placeholder="Transaction ID"
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+
+                            <p data-error="transaction_id"
+                                class="mt-1 hidden text-xs text-red-600">
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- Payment Proof --}}
+                    <div>
+
+                        <label for="payment_proof"
+                            class="mb-1.5 block text-sm font-medium text-gray-700">
+
+                            Payment Proof
+
+                            <span class="font-normal text-gray-400">
+                                (Optional)
+                            </span>
+
+                        </label>
+
+                        <input type="file"
+                            accept="image/png,image/jpg,image/jpeg"
+                            id="payment_proof"
+                            name="payment_proof"
+                            class="block w-full rounded-lg border border-gray-300
+                                   bg-white px-3 py-2 text-sm text-gray-600
+                                   file:mr-3 file:rounded-md file:border-0
+                                   file:bg-gray-100 file:px-3 file:py-1.5
+                                   file:text-xs file:font-medium
+                                   file:text-gray-700
+                                   hover:file:bg-gray-200">
+
+                        <p data-error="payment_proof"
+                            class="mt-1 hidden text-xs text-red-600">
+                        </p>
+
+                    </div>
+
+
+                    {{-- Notes --}}
+                    <div>
+
+                        <label for="payment_notes"
+                            class="mb-1.5 block text-sm font-medium text-gray-700">
+
+                            Notes
+
+                            <span class="font-normal text-gray-400">
+                                (Optional)
+                            </span>
+
+                        </label>
+
+                        <textarea id="payment_notes"
+                            name="notes"
+                            rows="2"
+                            placeholder="Enter payment notes"
+                            class="w-full resize-none rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"></textarea>
+
+                        <p data-error="notes"
+                            class="mt-1 hidden text-xs text-red-600">
+                        </p>
+
+                    </div>
+
                 </div>
-
-                {{-- Amount --}}
-                <div>
-                    <label
-                        for="payment_amount"
-                        class="mb-1 block text-sm font-medium text-gray-700"
-                    >
-                        Payment Amount
-                    </label>
-
-                    <input
-                        type="number"
-                        step="0.01"
-                        min="0.01"
-                        max="{{ $vendorBill->due_amount }}"
-                        id="payment_amount"
-                        name="amount"
-                        placeholder="Enter payment amount"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
-                    >
-
-                    <p
-                        data-error="amount"
-                        class="mt-1 hidden text-sm text-red-600"
-                    ></p>
-                </div>
-
-                {{-- Payment Method --}}
-                <div>
-                    <label
-                        for="payment_method"
-                        class="mb-1 block text-sm font-medium text-gray-700"
-                    >
-                        Payment Method<sup>*</sup>
-                    </label>
-
-                    <select
-                        id="payment_method"
-                        name="payment_method"
-                        class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
-                    >
-                        <option value="">Select payment method</option>
-                        <option value="cash">Cash</option>
-                        <option value="bank_transfer">Bank Transfer</option>
-                        <option value="cheque">Cheque</option>
-                        <option value="card">Card</option>
-                        <option value="other">Other</option>
-                    </select>
-
-                    <p
-                        data-error="payment_method"
-                        class="mt-1 hidden text-sm text-red-600"
-                    ></p>
-                </div>
-
-                {{-- Payment Date --}}
-                <div>
-                    <label
-                        for="payment_date"
-                        class="mb-1 block text-sm font-medium text-gray-700"
-                    >
-                        Payment Date
-                    </label>
-
-                    <input
-                        type="date"
-                        id="payment_date"
-                        name="payment_date"
-                        value="{{ now()->toDateString() }}"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
-                    >
-
-                    <p
-                        data-error="payment_date"
-                        class="mt-1 hidden text-sm text-red-600"
-                    ></p>
-                </div>
-
-                {{-- Transaction ID --}}
-                <div>
-                    <label
-                        for="transaction_id"
-                        class="mb-1 block text-sm font-medium text-gray-700"
-                    >
-                        Transaction ID
-                        <span class="font-normal text-gray-400">(Optional)</span>
-                    </label>
-
-                    <input
-                        type="text"
-                        id="transaction_id"
-                        name="transaction_id"
-                        placeholder="Enter transaction ID"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
-                    >
-
-                    <p
-                        data-error="transaction_id"
-                        class="mt-1 hidden text-sm text-red-600"
-                    ></p>
-                </div>
-
-                {{-- Notes --}}
-                <div>
-                    <label
-                        for="payment_notes"
-                        class="mb-1 block text-sm font-medium text-gray-700"
-                    >
-                        Notes
-                        <span class="font-normal text-gray-400">(Optional)</span>
-                    </label>
-
-                    <textarea
-                        id="payment_notes"
-                        name="notes"
-                        rows="3"
-                        placeholder="Enter payment notes"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
-                    ></textarea>
-
-                    <p
-                        data-error="notes"
-                        class="mt-1 hidden text-sm text-red-600"
-                    ></p>
-                </div>
-
-                   {{-- Amount --}}
-                <div>
-                    <label
-                        for="payment_proof"
-                        class="mb-1 block text-sm font-medium text-gray-700"
-                    >
-                        Payment Proof
-                    </label>
-
-                    <input
-                        type="file"
-                        accept="image/png, image/jpg, image/jpeg"
-                        id="payment_proof"
-                        name="payment_proof"
-                        placeholder="Select Payment Proof"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
-                    >
-
-                    <p
-                        data-error="payment_proof"
-                        class="mt-1 hidden text-sm text-red-600"
-                    ></p>
-                </div>
-
 
             </div>
 
-            {{-- Actions --}}
-            <div class="mt-6 flex justify-end gap-3 border-t border-gray-200 pt-5">
 
-                <button
-                    type="button"
+            {{-- Fixed Footer --}}
+            <div
+                class="flex shrink-0 justify-end gap-3
+                       border-t border-gray-200 bg-white px-5 py-4">
+
+                <button type="button"
                     id="cancelPayment"
-                    class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-                >
+                    class="rounded-lg border border-gray-300
+                           bg-white px-4 py-2 text-sm font-medium
+                           text-gray-700 shadow-sm transition
+                           hover:bg-gray-50">
+
                     Cancel
+
                 </button>
 
-                <button
-                    type="submit"
+                <button type="submit"
                     id="submitPayment"
-                    class="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
-                >
+                    class="inline-flex items-center gap-1.5
+                           rounded-lg bg-gray-900 px-4 py-2
+                           text-sm font-medium text-white
+                           shadow-sm transition hover:bg-gray-800">
+
                     <i class="bx bx-check"></i>
+
                     Record Payment
+
                 </button>
 
             </div>
+
         </form>
+
     </div>
+
 </div>
 
 
