@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Role\StoreRoleRequest;
+use App\Http\Requests\Role\UpdateRoleRequest;
+use App\Models\Permission;
 use App\Models\Role;
+use Exception;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
@@ -12,7 +16,9 @@ class RoleController extends Controller
      */
     public function index()
     {
-        //
+        $permissions = Permission::all();
+        $roles = Role::with('permissions')->latest()->paginate(10);
+        return view('roles.index',compact('roles','permissions'));
     }
 
     /**
@@ -26,9 +32,23 @@ class RoleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRoleRequest $request)
     {
-        //
+        $validated = $request->validated();
+        try{
+            Role::create($validated);
+            return response()->json([
+                'success'=>true,
+                'message'=>'Role created successfully.'
+            ],200);
+        }catch(Exception $e){
+            return response()->json([
+                'success'=>false,
+                'message'=>'Unable to create role',
+                'error'=>$e
+            ],500);
+        }
+        
     }
 
     /**
@@ -50,9 +70,22 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Role $role)
+    public function update(UpdateRoleRequest $request, Role $role)
     {
-        //
+        $validated = $request->validated();
+        try{
+            $role->update($validated);
+            return response()->json([
+                'success'=>true,
+                'message'=>'Role Updated successfully.'
+            ],200);
+        }catch(Exception $e){
+            return response()->json([
+                'success'=>false,
+                'message'=>'Unable to update role.',
+                'error'=>$e
+            ],500);
+        }
     }
 
     /**
@@ -60,6 +93,18 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
-        //
+        try{
+            $role->delete();
+            return response()->json([
+                'success'=>true,
+                'message'=>'Role deleted successfully.'
+            ],200);
+        }catch(Exception $e){
+            return response()->json([
+                'success'=>true,
+                'message'=>'Unable to delete the role, May be associated with users.',
+                'error'=>$e->getMessage()
+            ],500);
+        }
     }
 }

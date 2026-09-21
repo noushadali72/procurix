@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Permission\StorePermissionRequest;
 use App\Models\Permission;
+use Exception;
 use Illuminate\Http\Request;
 
 class PermissionController extends Controller
@@ -12,7 +14,8 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        //
+        $permissions = Permission::latest()->paginate(10);
+        return view('permissions.index',compact('permissions'));
     }
 
     /**
@@ -26,9 +29,24 @@ class PermissionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePermissionRequest $request)
     {
-        //
+
+        $validated = $request->validated();
+        try{
+            Permission::create($validated);
+            return response()->json([
+                'success'=>true,
+                'message'=>'Permission created successfully.'
+            ],200);
+        }catch(Exception $e){
+            return response()->json([
+                'success'=>false,
+                'message'=>'Unable to create permission.',
+                'error'=>$e
+            ],500);
+        }
+        
     }
 
     /**
@@ -52,7 +70,20 @@ class PermissionController extends Controller
      */
     public function update(Request $request, Permission $permission)
     {
-        //
+        $validated = $request->validated();
+        try{
+            $permission->update($validated);
+            return response()->json([
+                'success'=>true,
+                'message'=>'Permission Updated successfully.'
+            ],200);
+        }catch(Exception $e){
+            return response()->json([
+                'success'=>false,
+                'message'=>'Unable to update permission.',
+                'error'=>$e
+            ],500);
+        }
     }
 
     /**
@@ -60,6 +91,19 @@ class PermissionController extends Controller
      */
     public function destroy(Permission $permission)
     {
-        //
+        try{
+            $permission->delete();
+            return response()->json([
+                'success'=>true,
+                'message'=>'Permission deleted successfully.'
+            ],200);
+        }catch(Exception $e){
+            return response()->json([
+                'success'=>true,
+                'message'=>'Unable to delete the permission, May be associated with roles.',
+                'error'=>$e->getMessage()
+            ],500);
+        }
+        
     }
 }

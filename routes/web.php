@@ -7,11 +7,14 @@ use App\Http\Controllers\ManufacturingController;
 use App\Http\Controllers\ManufacturingFormulaController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\RawMaterialController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UnitController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VendorBillController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\VendorPaymentController;
@@ -28,6 +31,15 @@ Route::middleware(['guest'])->prefix('auth')->group(function () {
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', [DashboardController::class, 'dashboard'])->name('admin.dashboard');
 
+    // User management
+    Route::resource('users', UserController::class)->except(['edit','show']);
+
+    // Role Management
+    Route::resource('roles',RoleController::class)->except(['edit','show']);
+
+    // Permission management
+    Route::resource('permissions',PermissionController::class)->except(['edit','show']);
+    
     // Inventory routes
     Route::resource('products', ProductController::class);
     Route::resource('raw-materials', RawMaterialController::class)->except(['show']);
