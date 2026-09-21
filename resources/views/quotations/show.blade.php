@@ -28,9 +28,13 @@
         </div>
 
         {{-- Actions --}}
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 quotation-action">
 
-            @if($quotation->status === 'pending')
+            @if($quotation->purchaseRequest->status=='completed')
+                 <span class="inline-flex items-center rounded-lg bg-green-50 px-4 py-2.5 text-sm font-medium text-green-700">
+                    Purchase Request Fullfilled
+                </span>
+            @elseif($quotation->status === 'pending')
 
                 <a
                     href="{{ route('quotations.edit', $quotation) }}"
@@ -47,9 +51,9 @@
                     @csrf
 
                     <button
-                        type="button"
+                        type="submit"
                         id="accept-quotation"
-                        class="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+                        class="cursor-pointer rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
                     >
                         Accept Quotation
                     </button>
@@ -63,7 +67,6 @@
                 <span class="inline-flex items-center rounded-lg bg-green-50 px-4 py-2.5 text-sm font-medium text-green-700">
                     Quotation Accepted
                 </span>
-
             @endif
 
         </div>
@@ -381,16 +384,42 @@
         <script>
             $(document).ready(function () {
 
-                $('#accept-quotation').on('click', function () {
+                $('#accept-quotation-form').on('submit', function (e) {
+                    
+                    e.preventDefault();
 
                     const confirmed = confirm(
                         'Are you sure you want to accept this quotation?\n\nA Purchase Order will be created for this quotation.'
                     );
-
-                    if (confirmed) {
-                        $('#accept-quotation-form').submit();
+                    if(!confirmed){
+                        return;
                     }
 
+                    $.ajax({
+                        url: $(this).attr('action'),
+                        type:"POST",
+                        data:$(this).serialize(),
+                        success:function(res){
+                            showToast('success',res.message);
+                            $(".quotation-action").html(
+                                `
+                                     <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+                                        Accepted
+                                    </span>
+                            
+                                `
+                            );
+                           
+                         },
+                        error:function(xhr){
+                            if(xhr.responseJSON){
+                                showToast('error',xhr.responseJSON?.message||'Unable to accept quotation.');
+                                return;
+                            }
+                            showToast('error','Unable to accept quotation try again.');
+                        }
+                    });
                 });
 
             });

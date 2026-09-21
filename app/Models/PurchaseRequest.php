@@ -11,7 +11,8 @@ class PurchaseRequest extends Model
         'request_number',
         'status',
         'notes',
-        'due_date'
+        'due_date',
+        'delivery_address'
     ];
 
    protected static function booted(){

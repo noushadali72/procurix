@@ -63,129 +63,80 @@
 
 
 @push('scripts')
-
 <script>
-
-    $('#purchaseRequestForm').on('submit', function (e) {
-
+        $('#purchaseRequestForm').on('submit', function (e) {
         e.preventDefault();
+
         clearErrors();
+
         const form = $(this);
-        const button = $('#submitBtn');
+        const button = form.find('#submitBtn');
+
         button.prop('disabled', true);
 
-
         $.ajax({
-
             url: form.attr('action'),
-
             type: 'POST',
-
             data: form.serialize(),
-
             headers: {
                 'Accept': 'application/json'
             },
 
-
             success: function (response) {
-
-                showToast(
-                    'success',
-                    response.message
-                );
-
+                showToast('success', response.message);
 
                 setTimeout(function () {
-
                     window.location.href =
                         "{{ route('purchase-requests.index') }}";
-
                 }, 800);
-
             },
 
-
             error: function (xhr) {
-
                 button.prop('disabled', false);
 
-
                 if (xhr.status === 422) {
-
                     showValidationErrors(
-                        xhr.responseJSON.errors
+                        xhr.responseJSON?.errors || {}
                     );
-
                     return;
                 }
 
-
                 showToast(
                     'error',
-                    xhr.responseJSON?.message ??
+                    xhr.responseJSON?.message ||
                     'Something went wrong.'
                 );
-
             }
-
         });
-
     });
 
 
     function clearErrors() {
-
         $('#statusErr').text('');
         $('#notesErr').text('');
-
+        $('#deliveryAddressErr').text('');
     }
 
 
     function showValidationErrors(errors) {
-
-        if (errors.status) {
-
-            $('#statusErr')
-                .text(errors.status[0]);
-
-        }
-
-
-        if (errors.notes) {
-
-            $('#notesErr')
-                .text(errors.notes[0]);
-
-        }
-
+        $('#statusErr').text(errors.status?.[0] || '');
+        $('#notesErr').text(errors.notes?.[0] || '');
+        $('#deliveryAddressErr').text(
+            errors.delivery_address?.[0] || ''
+        );
 
         let itemErrorShown = false;
 
-
         $.each(errors, function (key, messages) {
-
             if (
                 !itemErrorShown &&
-                (
-                    key === 'items' ||
-                    key.startsWith('items.')
-                )
+                (key === 'items' || key.startsWith('items.'))
             ) {
-
-                showToast(
-                    'error',
-                    messages[0]
-                );
-
+                showToast('error', messages[0]);
                 itemErrorShown = true;
-
             }
-
         });
-
     }
-
 </script>
 
 @endpush

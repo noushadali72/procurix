@@ -33,6 +33,12 @@ class UpdatePurchaseRequest extends FormRequest
                 'string',
             ],
             'due_date'=>'nullable|date',
+            
+            'delivery_address'=>[
+                'nullable',
+                'string',
+                'max:255'
+            ],
             'items' => [
                 'required',
                 'array',
@@ -63,27 +69,19 @@ class UpdatePurchaseRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-
             $items = $this->input('items', []);
-
             foreach ($items as $index => $item) {
-
                 $rawMaterialId = $item['raw_material_id'] ?? null;
                 $unitId = $item['unit_id'] ?? null;
-
                 if (!$rawMaterialId || !$unitId) {
                     continue;
                 }
-
                 $rawMaterial = RawMaterial::with('unit')
                     ->find($rawMaterialId);
-
                 $unit = Unit::find($unitId);
-
                 if (!$rawMaterial || !$rawMaterial->unit || !$unit) {
                     continue;
                 }
-
                 if (
                     $rawMaterial->unit->unit_category_id !==
                     $unit->unit_category_id

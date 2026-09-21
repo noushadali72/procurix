@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PurchaseRequest\StorePurchaseRequest;
 use App\Http\Requests\PurchaseRequest\UpdatePurchaseRequest;
 use App\Models\PurchaseRequest;
+use App\Models\Quotation;
 use App\Models\RawMaterial;
+use Illuminate\Http\Request;
 use App\Models\Unit;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -32,6 +35,37 @@ class PurchaseRequestController extends Controller
     }
 
 
+    public function quotations(PurchaseRequest $pr)
+    {
+        $pr->load([
+            'quotations.vendor',
+            'quotations.items',
+        ]);
+
+        return view('purchase_requests.quotations', compact('pr'));
+    }
+
+
+    public function compareQuotations(PurchaseRequest $pr)
+    {
+        $quotationIds = request()->input('quotations', []);
+        abort_if(count($quotationIds) < 2, 422);
+        $pr->load([
+            'items.rawMaterial',
+            'items.unit',
+        ]);
+        $quotations = $pr->quotations()
+            ->whereIn('id', $quotationIds)
+            ->with([
+                'vendor',
+                'items.rawMaterial',
+                'items.unit',
+            ])->get();
+        return view(
+            'purchase_requests.quotation-comparison',
+            compact('pr', 'quotations')
+        );
+    }
     /**
      * Show create form.
      */
@@ -46,6 +80,29 @@ class PurchaseRequestController extends Controller
         );
     }
 
+    public function updateStatus(PurchaseRequest $purchaseRequest){
+
+        try{
+
+            $purchaseRequest->update([
+                'status'=>'active'
+                ]);
+                
+                return response()->json([
+                    'success'=>true,
+                    'message'=>"Status updated to '$purchaseRequest->status' successfully."
+                    ],200);
+                    
+        }catch(Exception $e){
+            return response()->json([
+                'success'=>false,
+                'message'=>'Unable to update the status.',
+                'error'=>$e->getMessage()
+            ],500);
+        }
+
+
+    }
 
     /**
      * Store purchase request.
@@ -64,6 +121,7 @@ class PurchaseRequestController extends Controller
                     'request_number' => $this->generateRequestNumber(),
                     'status' => $validated['status'],
                     'notes' => $validated['notes'] ?? null,
+                    'delivery_address'=>$validated['delivery_address']
                 ]);
 
 
@@ -98,6 +156,9 @@ class PurchaseRequestController extends Controller
         $purchaseRequest->load([
             'items.rawMaterial',
             'items.unit',
+            'quotations',
+            'quotations.items'
+
         ]);
 
 
@@ -157,18 +218,11 @@ class PurchaseRequestController extends Controller
                 $purchaseRequest->update([
                     'status' => $validated['status'],
                     'notes' => $validated['notes'] ?? null,
+                    'delivery_address'=>$validated['delivery_address']
                 ]);
 
-
-                /*
-                 * Simple approach:
-                 * delete existing items and recreate submitted ones.
-                 */
                 $purchaseRequest->items()->delete();
-
-
                 foreach ($validated['items'] as $item) {
-
                     $purchaseRequest->items()->create([
                         'raw_material_id' => $item['raw_material_id'],
                         'qty' => $item['qty'],
@@ -177,7 +231,6 @@ class PurchaseRequestController extends Controller
                 }
             }
         );
-
 
         return response()->json([
             'message' => 'Purchase request updated successfully.',
@@ -190,21 +243,16 @@ class PurchaseRequestController extends Controller
     /**
      * Delete purchase request.
      */
-    public function destroy(
-        PurchaseRequest $purchaseRequest
-    ): JsonResponse {
-
+    public function destroy(PurchaseRequest $purchaseRequest){
         try {
-
             $purchaseRequest->delete();
-
-
             return response()->json([
+                'success'=>true,
                 'message' => 'Purchase request deleted successfully.',
-            ]);
+            ],200);
         } catch (\Throwable $e) {
-
             return response()->json([
+                'success'=>false,
                 'message' => 'Unable to delete purchase request.',
             ], 500);
         }
@@ -217,10 +265,7 @@ class PurchaseRequestController extends Controller
     public function rawMaterial(
         RawMaterial $rawMaterial
     ): JsonResponse {
-
         $rawMaterial->load('unit.unitCategory');
-
-
         return response()->json([
             'id' => $rawMaterial->id,
             'name' => $rawMaterial->name,
@@ -247,7 +292,6 @@ class PurchaseRequestController extends Controller
     private function generateRequestNumber(): string
     {
         do {
-
             $requestNumber =
                 'PR-' . strtoupper(Str::random(7));
         } while (
@@ -256,8 +300,6 @@ class PurchaseRequestController extends Controller
                 $requestNumber
             )->exists()
         );
-
-
         return $requestNumber;
     }
 }

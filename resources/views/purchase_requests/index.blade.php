@@ -76,7 +76,7 @@
                           <th class="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Quotations Received
                         </th>
-
+                        
                         <th class="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Actions
                         </th>
@@ -102,6 +102,7 @@
                                     </div>
 
                                     <div>
+                                        <a href="{{ route('purchase-requests.show',$purchaseRequest) }}">
                                         <div class="font-medium text-gray-900">
                                             {{ $purchaseRequest->request_number }}
                                         </div>
@@ -109,6 +110,7 @@
                                         <div class="mt-0.5 text-xs text-gray-500">
                                             Purchase request
                                         </div>
+                                        </a>
                                     </div>
 
                                 </div>
@@ -117,7 +119,7 @@
 
 
                             {{-- Status --}}
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-4 status">
 
                                 @php
                                     $status = $purchaseRequest->status;
@@ -189,30 +191,37 @@
                             </td>
 
 
-                            {{-- Items --}}
+                            {{-- Quotations count --}}
                             <td class="px-5 py-4">
 
-                                <span
+                                <a href="{{ route('purchase-requests.quotations',$purchaseRequest) }}"
                                     class="inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
                                     <i class="bx bx-file-find text-[15px]"></i>
                                     {{ $purchaseRequest->quotations->count() }}
-                                </span>
+                                </a>
 
                             </td>
-
 
                             {{-- Actions --}}
                             <td class="px-5 py-4">
 
                                 <div class="flex items-center justify-end gap-2">
 
-                                    {{-- View --}}
+                                    {{-- View
                                     <a href="{{ route('purchase-requests.show', $purchaseRequest) }}"
                                         class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white">
                                         <i class="bx bx-show"></i>
                                         View
-                                    </a>
+                                    </a> --}}
 
+                                    @if($purchaseRequest->status=='pending')
+                                    {{-- Approve --}}
+                                    <button data-purchase-request-id="{{ $purchaseRequest->id }}"
+                                        class="approve-btn cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-green-300 px-3 py-1.5 text-xs font-medium text-green-700 transition hover:green-gray-900 hover:bg-green-900 hover:text-white">
+                                        <i class="bx bx-edit-alt"></i>
+                                        Approve
+                                    </button>
+                                    @endif
 
                                     {{-- Edit --}}
                                     <a href="{{ route('purchase-requests.edit', $purchaseRequest) }}"
@@ -291,15 +300,12 @@
     @push('scripts')
         <script>
             $(document).on('click', '.delete-btn', function() {
-
                 const button = $(this);
                 const url = button.data('url');
                 const name = button.data('name');
-
                 if (!confirm(`Are you sure you want to delete "${name}"?`)) {
                     return;
                 }
-
                 button.prop('disabled', true);
 
                 $.ajax({
@@ -312,12 +318,10 @@
                     },
 
                     success: function(response) {
-
                         showToast(
                             'success',
                             response.message || 'Purchase request deleted successfully.'
                         );
-
                         setTimeout(function() {
                             window.location.reload();
                         }, 800);
@@ -325,9 +329,7 @@
                     },
 
                     error: function(xhr) {
-
                         button.prop('disabled', false);
-
                         showToast(
                             'error',
                             xhr.responseJSON?.message ||
@@ -338,6 +340,44 @@
                 });
 
             });
+
+            function approve(){
+            
+                const button = $(this);
+                if(!confirm('Do you want to approve the Purchase Request?')){
+                    return;
+                }
+                
+                var purchaseRequestId = $(this).data('purchase-request-id');
+                var url = "{{ route('purchase-requests.updateStatus',':id') }}";
+                url = url.replace(':id',purchaseRequestId);
+
+                button.prop('disabled',true);
+                button.text('approving...');
+
+                $.ajax({
+                   url:url,
+                   type:"POST",
+                   success:function(res){
+                        showToast('success',res.message);
+                        button.hide();
+                        button.closest('tr').find('.status').html(`
+                                <span
+                                    class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-blue-100 text-blue-700">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                                    Active
+                                </span>
+                        `);
+                   },
+                   error:function(xhr){
+                        showToast('error',xhr.responseJSON?.message || 'Unable to update the status.');
+                   }
+
+                });
+            }
+
+            $(document).on('click','.approve-btn',approve);
+
         </script>
     @endpush
 

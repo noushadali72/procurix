@@ -79,7 +79,7 @@ class QuotationController extends Controller
         }
 
         $quotation = DB::transaction(function () use ($validated) {
-
+            $total = 0;
             $quotation = Quotation::create([
                 'purchase_request_id' => $validated['purchase_request_id'],
                 'vendor_id' => $validated['vendor_id'],
@@ -91,16 +91,20 @@ class QuotationController extends Controller
             ]);
 
             foreach ($validated['items'] as $item) {
-                $total = $item['qty'] * $item['price'];
+                $line_total = $item['qty'] * $item['price'];
+                $total+=$line_total;
 
                 $quotation->items()->create([
                     'raw_material_id' => $item['raw_material_id'],
                     'qty' => $item['qty'],
                     'unit_id' => $item['unit_id'],
                     'price' => $item['price'],
-                    'total' => $total,
+                    'total' => $line_total,
                 ]);
             }
+            $quotation->update([
+                'total'=>$total
+            ]);
 
             return $quotation;
         });
@@ -118,6 +122,7 @@ class QuotationController extends Controller
     public function show(Quotation $quotation)
     {
         $quotation->load([
+            
             'purchaseRequest.items.rawMaterial',
             'purchaseRequest.items.unit',
             'vendor',
@@ -221,49 +226,39 @@ class QuotationController extends Controller
     public function accept(Quotation $quotation)
     {
         if ($quotation->status === 'accepted') {
-            return back()->with(
-                'error',
-                'This quotation has already been accepted.'
-            );
+            return response()->json([
+                'success'=>false,
+                'message'=>'This quotation has already been accepted.'
+            ],500);
         }
 
         if ($quotation->status === 'expired') {
-            return back()->with(
-                'error',
-                'This quotation has been Expired.'
-            );
+            return response()->json([
+                'success'=>false,
+                'message'=>'This quotation has been Expired.'
+            ],500);
         }
 
         if ($quotation->purchaseOrder()->exists()) {
-            return back()->with(
-                'error',
-                'A purchase order has already been created for this quotation.'
-            );
+            return response()->json([
+                'success'=>false,
+                'message'=>'A purchase order has already been created for this quotation.'
+            ],500);
         }
 
-        $quotation->load([
-            'items',
-            'purchaseRequest',
-        ]);
+        $quotation->load(['items', 'purchaseRequest']);
 
         if ($quotation->items->isEmpty()) {
-            return back()->with(
-                'error',
-                'Cannot accept a quotation without items.'
-            );
+            return response()->json([
+                'success'=>false,
+                'message'=>'Cannot accept a quotation without items.'
+            ],500);
         }
 
         DB::transaction(function () use ($quotation) {
 
             $order = PurchaseOrder::create([
-                'order_number' =>
-                    'PO-' . str_pad(
-                        (PurchaseOrder::max('id') ?? 0) + 1,
-                        5,
-                        '0',
-                        STR_PAD_LEFT
-                    ),
-
+                'order_number' => 'PO-' . str_pad((PurchaseOrder::max('id') ?? 0) + 1,5,'0',STR_PAD_LEFT),
                 'quotation_id' => $quotation->id,
                 'vendor_id' => $quotation->vendor_id,
                 'status' => 'placed',
@@ -281,21 +276,15 @@ class QuotationController extends Controller
                 ]);
             }
 
-            $quotation->update([
-                'status' => 'accepted',
-            ]);
-
-            $quotation->purchaseRequest->update([
-                'status' => 'completed',
-            ]);
+            $quotation->update(['status' => 'accepted' ]);
+            $quotation->purchaseRequest->update(['status' => 'completed' ]);
         });
-
-        return redirect()
-            ->route('quotations.show', $quotation)
-            ->with(
-                'success',
-                'Quotation accepted and Purchase Order created successfully.'
-            );
+        
+        return response()->json([
+            'success'=>true,
+            'message'=>'Quotation accepted and Purchase Order created successfully.',
+            'redirect'=>route('quotations.show',$quotation)
+        ],200);
     }
 
     /**
@@ -312,7 +301,8 @@ class QuotationController extends Controller
                 
                 return response()->json([
                     'message' => 'Quotation deleted successfully.',
-                    ]);
+                ],200);
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to delete quotation. May be associated with a purchase order.',

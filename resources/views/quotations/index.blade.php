@@ -46,7 +46,7 @@
                     <tr>
 
                         <th class="px-5 py-3.5 font-medium">
-                            #
+                            Quotation
                         </th>
 
                         <th class="px-5 py-3.5 font-medium">
@@ -110,8 +110,10 @@
                         <tr id="quotation-row-{{ $quotation->id }}" class="transition hover:bg-gray-50">
 
                             {{-- Serial Number --}}
-                            <td class="px-5 py-4 text-gray-400">
+                            <td class="px-5 py-4 text-gray-700">
+                                <a href="{{ route('quotations.show',$quotation) }}" class="underline">
                                 {{ $quotation->quotation_number??$index+1 }}
+                                </a>
                             </td>
 
 
@@ -209,12 +211,21 @@
 
                             <div class="flex justify-end gap-2">
 
-                                <a
+                                {{-- <a
                                     href="{{ route('quotations.show', $quotation) }}"
                                     class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
                                 >
                                     View
-                                </a>
+                                </a> --}}
+
+                                 @if($quotation->status=='pending' && $quotation->purchaseRequest->status!='completed')
+                                    {{-- Accept --}}
+                                    <button data-quotation-id="{{ $quotation->id }}"
+                                        class="accept-btn cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-green-300 px-3 py-1.5 text-xs font-medium text-green-700 transition hover:green-gray-900 hover:bg-green-900 hover:text-white">
+                                        <i class="bx bx-edit-alt"></i>
+                                        Accept
+                                    </button>
+                                    @endif
 
                                 <a
                                     href="{{ route('quotations.edit', $quotation) }}"
@@ -368,6 +379,42 @@
                     });
 
                 });
+
+
+
+                function accept(){
+            
+                const button = $(this);
+                if(!confirm('Do you want to Accept the quotation?')){
+                    return;
+                }
+                
+                var quotationId = $(this).data('quotation-id');
+                var url = "{{ route('quotations.accept',':id') }}";
+                url = url.replace(':id',quotationId);
+
+                button.prop('disabled',true);
+                button.text('accepting...');
+
+                $.ajax({
+                   url:url,
+                   type:"POST",
+                   success:function(res){
+                        showToast('success',res.message);
+                        button.hide();
+                        setTimeout(function(){
+                            window.location.reload();
+                        },500)
+                   },
+                   error:function(xhr){
+                        showToast('error',xhr.responseJSON?.message || 'Unable to accept quotation.');
+                   }
+
+                });
+            }
+
+            $(document).on('click','.accept-btn',accept);
+
 
             });
         </script>

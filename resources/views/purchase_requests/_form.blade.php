@@ -50,6 +50,19 @@
 
             </div>
 
+            {{-- address --}}
+            <div>
+
+                <label for="delivery_address" class="mb-2 block text-sm font-medium text-slate-700">
+                    Delivery Address
+                </label>
+
+                <textarea name="delivery_address" id="delivery_address" rows="3" placeholder="Enter delivery address..."
+                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200">{{ old('delivery_address', $purchaseRequest->delivery_address ?? '') }}</textarea>
+                <span id="deliveryAddressErr" class="mt-1 block text-xs text-red-600"></span>
+
+            </div>
+
 
             {{-- Notes --}}
             <div>
@@ -415,7 +428,6 @@
 
             let itemIndex = container.find(".item-row").length;
 
-
             // Filter units based on raw material category
             function filterUnits(item) {
 
@@ -429,7 +441,6 @@
                 unitSelect.find("option").each(function() {
 
                     const option = $(this);
-
                     if (!option.val()) {
                         option.show();
                         return;
@@ -461,9 +472,7 @@
                 const selected = [];
 
                 $(".raw-material-select").each(function() {
-
                     const value = $(this).val();
-
                     if (value) {
                         selected.push(value);
                     }
@@ -471,17 +480,12 @@
                 });
 
                 $(".raw-material-select").each(function() {
-
                     const currentValue = $(this).val();
-
                     $(this).find("option").each(function() {
-
                         const option = $(this);
-
                         if (!option.val()) {
                             return;
                         }
-
                         option.toggle(
                             option.val() === currentValue ||
                             !selected.includes(option.val())
@@ -495,18 +499,13 @@
 
             // Raw material changed
             container.on("change", ".raw-material-select", function() {
-
                 const item = $(this).closest(".item-row");
-
                 filterUnits(item);
-
                 // Select raw material's own stock unit by default
                 if (!item.find(".unit-select").val()) {
-
                     const unitId = $(this)
                         .find("option:selected")
                         .data("unit-id");
-
                     item.find(".unit-select").val(unitId);
                 }
 
@@ -522,57 +521,40 @@
 
             // Add item
             $("#addItemBtn").on("click", function() {
-
                 let template = $("#itemRowTemplate").html();
-
                 template = template.replaceAll(
                     "__INDEX__",
                     itemIndex
                 );
-
                 container.append(template);
-
                 itemIndex++;
-
                 updateRawMaterials();
             });
 
 
             // Remove item
             container.on("click", ".remove-item", function() {
-
                 if (container.find(".item-row").length <= 1) {
-
                     showToast(
                         "warning",
                         "At least one raw material is required."
                     );
-
                     return;
                 }
 
-                $(this)
-                    .closest(".item-row")
-                    .remove();
-
+                $(this).closest(".item-row").remove();
                 updateRawMaterials();
             });
 
 
             // Quantity: decimal numbers only
             $(document).on("input", ".qty-input", function() {
-
                 this.value = this.value.replace(/[^0-9.]/g, "");
-
                 const parts = this.value.split(".");
-
                 if (parts.length > 2) {
-                    this.value =
-                        parts[0] + "." + parts.slice(1).join("");
+                    this.value = parts[0] + "." + parts.slice(1).join("");
                 }
             });
-
-
             // Initial raw material filtering
             updateRawMaterials();
 

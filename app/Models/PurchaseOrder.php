@@ -23,7 +23,7 @@ class PurchaseOrder extends Model
 
     public function quotation()
     {
-        return $this->belongsTo(Quotation::class);
+        return $this->belongsTo(Quotation::class, 'quotation_id');
     }
 
     public function vendor()

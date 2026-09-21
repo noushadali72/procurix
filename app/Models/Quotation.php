@@ -18,6 +18,7 @@ class Quotation extends Model
         'status',
         'quotation_date',
         'valid_until',
+        'total',
         'notes',
     ];
 
@@ -42,7 +43,7 @@ class Quotation extends Model
     }
     public function purchaseOrder()
     {
-        return $this->hasOne(PurchaseOrder::class);
+        return $this->hasOne(PurchaseOrder::class, 'quotation_id');
     }
 
     #[Override]

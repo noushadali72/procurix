@@ -32,12 +32,13 @@
 
             <div>
                 <h3 class="font-semibold text-gray-900">
-                    Purchase Request #{{ $purchaseRequest->request_number }}
+                     Purchase Request 
+                    <a class="underline" href="{{ route('purchase-requests.show',$purchaseRequest) }}">
+                       #{{ $purchaseRequest->request_number }}
+                    </a>
                 </h3>
 
-                <p class="text-sm text-gray-500">
-                    Requested materials
-                </p>
+              
             </div>
 
         </div>

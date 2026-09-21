@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('status',['pending','accepted','expired']);
             $table->date('quotation_date');
             $table->date('valid_until')->nullable();
+            $table->decimal('total',20,2)->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

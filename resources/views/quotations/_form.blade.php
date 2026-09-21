@@ -144,7 +144,7 @@
             </h3>
 
             <p class="mt-1 text-sm text-gray-500">
-                Enter the price offered by the vendor. You can remove materials that are not included in the quotation.
+                Enter the price offered by the vendor.
             </p>
         </div>
 
@@ -163,7 +163,7 @@
                                 <th class="px-4 py-3 font-medium">Unit</th>
                                 <th class="px-4 py-3 font-medium">Unit Price</th>
                                 <th class="px-4 py-3 text-right font-medium">Total</th>
-                                <th class="px-4 py-3 text-right font-medium">Action</th>
+                                {{-- <th class="px-4 py-3 text-right font-medium">Action</th> --}}
                             </tr>
                         </thead>
 
@@ -199,9 +199,9 @@
 
                                         <input type="number" step="0.1" min="0.1"
                                             name="items[{{ $index }}][qty]"
+                                            readonly
                                             value="{{ old("items.$index.qty", $quotationItem?->qty ?? $requestItem->qty) }}"
-                                            class="item-qty w-28 rounded-lg border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-gray-900 focus:ring-gray-900">
-
+                                            class="item-qty w-28 rounded-lg border-gray-300 px-3 py-2 text-sm shadow-sm bg-gray-200">
                                     </td>
 
                                     {{-- Unit --}}
@@ -234,7 +234,7 @@
 
                                     </td>
 
-                                    {{-- Remove --}}
+                                    {{-- Remove
                                     <td class="px-4 py-4 text-right">
 
                                         <button type="button"
@@ -243,7 +243,7 @@
                                             Remove
                                         </button>
 
-                                    </td>
+                                    </td> --}}
 
                                 </tr>
                             @endforeach
@@ -312,71 +312,34 @@
             function calculateTotals() {
 
                 let grandTotal = 0;
-
                 $('#quotation-items .quotation-item').each(function() {
-
                     const row = $(this);
-
-                    const qty =
-                        parseFloat(
-                            row.find('.item-qty').val()
-                        ) || 0;
-
-                    const price =
-                        parseFloat(
-                            row.find('.item-price').val()
-                        ) || 0;
-
-                    const total =
-                        qty * price;
-
-                    row.find('.item-total')
-                        .text(total.toFixed(2));
-
+                    const qty = parseFloat(row.find('.item-qty').val()) || 0;
+                    const price = parseFloat(row.find('.item-price').val()) || 0;
+                    const total =qty * price;
+                    row.find('.item-total').text(total.toFixed(2));
                     grandTotal += total;
                 });
 
-                $('#grand-total')
-                    .text(grandTotal.toFixed(2));
-
-                if (
-                    $('#quotation-items .quotation-item')
-                    .length === 0
-                ) {
-                    $('#no-items')
-                        .removeClass('hidden');
+                $('#grand-total').text(grandTotal.toFixed(2));
+                if ($('#quotation-items .quotation-item').length === 0) {
+                    $('#no-items').removeClass('hidden');
                 } else {
-                    $('#no-items')
-                        .addClass('hidden');
+                    $('#no-items').addClass('hidden');
                 }
 
             }
+            $(document).on('input', '.item-price, .item-qty', calculateTotals);
 
 
-            $(document).on(
-                'input',
-                '.item-price, .item-qty',
-                calculateTotals
-            );
-
-
-            $(document).on(
-                'click',
-                '.remove-item',
-                function() {
-
-                    $(this)
-                        .closest('.quotation-item')
-                        .remove();
-
-                    calculateTotals();
-
-                }
-            );
-
+            // $(document).on('click', '.remove-item',
+            //     function() {
+            //         $(this).closest('.quotation-item').remove();
+            //         calculateTotals();
+            //     }
+            // );
 
             calculateTotals();
-
         });
     </script>
 @endpush

@@ -37,13 +37,15 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Procurement
     Route::get('/purchase-requests/raw-material/{rawMaterial}', [PurchaseRequestController::class, 'rawMaterial'])->name('purchase-requests.raw-material');
     Route::resource('purchase-requests', PurchaseRequestController::class);
+    Route::post('purchase-requests/{purchaseRequest}/update-status',[PurchaseRequestController::class,'updateStatus'])->name('purchase-requests.updateStatus');
     Route::resource('vendors', VendorController::class);
     Route::resource('quotations', QuotationController::class)->except('create');
     Route::get('quotations/create/{purchaseRequest}', [QuotationController::class, 'create'])->name('quotations.create');
     Route::post('quotations/{quotation}/accept', [QuotationController::class, 'accept'])->name('quotations.accept');
     Route::resource('purchase-orders', PurchaseOrderController::class)->only(['index', 'show', 'destroy']);
     Route::post('purchase-orders/{purchaseOrder}/receive',[PurchaseOrderController::class, 'receive'])->name('purchase-orders.receive');
-   
+    Route::get('purchase-requests/{pr}/quotations', [PurchaseRequestController::class, 'quotations'])->name('purchase-requests.quotations');
+    Route::get('purchase-requests/{pr}/quotations/compare',[PurchaseRequestController::class, 'compareQuotations'])->name('purchase-requests.quotations.compare');
 
     // Receiving
     Route::get('goods-receipts', [GoodsReceiptController::class, 'index'])->name('goods-receipts.index');

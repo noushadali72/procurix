@@ -35,6 +35,11 @@ class StorePurchaseRequest extends FormRequest
                 'string',
             ],
             'due_date'=>'nullable|date',
+            'delivery_address'=>[
+                'nullable',
+                'string',
+                'max:255'
+            ],
 
             'items' => [
                 'required',
