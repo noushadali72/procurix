@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PurchaseRequest\StorePurchaseRequest;
 use App\Http\Requests\PurchaseRequest\UpdatePurchaseRequest;
+use App\Jobs\SendRfqMail;
+use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
 use App\Models\Quotation;
 use App\Models\RawMaterial;
 use Illuminate\Http\Request;
 use App\Models\Unit;
+use App\Models\Vendor;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +27,7 @@ class PurchaseRequestController extends Controller
         $purchaseRequests = PurchaseRequest::with([
             'items.rawMaterial',
             'items.unit',
+            'vendor'
         ])
             ->latest()
             ->paginate(10);
@@ -34,6 +38,77 @@ class PurchaseRequestController extends Controller
         );
     }
 
+    public function confirm(PurchaseRequest $purchaseRequest)
+    {
+        if ($purchaseRequest->status === 'completed') {
+            return response()->json([
+                'success'=>false,
+                'message'=>'This Purchase Request has already been completed.'
+            ],500);
+        }
+
+        if ($purchaseRequest->status === 'pending') {
+            return response()->json([
+                'success'=>false,
+                'message'=>'The purchase request is in pending review.'
+            ],500);
+        }
+
+        if ($purchaseRequest->purchaseOrder()->exists()) {
+            return response()->json([
+                'success'=>false,
+                'message'=>'A purchase order has already been created for this purchase Request.'
+            ],500);
+        }
+
+        $purchaseRequest->load(['items']);
+
+        if ($purchaseRequest->items->isEmpty()) {
+            return response()->json([
+                'success'=>false,
+                'message'=>'Cannot accept a confirm Order without items.'
+            ],500);
+        }
+        $order = null;
+
+        DB::transaction(function () use ($purchaseRequest, &$order) {
+            $total = 0;
+            $order = PurchaseOrder::create([
+                'order_number' => 'PO-' . str_pad((PurchaseOrder::max('id') ?? 0) + 1,5,'0',STR_PAD_LEFT),
+                'purchase_request_id' => $purchaseRequest->id,
+                'vendor_id' => $purchaseRequest->vendor_id,
+                'status' => 'placed',
+                'order_date' => now()->toDateString(),
+                'total'=>$total,
+                'notes' => $purchaseRequest->notes,
+            ]);
+
+            foreach ($purchaseRequest->items as $item) {
+                $total += $item->unit_cost*$item->qty;
+                $order->items()->create([
+                    'raw_material_id' => $item->raw_material_id,
+                    'qty' => $item->qty,
+                    'unit_id' => $item->unit_id,
+                    'unit_cost' => $item->unit_cost,
+                    'total' => $item->total,
+                ]);
+            }
+            $order->update(['total'=>$total]);
+          
+        });
+        
+        return response()->json([
+            'success'=>true,
+            'message'=>'Purchase Order created successfully.',
+            'redirect'=>route('purchase-orders.show',$order)
+        ],200);
+    }
+
+    public function confirmation(PurchaseRequest $purchaseRequest){
+        $purchaseRequest->load(['items.rawMaterial','items.unit','vendor']);
+
+        return view('purchase_requests.confirmation',compact('purchaseRequest'));
+    }
 
     public function quotations(PurchaseRequest $pr)
     {
@@ -73,10 +148,10 @@ class PurchaseRequestController extends Controller
     {
         $rawMaterials = RawMaterial::with('unit.unitCategory')->orderBy('name')->get();
         $units = Unit::with('unitCategory')->orderBy('name')->get();
-
+        $vendors = Vendor::all();
         return view(
             'purchase_requests.create',
-            compact('rawMaterials', 'units')
+            compact('rawMaterials', 'units','vendors')
         );
     }
 
@@ -113,7 +188,6 @@ class PurchaseRequestController extends Controller
 
         $validated = $request->validated();
 
-
         $purchaseRequest = DB::transaction(
             function () use ($validated) {
 
@@ -121,7 +195,9 @@ class PurchaseRequestController extends Controller
                     'request_number' => $this->generateRequestNumber(),
                     'status' => $validated['status'],
                     'notes' => $validated['notes'] ?? null,
-                    'delivery_address'=>$validated['delivery_address']
+                    'delivery_address'=>$validated['delivery_address'],
+                    'vendor_id'=>$validated['vendor_id'],
+                    
                 ]);
 
 
@@ -131,6 +207,8 @@ class PurchaseRequestController extends Controller
                         'raw_material_id' => $item['raw_material_id'],
                         'qty' => $item['qty'],
                         'unit_id' => $item['unit_id'],
+                        'unit_cost'=>$item['unit_cost'],
+                        'total'=>$item['unit_cost']*$item['qty'],
                     ]);
                 }
 
@@ -139,11 +217,12 @@ class PurchaseRequestController extends Controller
             }
         );
 
-
+        SendRfqMail::dispatch($purchaseRequest); 
+        
         return response()->json([
-            'message' => 'Purchase request created successfully.',
+            'message' => 'Purchase Request Send to Vendor successfully.',
             'id' => $purchaseRequest->id,
-            'redirect' => route('purchase-requests.index'),
+            'redirect' => route('purchase-requests.confirmation', $purchaseRequest),
         ], 201);
     }
 
@@ -177,6 +256,7 @@ class PurchaseRequestController extends Controller
         $purchaseRequest->load([
             'items.rawMaterial',
             'items.unit',
+            'vendor'
         ]);
 
 
@@ -189,13 +269,16 @@ class PurchaseRequestController extends Controller
             ->orderBy('name')
             ->get();
 
+        $vendors = Vendor::all();
+
 
         return view(
             'purchase_requests.edit',
             compact(
                 'purchaseRequest',
                 'rawMaterials',
-                'units'
+                'units',
+                'vendors'
             )
         );
     }
@@ -218,7 +301,9 @@ class PurchaseRequestController extends Controller
                 $purchaseRequest->update([
                     'status' => $validated['status'],
                     'notes' => $validated['notes'] ?? null,
-                    'delivery_address'=>$validated['delivery_address']
+                    'delivery_address'=>$validated['delivery_address'],
+                    'vendor_id'=>$validated['vendor_id'],
+                   
                 ]);
 
                 $purchaseRequest->items()->delete();
@@ -227,6 +312,8 @@ class PurchaseRequestController extends Controller
                         'raw_material_id' => $item['raw_material_id'],
                         'qty' => $item['qty'],
                         'unit_id' => $item['unit_id'],
+                        'unit_cost'=>$item['unit_cost'],
+                        'total'=>$item['unit_cost']*$item['qty'],
                     ]);
                 }
             }

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('bill_number')->nullable();
             $table->date('bill_date')->nullable();
             $table->date('due_date')->nullable();
+           
             $table->decimal('subtotal',20,2)->default(0);
             $table->decimal('tax',10,2)->default(0);
             $table->decimal('total',20,2)->default(0);

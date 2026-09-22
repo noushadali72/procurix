@@ -40,6 +40,10 @@ class StorePurchaseRequest extends FormRequest
                 'string',
                 'max:255'
             ],
+            'vendor_id'=>[
+                'required',
+                'exists:vendors,id'
+            ],
 
             'items' => [
                 'required',
@@ -58,6 +62,11 @@ class StorePurchaseRequest extends FormRequest
                 'required',
                 'numeric',
                 'gt:0',
+            ],
+            'items.*.unit_cost'=>[
+                'required',
+                'numeric',
+                'gt:0'
             ],
 
             'items.*.unit_id' => [
@@ -112,6 +121,9 @@ class StorePurchaseRequest extends FormRequest
         return [
             'status.required' => 'The status is required.',
             'status.in' => 'The selected status is invalid.',
+
+            'vendor_id.required'=>'Select the vendor first.',
+            'vendor_id.exists'=>'Selected vendor doesn\'t exists.',
 
             'items.required' => 'At least one item is required.',
             'items.array' => 'The items must be valid.',

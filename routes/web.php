@@ -50,6 +50,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/purchase-requests/raw-material/{rawMaterial}', [PurchaseRequestController::class, 'rawMaterial'])->name('purchase-requests.raw-material');
     Route::resource('purchase-requests', PurchaseRequestController::class);
     Route::post('purchase-requests/{purchaseRequest}/update-status',[PurchaseRequestController::class,'updateStatus'])->name('purchase-requests.updateStatus');
+    Route::post('purchase-requests/{purchaseRequest}/confirm',[PurchaseRequestController::class,'confirm'])->name('purchase-requests.confirm');
+    Route::get('purchase-requests/{purchaseRequest}/confirmation',[PurchaseRequestController::class,'confirmation'])->name('purchase-requests.confirmation');
     Route::resource('vendors', VendorController::class);
     Route::resource('quotations', QuotationController::class)->except('create');
     Route::get('quotations/create/{purchaseRequest}', [QuotationController::class, 'create'])->name('quotations.create');

@@ -9,3 +9,6 @@ services:
   - mailpit
   - mysql
   - redis
+workers:
+  - queue
+  - vite

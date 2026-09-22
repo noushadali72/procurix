@@ -9,6 +9,36 @@
 
         <div class="grid gap-5 md:grid-cols-2 justify-start">
 
+            {{-- Vendor --}}
+            <div>
+                <div class="mb-2 flex items-center justify-between">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Vendor <span class="text-red-500">*</span>
+                    </label>
+
+                    <button type="button" id="openVendorModal"
+                        class="inline-flex cursor-pointer items-center gap-1 text-xs font-medium text-gray-700 transition hover:text-gray-900">
+                        <i class="bx bx-plus"></i>
+                        Add Vendor
+                    </button>
+                </div>
+
+                <select name="vendor_id" id="vendor_id"
+                    class="block w-full rounded-lg border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:ring-gray-900">
+                    <option value="">Select Vendor</option>
+
+                    @foreach ($vendors as $vendor)
+                        <option value="{{ $vendor->id }}"
+                            {{ old('vendor_id', $purchaseRequest->vendor_id ?? '') == $vendor->id ? 'selected' : '' }}>
+                            {{ $vendor->company_name ?: $vendor->name }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <span id="vendorIdErr" class="mt-1.5 block text-xs text-red-600"></span>
+            </div>
+
+
             {{-- Status --}}
             <div>
 
@@ -127,6 +157,10 @@
                             Quantity<sup>*</sup>
                         </th>
 
+                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Unit Cost<sup>*</sup>
+                        </th>
+
                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                             Unit<sup>*</sup>
                         </th>
@@ -187,6 +221,15 @@
                                         class="qty-input w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                                         required>
 
+                                </td>
+
+                                {{-- Unit Cost --}}
+                                <td class="px-4 py-4">
+                                    <input type="text" inputmode="decimal"
+                                        name="items[{{ $index }}][unit_cost]" value="{{ $item->unit_cost }}"
+                                        placeholder="Unit cost"
+                                        class="cost-input w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                                        required>
                                 </td>
 
 
@@ -262,13 +305,21 @@
 
                             {{-- Quantity --}}
                             <td class="px-4 py-4">
-
-                                <input type="text" inputmode="decimal" name="items[0][qty]" placeholder="Quantity"
+                                <input type="text" inputmode="decimal" name="items[0][qty]" value="1"
+                                    placeholder="Quantity" 
                                     class="qty-input w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                                     required>
 
                             </td>
 
+
+                            {{-- Unit Cost --}}
+                            <td class="px-4 py-4">
+                                <input type="text" inputmode="decimal" name="items[0][unit_cost]"
+                                    placeholder="Unit cost"
+                                    class="cost-input w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                                    required>
+                            </td>
 
                             {{-- Unit --}}
                             <td class="px-4 py-4">
@@ -312,9 +363,47 @@
 
             </table>
 
+
+
+
         </div>
 
+        
+
     </div>
+
+             
+{{-- Summary --}}
+<div class="mt-6 grid gap-4 sm:grid-cols-3">
+
+    <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+        <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
+            Total Items
+        </p>
+        <p id="totalItems" class="mt-1 text-xl font-semibold text-slate-800">
+            0
+        </p>
+    </div>
+
+    <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+        <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
+            Total Quantity
+        </p>
+        <p id="totalQuantity" class="mt-1 text-xl font-semibold text-slate-800">
+            0
+        </p>
+    </div>
+
+    <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+        <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
+            Estimated Total Cost
+        </p>
+        <p id="totalCost" class="mt-1 text-xl font-semibold text-slate-800">
+            0.00
+        </p>
+    </div>
+
+</div>
 
 </div>
 
@@ -366,8 +455,23 @@
                 type="text"
                 inputmode="decimal"
                 name="items[__INDEX__][qty]"
+                value="1"
                 placeholder="Quantity"
                 class="qty-input w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                required
+            >
+
+        </td>
+
+        {{-- Unit Cost --}}
+        <td class="px-4 py-4">
+
+            <input
+                type="text"
+                inputmode="decimal"
+                name="items[__INDEX__][unit_cost]"
+                placeholder="Unit cost"
+                class="cost-input w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                 required
             >
 
@@ -421,143 +525,268 @@
 </script>
 
 @push('scripts')
-    <script>
-        $(document).ready(function() {
+<script>
+$(document).ready(function () {
 
-            const container = $("#itemsContainer");
+    const container = $("#itemsContainer");
 
-            let itemIndex = container.find(".item-row").length;
+    let itemIndex = container.find(".item-row").length;
 
-            // Filter units based on raw material category
-            function filterUnits(item) {
 
-                const rawMaterial = item.find(".raw-material-select");
-                const unitSelect = item.find(".unit-select");
+    // -----------------------------------------
+    // Filter units based on raw material category
+    // -----------------------------------------
+    function filterUnits(item) {
 
-                const categoryId = rawMaterial
-                    .find("option:selected")
-                    .data("category-id");
+        const rawMaterial = item.find(".raw-material-select");
+        const unitSelect = item.find(".unit-select");
 
-                unitSelect.find("option").each(function() {
+        const categoryId = rawMaterial
+            .find("option:selected")
+            .data("category-id");
 
-                    const option = $(this);
-                    if (!option.val()) {
-                        option.show();
-                        return;
-                    }
+        unitSelect.find("option").each(function () {
 
-                    const optionCategoryId = option.data("category-id");
+            const option = $(this);
 
-                    option.toggle(
-                        categoryId &&
-                        Number(optionCategoryId) === Number(categoryId)
-                    );
-
-                });
-
-                const selectedOption = unitSelect.find("option:selected");
-
-                if (
-                    selectedOption.val() &&
-                    Number(selectedOption.data("category-id")) !== Number(categoryId)
-                ) {
-                    unitSelect.val("");
-                }
+            if (!option.val()) {
+                option.show();
+                return;
             }
 
+            const optionCategoryId = option.data("category-id");
 
-            // Hide already selected raw materials from other rows
-            function updateRawMaterials() {
+            option.toggle(
+                categoryId &&
+                Number(optionCategoryId) === Number(categoryId)
+            );
+        });
 
-                const selected = [];
 
-                $(".raw-material-select").each(function() {
-                    const value = $(this).val();
-                    if (value) {
-                        selected.push(value);
-                    }
+        // Clear invalid selected unit
+        const selectedOption = unitSelect.find("option:selected");
 
-                });
+        if (
+            selectedOption.val() &&
+            Number(selectedOption.data("category-id")) !== Number(categoryId)
+        ) {
+            unitSelect.val("");
+        }
+    }
 
-                $(".raw-material-select").each(function() {
-                    const currentValue = $(this).val();
-                    $(this).find("option").each(function() {
-                        const option = $(this);
-                        if (!option.val()) {
-                            return;
-                        }
-                        option.toggle(
-                            option.val() === currentValue ||
-                            !selected.includes(option.val())
-                        );
 
-                    });
+    // -----------------------------------------
+    // Hide already selected raw materials
+    // -----------------------------------------
+    function updateRawMaterials() {
 
-                });
+        const selected = [];
+
+        $(".raw-material-select").each(function () {
+
+            const value = $(this).val();
+
+            if (value) {
+                selected.push(value);
             }
+        });
 
 
-            // Raw material changed
-            container.on("change", ".raw-material-select", function() {
-                const item = $(this).closest(".item-row");
-                filterUnits(item);
-                // Select raw material's own stock unit by default
-                if (!item.find(".unit-select").val()) {
-                    const unitId = $(this)
-                        .find("option:selected")
-                        .data("unit-id");
-                    item.find(".unit-select").val(unitId);
-                }
+        $(".raw-material-select").each(function () {
 
-                updateRawMaterials();
-            });
+            const currentValue = $(this).val();
 
+            $(this).find("option").each(function () {
 
-            // Filter units for existing rows
-            container.find(".item-row").each(function() {
-                filterUnits($(this));
-            });
+                const option = $(this);
 
-
-            // Add item
-            $("#addItemBtn").on("click", function() {
-                let template = $("#itemRowTemplate").html();
-                template = template.replaceAll(
-                    "__INDEX__",
-                    itemIndex
-                );
-                container.append(template);
-                itemIndex++;
-                updateRawMaterials();
-            });
-
-
-            // Remove item
-            container.on("click", ".remove-item", function() {
-                if (container.find(".item-row").length <= 1) {
-                    showToast(
-                        "warning",
-                        "At least one raw material is required."
-                    );
+                if (!option.val()) {
                     return;
                 }
 
-                $(this).closest(".item-row").remove();
-                updateRawMaterials();
+                option.toggle(
+                    option.val() === currentValue ||
+                    !selected.includes(option.val())
+                );
             });
-
-
-            // Quantity: decimal numbers only
-            $(document).on("input", ".qty-input", function() {
-                this.value = this.value.replace(/[^0-9.]/g, "");
-                const parts = this.value.split(".");
-                if (parts.length > 2) {
-                    this.value = parts[0] + "." + parts.slice(1).join("");
-                }
-            });
-            // Initial raw material filtering
-            updateRawMaterials();
-
         });
-    </script>
+    }
+
+
+    // -----------------------------------------
+    // Update summary
+    // -----------------------------------------
+    function updateSummary() {
+
+        let totalItems = 0;
+        let totalQuantity = 0;
+        let totalCost = 0;
+
+
+        container.find(".item-row").each(function () {
+
+            const row = $(this);
+
+            const rawMaterial = row
+                .find(".raw-material-select")
+                .val();
+
+            const qty = parseFloat(
+                row.find(".qty-input").val()
+            ) || 0;
+
+            const unitCost = parseFloat(
+                row.find(".cost-input").val()
+            ) || 0;
+
+
+            // Count only rows with a selected raw material
+            if (rawMaterial) {
+                totalItems++;
+            }
+
+
+            totalQuantity += qty;
+            totalCost += qty * unitCost;
+        });
+
+
+        $("#totalItems").text(totalItems);
+
+        $("#totalQuantity").text(
+            totalQuantity.toLocaleString(undefined, {
+                maximumFractionDigits: 2
+            })
+        );
+
+        $("#totalCost").text(
+            totalCost.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })
+        );
+    }
+
+
+    // -----------------------------------------
+    // Raw material changed
+    // -----------------------------------------
+    container.on("change", ".raw-material-select", function () {
+
+        const item = $(this).closest(".item-row");
+
+        filterUnits(item);
+
+
+        // Select raw material's default unit
+        if (!item.find(".unit-select").val()) {
+
+            const unitId = $(this)
+                .find("option:selected")
+                .data("unit-id");
+
+            item.find(".unit-select").val(unitId);
+        }
+
+
+        updateRawMaterials();
+        updateSummary();
+    });
+
+
+    // -----------------------------------------
+    // Quantity / Unit Cost changed
+    // -----------------------------------------
+    container.on(
+        "input",
+        ".qty-input, .cost-input",
+        function () {
+
+            // Allow digits and one decimal point
+            this.value = this.value.replace(/[^0-9.]/g, "");
+
+            const parts = this.value.split(".");
+
+            if (parts.length > 2) {
+                this.value =
+                    parts[0] +
+                    "." +
+                    parts.slice(1).join("");
+            }
+
+
+            updateSummary();
+        }
+    );
+
+
+    // -----------------------------------------
+    // Add item
+    // -----------------------------------------
+    $("#addItemBtn").on("click", function () {
+
+        let template = $("#itemRowTemplate").html();
+
+        template = template.replaceAll(
+            "__INDEX__",
+            itemIndex
+        );
+
+
+        container.append(template);
+
+        itemIndex++;
+
+
+        updateRawMaterials();
+        updateSummary();
+    });
+
+
+    // -----------------------------------------
+    // Remove item
+    // -----------------------------------------
+    container.on("click", ".remove-item", function () {
+
+        if (container.find(".item-row").length <= 1) {
+
+            showToast(
+                "warning",
+                "At least one raw material is required."
+            );
+
+            return;
+        }
+
+
+        $(this)
+            .closest(".item-row")
+            .remove();
+
+
+        updateRawMaterials();
+        updateSummary();
+    });
+
+
+    // -----------------------------------------
+    // Initial setup
+    // -----------------------------------------
+
+    // Filter units for existing rows
+    container.find(".item-row").each(function () {
+        filterUnits($(this));
+    });
+
+
+    // Hide already selected raw materials
+    updateRawMaterials();
+
+
+    // Calculate initial summary
+    updateSummary();
+
+});
+
+</script>
 @endpush

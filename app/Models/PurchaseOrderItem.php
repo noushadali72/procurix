@@ -11,7 +11,7 @@ class PurchaseOrderItem extends Model
         'raw_material_id',
         'qty',
         'unit_id',
-        'price',
+        'unit_cost',
         'total',
     ];
 

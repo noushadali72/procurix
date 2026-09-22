@@ -173,16 +173,16 @@
 
 
                     {{-- Quotations --}}
-                    <a href="{{ route('quotations.index') }}"
+                    {{-- <a href="{{ route('quotations.index') }}"
                         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
                         {{ request()->routeIs('quotations.*')
                             ? 'bg-gray-800 text-white'
                             : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
 
                         <i class="bx bx-file-find text-[20px]"></i>
-                        <span>Quotations</span>
+                        <span>Quotations(removed)</span>
 
-                    </a>
+                    </a> --}}
 
 
                     {{-- Purchase Orders --}}

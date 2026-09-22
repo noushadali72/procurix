@@ -9,17 +9,23 @@ class PurchaseOrder extends Model
     protected $fillable = [
         'order_number',
         'quotation_id',
+        'purchase_request_id',
         'vendor_id',
         'status',
         'order_date',
         'received_date',
         'notes',
+        'total'
     ];
 
     protected $casts = [
         'order_date' => 'date',
         'received_date' => 'date',
     ];
+
+    public function purchaseRequest(){
+        return $this->belongsTo(PurchaseRequest::class,'purchase_request_id');
+    }
 
     public function quotation()
     {

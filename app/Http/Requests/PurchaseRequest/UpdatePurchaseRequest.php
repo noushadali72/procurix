@@ -32,12 +32,16 @@ class UpdatePurchaseRequest extends FormRequest
                 'nullable',
                 'string',
             ],
-            'due_date'=>'nullable|date',
-            
-            'delivery_address'=>[
+            'due_date' => 'nullable|date',
+
+            'delivery_address' => [
                 'nullable',
                 'string',
                 'max:255'
+            ],
+            'vendor_id' => [
+                'required',
+                'exists:vendors,id'
             ],
             'items' => [
                 'required',
@@ -56,6 +60,11 @@ class UpdatePurchaseRequest extends FormRequest
                 'required',
                 'numeric',
                 'gt:0',
+            ],
+            'items.*.unit_cost'=>[
+                'nullable',
+                'numeric',
+                'gt:0'
             ],
 
             'items.*.unit_id' => [
@@ -106,28 +115,28 @@ class UpdatePurchaseRequest extends FormRequest
             'items.min' => 'At least one item is required.',
 
             'items.*.raw_material_id.required' =>
-                'Please select a raw material.',
+            'Please select a raw material.',
 
             'items.*.raw_material_id.exists' =>
-                'The selected raw material is invalid.',
+            'The selected raw material is invalid.',
 
             'items.*.raw_material_id.distinct' =>
-                'The selected raw material has already been added. Please choose a different raw material.',
+            'The selected raw material has already been added. Please choose a different raw material.',
 
             'items.*.qty.required' =>
-                'The quantity is required.',
+            'The quantity is required.',
 
             'items.*.qty.numeric' =>
-                'The quantity must be a number.',
+            'The quantity must be a number.',
 
             'items.*.qty.gt' =>
-                'The quantity must be greater than 0.',
+            'The quantity must be greater than 0.',
 
             'items.*.unit_id.required' =>
-                'Please select a unit.',
+            'Please select a unit.',
 
             'items.*.unit_id.exists' =>
-                'The selected unit is invalid.',
+            'The selected unit is invalid.',
         ];
     }
 }

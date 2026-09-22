@@ -386,7 +386,7 @@
                     <th style="width: 35%;">Item</th>
                     <th style="width: 12%;" class="text-center">Unit</th>
                     <th style="width: 12%;" class="text-right">Qty</th>
-                    <th style="width: 16%;" class="text-right">Unit Price</th>
+                    <th style="width: 16%;" class="text-right">Unit Cost</th>
                     <th style="width: 20%;" class="text-right">Line Total</th>
                 </tr>
             </thead>
@@ -422,7 +422,7 @@
                         </td>
 
                         <td class="text-right">
-                            {{ number_format($item->unit_price, 2) }}
+                            {{ number_format($item->unit_cost, 2) }}
                         </td>
 
                         <td class="text-right">

@@ -31,6 +31,7 @@ class UpdateVendorBillRequest extends FormRequest
             'vendor_id'=>['required','exists:vendors,id'],
             'bill_date'=>['nullable','date'],
             'due_date'=>['nullable','date'],
+            
             'tax'=>['nullable','numeric','gt:0'],
             'status'=>[
                 'nullable',

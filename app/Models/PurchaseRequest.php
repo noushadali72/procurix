@@ -12,7 +12,8 @@ class PurchaseRequest extends Model
         'status',
         'notes',
         'due_date',
-        'delivery_address'
+        'delivery_address',
+        'vendor_id'
     ];
 
    protected static function booted(){
@@ -23,14 +24,22 @@ class PurchaseRequest extends Model
 
 
     public function items()
-        {
-            return $this->hasMany(PurchaseRequestItem::class);
-        }
+    {
+        return $this->hasMany(PurchaseRequestItem::class);
+    }
 
     public function quotations()
-        {
-            return $this->hasMany(Quotation::class);
-        }
+    {
+        return $this->hasMany(Quotation::class);
+    }
+
+    public function vendor(){
+        return $this->belongsTo(Vendor::class);
+    }
+
+    public function purchaseOrder(){
+        return $this->hasOne(PurchaseOrder::class);
+    }
 
      private static function generateRequestNumber(): string
         {

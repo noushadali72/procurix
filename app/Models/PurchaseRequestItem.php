@@ -10,7 +10,9 @@ class PurchaseRequestItem extends Model
         'purchase_request_id',
         'raw_material_id',
         'qty',
+        'unit_cost',
         'unit_id',
+        'total'
     ];
 
     public function purchaseRequest()

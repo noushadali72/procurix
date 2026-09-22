@@ -3,26 +3,31 @@
 namespace App\Jobs;
 
 use App\Mail\RfqMail;
+use App\Models\PurchaseRequest;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 
 class SendRfqMail implements ShouldQueue
 {
-    use Queueable;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * Create a new job instance.
-     */
-    public function __construct()
-    {
-        //
+    public function __construct(
+        public PurchaseRequest $purchaseRequest
+    ) {
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
-        
+        $purchaseRequest = $this->purchaseRequest->load([
+            'vendor',
+            'items.rawMaterial',
+            'items.unit',
+        ]);
+        Mail::to($purchaseRequest->vendor->email)->send(new RfqMail($purchaseRequest));
     }
 }
+

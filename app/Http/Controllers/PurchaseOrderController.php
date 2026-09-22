@@ -28,7 +28,7 @@ class PurchaseOrderController extends Controller
     {
        $purchaseOrder->load([
         'vendor',
-        'quotation.purchaseRequest',
+        'purchaseRequest',
         'items.rawMaterial',
         'items.unit',
         'goodsReceipts.items',

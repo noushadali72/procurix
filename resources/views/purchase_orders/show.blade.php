@@ -153,15 +153,15 @@
                 </p>
             </div>
 
-
+   
             {{-- Purchase Request --}}
             <div>
                 <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
                     Purchase Request
                 </p>
 
-                <a href="{{ route('purchase-requests.show',$purchaseOrder->quotation->purchaseRequest) }}" class="mt-1.5 font-semibold text-blue-900 underline">
-                    PR-{{ $purchaseOrder->quotation->purchaseRequest->request_number }}
+                <a href="{{ route('purchase-requests.show',$purchaseOrder->purchaseRequest) }}" class="mt-1.5 font-semibold text-blue-900 underline">
+                    PR-{{ $purchaseOrder->purchaseRequest->request_number }}
                 </a>
             </div>
 
@@ -193,19 +193,6 @@
                     </span>
 
                 </div>
-            </div>
-
-
-
-            {{-- Received Date --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Quotation Number
-                </p>
-
-                <a href="{{ route('quotations.show',$purchaseOrder->quotation) }}" class="mt-1.5 font-semibold text-blue-900 underline">
-                    {{ $purchaseOrder->quotation->quotation_number ?? '-' }}
-                </a>
             </div>
 
 
@@ -288,7 +275,7 @@
                         </th>
 
                         <th class="px-6 py-3.5">
-                            Unit Price
+                            Unit Cost
                         </th>
 
                         <th class="px-6 py-3.5 text-right">
@@ -332,7 +319,7 @@
                             </td>
 
                             <td class="px-6 py-4 text-gray-700">
-                                {{ number_format($item->price, 2) }}
+                                {{ number_format($item->unit_cost, 2) }}
                             </td>
 
                             <td class="px-6 py-4 text-right font-semibold text-gray-900">
@@ -364,7 +351,7 @@
                         <td class="px-6 py-4 text-right">
 
                             <span class="text-lg font-bold text-gray-900">
-                                {{ number_format($purchaseOrder->items->sum('total'), 2) }}
+                                {{ number_format($purchaseOrder->total, 2) }}
                             </span>
 
                         </td>

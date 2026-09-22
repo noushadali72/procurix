@@ -58,6 +58,11 @@
                         </th>
 
                         <th class="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            Vendor
+                        </th>
+
+
+                        <th class="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Status
                         </th>
 
@@ -73,9 +78,7 @@
                             Date
                         </th>
 
-                          <th class="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                            Quotations Received
-                        </th>
+
                         
                         <th class="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Actions
@@ -116,6 +119,23 @@
                                 </div>
 
                             </td>
+
+                             {{-- Vendor --}}
+                            <td class="max-w-xs px-5 py-4">
+
+                                @if ($purchaseRequest->vendor)
+                                    <div class="truncate text-sm text-gray-600" title="{{ $purchaseRequest->notes }}">
+                                        {{ $purchaseRequest->vendor->name }}
+                                    </div>
+                                @else
+                                    <span class="text-gray-400">
+                                        —
+                                    </span>
+                                @endif
+
+                            </td>
+
+
 
 
                             {{-- Status --}}
@@ -191,16 +211,7 @@
                             </td>
 
 
-                            {{-- Quotations count --}}
-                            <td class="px-5 py-4">
-
-                                <a href="{{ route('purchase-requests.quotations',$purchaseRequest) }}"
-                                    class="inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
-                                    <i class="bx bx-file-find text-[15px]"></i>
-                                    {{ $purchaseRequest->quotations->count() }}
-                                </a>
-
-                            </td>
+                          
 
                             {{-- Actions --}}
                             <td class="px-5 py-4">
@@ -217,7 +228,7 @@
                                     @if($purchaseRequest->status=='pending')
                                     {{-- Approve --}}
                                     <button data-purchase-request-id="{{ $purchaseRequest->id }}"
-                                        class="approve-btn cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-green-300 px-3 py-1.5 text-xs font-medium text-green-700 transition hover:green-gray-900 hover:bg-green-900 hover:text-white">
+                                        class="approve-btn cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-green-900 px-3 py-1.5 text-xs font-medium text-green-700 transition hover:bg-green-900 hover:text-white">
                                         <i class="bx bx-edit-alt"></i>
                                         Approve
                                     </button>
@@ -250,7 +261,7 @@
 
                         <tr>
 
-                            <td colspan="6" class="px-6 py-16 text-center">
+                            <td colspan="8" class="px-6 py-16 text-center">
 
                                 <div class="mx-auto flex max-w-sm flex-col items-center">
 

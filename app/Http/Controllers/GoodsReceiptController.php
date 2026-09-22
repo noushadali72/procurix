@@ -6,6 +6,7 @@ use App\Http\Requests\GoodsReceipt\StoreGoodsReceiptRequest;
 use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptAttachment;
 use App\Models\PurchaseOrder;
+use App\Models\PurchaseRequest;
 use App\Models\RawMaterial;
 use App\Models\Unit;
 use App\Services\UnitConversionService;
@@ -58,7 +59,8 @@ class GoodsReceiptController extends Controller
         );
     }
 
-    public function store(StoreGoodsReceiptRequest $request, PurchaseOrder $purchaseOrder,UnitConversionService $conversion): JsonResponse {
+    public function store(StoreGoodsReceiptRequest $request, PurchaseOrder $purchaseOrder, UnitConversionService $conversion): JsonResponse
+    {
         if ($purchaseOrder->status === 'received') {
             return response()->json([
                 'message' => 'This purchase order has already been fully received.',
@@ -115,7 +117,7 @@ class GoodsReceiptController extends Controller
                 /*
                  * Quantity remaining before this receipt.
                  */
-                $remainingBeforeReceipt = max(0,(float) $orderItem->qty - $receivedQty);
+                $remainingBeforeReceipt = max(0, (float) $orderItem->qty - $receivedQty);
 
                 /*
                  * Prevent receiving more than the ordered quantity.
@@ -130,7 +132,7 @@ class GoodsReceiptController extends Controller
                  * Quantity remaining after this receipt.
                  * Stored in the purchase order item's unit.
                  */
-                $remainingAfterReceipt = max(0,$remainingBeforeReceipt - $currentReceivedQty);
+                $remainingAfterReceipt = max(0, $remainingBeforeReceipt - $currentReceivedQty);
 
                 $goodsReceipt->items()->create([
                     'purchase_order_item_id' => $orderItem->id,
@@ -214,7 +216,6 @@ class GoodsReceiptController extends Controller
                 'message' => 'Goods receipt deleted successfully.',
                 'redirect' => route('goods-receipts.index')
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Unable to delete goods receipt.',
@@ -255,6 +256,7 @@ class GoodsReceiptController extends Controller
         $purchaseOrder->load([
             'items.unit',
             'items.goodsReceiptItems.unit',
+            'purchaseRequest'
         ]);
 
         $allReceived = true;
@@ -289,6 +291,12 @@ class GoodsReceiptController extends Controller
                 'status' => 'received',
                 'received_date' => now()->toDateString(),
             ]);
+
+            if ($purchaseOrder->purchaseRequest) {
+                $purchaseOrder->purchaseRequest->update([
+                    'status' => 'completed',
+                ]);
+            }
 
             return;
         }

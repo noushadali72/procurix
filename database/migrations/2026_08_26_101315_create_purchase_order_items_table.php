@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreignId('raw_material_id')->nullable()->constrained('raw_materials')->nullOnDelete();
             $table->decimal('qty',12,3);
             $table->foreignId('unit_id')->constrained('units')->restrictOnDelete();
-            $table->decimal('price', 20, 2);
-            $table->decimal('total', 20, 2);
+            $table->decimal('unit_cost', 20, 2)->nullable();
+            $table->decimal('total', 20, 2)->nullable();
             $table->timestamps();
         });
     }

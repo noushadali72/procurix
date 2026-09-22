@@ -15,8 +15,12 @@ class Vendor extends Model
         'ntn',
         'address',
         'is_active',
+        
     ];
 
+    public function purchaseRequests(){
+        return $this->hasMany(PurchaseRequest::class);
+    }
     public function quotations(){
         return $this->hasMany(Quotation::class);
     }

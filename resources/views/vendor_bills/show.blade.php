@@ -278,7 +278,7 @@
                         </th>
 
                         <th class="px-6 py-3.5 text-right">
-                            Unit Price
+                            Unit Cost
                         </th>
 
                         <th class="px-6 py-3.5 text-right">
@@ -320,7 +320,7 @@
                             </td>
 
                             <td class="px-6 py-4 text-right text-gray-700">
-                                {{ number_format($item->unit_price, 2) }}
+                                {{ number_format($item->unit_cost, 2) }}
                             </td>
 
                             <td class="px-6 py-4 text-right font-semibold text-gray-900">
@@ -532,6 +532,7 @@
                                 step="0.01"
                                 min="0.01"
                                 max="{{ $vendorBill->due_amount }}"
+                                value="{{ $vendorBill->due_amount }}"
                                 id="payment_amount"
                                 name="amount"
                                 placeholder="Enter amount"
