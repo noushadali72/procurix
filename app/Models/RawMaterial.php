@@ -47,4 +47,8 @@ class RawMaterial extends Model
         }
         return false;
     }
+
+    public function activities(){
+        return $this->hasMany(RawMaterialActivity::class);
+    }
 }

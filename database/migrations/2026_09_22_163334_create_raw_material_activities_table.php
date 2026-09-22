@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('raw_material_activities', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('raw_material_id')->constrained('raw_materials')->cascadeOnDelete();
+            $table->enum('direction',['up','down','adjust'])->nullable();
+            $table->string('action')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

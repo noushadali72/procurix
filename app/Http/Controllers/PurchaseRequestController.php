@@ -7,6 +7,7 @@ use App\Http\Requests\PurchaseRequest\UpdatePurchaseRequest;
 use App\Jobs\SendRfqMail;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
+use App\Models\PurchaseRequestActivity;
 use App\Models\Quotation;
 use App\Models\RawMaterial;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ use App\Models\Unit;
 use App\Models\Vendor;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -42,49 +44,49 @@ class PurchaseRequestController extends Controller
     {
         if ($purchaseRequest->status === 'completed') {
             return response()->json([
-                'success'=>false,
-                'message'=>'This Purchase Request has already been completed.'
-            ],500);
+                'success' => false,
+                'message' => 'This Purchase Request has already been completed.'
+            ], 500);
         }
 
         if ($purchaseRequest->status === 'pending') {
             return response()->json([
-                'success'=>false,
-                'message'=>'The purchase request is in pending review.'
-            ],500);
+                'success' => false,
+                'message' => 'The purchase request is in pending review.'
+            ], 500);
         }
 
         if ($purchaseRequest->purchaseOrder()->exists()) {
             return response()->json([
-                'success'=>false,
-                'message'=>'A purchase order has already been created for this purchase Request.'
-            ],500);
+                'success' => false,
+                'message' => 'A purchase order has already been created for this purchase Request.'
+            ], 500);
         }
 
         $purchaseRequest->load(['items']);
 
         if ($purchaseRequest->items->isEmpty()) {
             return response()->json([
-                'success'=>false,
-                'message'=>'Cannot accept a confirm Order without items.'
-            ],500);
+                'success' => false,
+                'message' => 'Cannot accept a confirm Order without items.'
+            ], 500);
         }
         $order = null;
 
         DB::transaction(function () use ($purchaseRequest, &$order) {
             $total = 0;
             $order = PurchaseOrder::create([
-                'order_number' => 'PO-' . str_pad((PurchaseOrder::max('id') ?? 0) + 1,5,'0',STR_PAD_LEFT),
+                'order_number' => 'PO-' . str_pad((PurchaseOrder::max('id') ?? 0) + 1, 5, '0', STR_PAD_LEFT),
                 'purchase_request_id' => $purchaseRequest->id,
                 'vendor_id' => $purchaseRequest->vendor_id,
                 'status' => 'placed',
                 'order_date' => now()->toDateString(),
-                'total'=>$total,
+                'total' => $total,
                 'notes' => $purchaseRequest->notes,
             ]);
 
             foreach ($purchaseRequest->items as $item) {
-                $total += $item->unit_cost*$item->qty;
+                $total += $item->unit_cost * $item->qty;
                 $order->items()->create([
                     'raw_material_id' => $item->raw_material_id,
                     'qty' => $item->qty,
@@ -93,21 +95,28 @@ class PurchaseRequestController extends Controller
                     'total' => $item->total,
                 ]);
             }
-            $order->update(['total'=>$total]);
-          
+            $order->update(['total' => $total]);
+
+            $purchaseRequest->activities()->create([
+                'action' => 'Purchase Order Created.',
+                'description' => "Purchase Order created.",
+                'user_id' => Auth::user()->id,
+                'vendor_id' => $purchaseRequest->vendor_id
+            ]);
         });
-        
+
         return response()->json([
-            'success'=>true,
-            'message'=>'Purchase Order created successfully.',
-            'redirect'=>route('purchase-orders.show',$order)
-        ],200);
+            'success' => true,
+            'message' => 'Purchase Order created successfully.',
+            'redirect' => route('purchase-orders.show', $order)
+        ], 200);
     }
 
-    public function confirmation(PurchaseRequest $purchaseRequest){
-        $purchaseRequest->load(['items.rawMaterial','items.unit','vendor']);
+    public function confirmation(PurchaseRequest $purchaseRequest)
+    {
+        $purchaseRequest->load(['items.rawMaterial', 'items.unit', 'vendor']);
 
-        return view('purchase_requests.confirmation',compact('purchaseRequest'));
+        return view('purchase_requests.confirmation', compact('purchaseRequest'));
     }
 
     public function quotations(PurchaseRequest $pr)
@@ -151,32 +160,37 @@ class PurchaseRequestController extends Controller
         $vendors = Vendor::all();
         return view(
             'purchase_requests.create',
-            compact('rawMaterials', 'units','vendors')
+            compact('rawMaterials', 'units', 'vendors')
         );
     }
 
-    public function updateStatus(PurchaseRequest $purchaseRequest){
+    public function updateStatus(PurchaseRequest $purchaseRequest)
+    {
 
-        try{
+        try {
 
             $purchaseRequest->update([
-                'status'=>'active'
-                ]);
-                
-                return response()->json([
-                    'success'=>true,
-                    'message'=>"Status updated to '$purchaseRequest->status' successfully."
-                    ],200);
-                    
-        }catch(Exception $e){
+                'status' => 'active'
+            ]);
+
+            $purchaseRequest->activities()->create([
+                'action' => 'Status updated.',
+                'description' => "Purchase Request status updated to active by " . Auth::user()->name . '',
+                'user_id' => Auth::user()->id,
+                'vendor_id' => $purchaseRequest->vendor_id
+            ]);
+
             return response()->json([
-                'success'=>false,
-                'message'=>'Unable to update the status.',
-                'error'=>$e->getMessage()
-            ],500);
+                'success' => true,
+                'message' => "Status updated to '$purchaseRequest->status' successfully."
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to update the status.',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-
     }
 
     /**
@@ -195,9 +209,9 @@ class PurchaseRequestController extends Controller
                     'request_number' => $this->generateRequestNumber(),
                     'status' => $validated['status'],
                     'notes' => $validated['notes'] ?? null,
-                    'delivery_address'=>$validated['delivery_address'],
-                    'vendor_id'=>$validated['vendor_id'],
-                    
+                    'delivery_address' => $validated['delivery_address'],
+                    'vendor_id' => $validated['vendor_id'],
+
                 ]);
 
 
@@ -207,18 +221,32 @@ class PurchaseRequestController extends Controller
                         'raw_material_id' => $item['raw_material_id'],
                         'qty' => $item['qty'],
                         'unit_id' => $item['unit_id'],
-                        'unit_cost'=>$item['unit_cost'],
-                        'total'=>$item['unit_cost']*$item['qty'],
+                        'unit_cost' => $item['unit_cost'],
+                        'total' => $item['unit_cost'] * $item['qty'],
                     ]);
                 }
 
+
+                $purchaseRequest->activities()->create([
+                    'action' => 'Purchase Request Created.',
+                    'description' => "Purchase Request created by " . Auth::user()->name . '',
+                    'user_id' => Auth::user()->id,
+                    'vendor_id' => $purchaseRequest->vendor_id
+                ]);
 
                 return $purchaseRequest;
             }
         );
 
-        SendRfqMail::dispatch($purchaseRequest); 
-        
+        SendRfqMail::dispatch($purchaseRequest);
+
+        $purchaseRequest->activities()->create([
+            'action' => 'Mail Sent.',
+            'description' => "Purchase request Mail sent to " . $purchaseRequest->vendor->name . '',
+            'user_id' => Auth::user()->id,
+            'vendor_id' => $purchaseRequest->vendor_id
+        ]);
+
         return response()->json([
             'message' => 'Purchase Request Send to Vendor successfully.',
             'id' => $purchaseRequest->id,
@@ -301,9 +329,9 @@ class PurchaseRequestController extends Controller
                 $purchaseRequest->update([
                     'status' => $validated['status'],
                     'notes' => $validated['notes'] ?? null,
-                    'delivery_address'=>$validated['delivery_address'],
-                    'vendor_id'=>$validated['vendor_id'],
-                   
+                    'delivery_address' => $validated['delivery_address'],
+                    'vendor_id' => $validated['vendor_id'],
+
                 ]);
 
                 $purchaseRequest->items()->delete();
@@ -312,10 +340,17 @@ class PurchaseRequestController extends Controller
                         'raw_material_id' => $item['raw_material_id'],
                         'qty' => $item['qty'],
                         'unit_id' => $item['unit_id'],
-                        'unit_cost'=>$item['unit_cost'],
-                        'total'=>$item['unit_cost']*$item['qty'],
+                        'unit_cost' => $item['unit_cost'],
+                        'total' => $item['unit_cost'] * $item['qty'],
                     ]);
                 }
+
+                $purchaseRequest->activities()->create([
+                    'action' => 'Purchase Request updated.',
+                    'description' => "Purchase Request updated by " . Auth::user()->name . '',
+                    'user_id' => Auth::user()->id,
+                    'vendor_id' => $purchaseRequest->vendor_id
+                ]);
             }
         );
 
@@ -330,16 +365,17 @@ class PurchaseRequestController extends Controller
     /**
      * Delete purchase request.
      */
-    public function destroy(PurchaseRequest $purchaseRequest){
+    public function destroy(PurchaseRequest $purchaseRequest)
+    {
         try {
             $purchaseRequest->delete();
             return response()->json([
-                'success'=>true,
+                'success' => true,
                 'message' => 'Purchase request deleted successfully.',
-            ],200);
+            ], 200);
         } catch (\Throwable $e) {
             return response()->json([
-                'success'=>false,
+                'success' => false,
                 'message' => 'Unable to delete purchase request.',
             ], 500);
         }

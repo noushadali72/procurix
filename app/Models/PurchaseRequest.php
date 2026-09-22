@@ -41,6 +41,10 @@ class PurchaseRequest extends Model
         return $this->hasOne(PurchaseOrder::class);
     }
 
+    public function activities(){
+        return $this->hasMany(PurchaseRequestActivity::class);
+    }
+
      private static function generateRequestNumber(): string
         {
             do {

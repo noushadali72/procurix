@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('purchase_request_activities', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('purchase_request_id')->constrained('purchase_requests')->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('vendor_id')->nullable()->constrained('vendors')->nullOnDelete();
+            $table->string('action')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

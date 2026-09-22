@@ -167,7 +167,7 @@
                             : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
 
                         <i class="bx bx-file text-[20px]"></i>
-                        <span>Purchase Requests <b>(RFQ)</b></span>
+                        <span>Purchase Requests</span>
 
                     </a>
 
