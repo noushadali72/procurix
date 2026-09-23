@@ -295,8 +295,10 @@ class GoodsReceiptController extends Controller
             if ($purchaseOrder->purchaseRequest) {
                 $purchaseOrder->purchaseRequest->update([
                     'status' => 'completed',
+                    'stage'=>'completed'
                 ]);
             }
+
 
             return;
         }
@@ -306,6 +308,14 @@ class GoodsReceiptController extends Controller
                 'status' => 'partially_received',
                 'received_date' => null,
             ]);
+
+             if ($purchaseOrder->purchaseRequest) {
+                    $purchaseOrder->purchaseRequest->update([
+                        'stage' => 'receiving',
+                        'status'=>'partially_closed'
+                    ]);
+                }
+
 
             return;
         }

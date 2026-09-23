@@ -1,110 +1,124 @@
-<div class="space-y-6">
 
-    {{-- Purchase Request Information --}}
-    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
 
-        <h2 class="mb-5 text-lg font-semibold text-slate-800">
-            Purchase Request Information
-        </h2>
+    {{-- Request Details --}}
+    <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
 
-        <div class="grid gap-5 md:grid-cols-2 justify-start">
+        <div class="border-b border-slate-200 px-6 py-4">
+            <h2 class="text-base font-semibold text-slate-900">
+                Request Details
+            </h2>
+
+            <p class="mt-1 text-xs text-slate-500">
+                Enter the basic information for this purchase request.
+            </p>
+        </div>
+
+
+        <div class="grid grid-cols-1 gap-x-8 gap-y-5 p-6 md:grid-cols-2 lg:grid-cols-3">
 
             {{-- Vendor --}}
             <div>
-                <div class="mb-2 flex items-center justify-between">
-                    <label class="block text-sm font-medium text-gray-700">
+                <div class="mb-1.5 flex items-center justify-between">
+
+                    <label for="vendor_id"
+                        class="text-sm font-medium text-slate-700">
                         Vendor <span class="text-red-500">*</span>
                     </label>
 
-                    <button type="button" id="openVendorModal"
-                        class="inline-flex cursor-pointer items-center gap-1 text-xs font-medium text-gray-700 transition hover:text-gray-900">
-                        <i class="bx bx-plus"></i>
-                        Add Vendor
+                    <button type="button"
+                        id="openVendorModal"
+                        class="text-xs font-medium text-slate-600 hover:text-slate-900">
+                        + Add Vendor
                     </button>
+
                 </div>
 
-                <select name="vendor_id" id="vendor_id"
-                    class="block w-full rounded-lg border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm focus:border-gray-900 focus:ring-gray-900">
-                    <option value="">Select Vendor</option>
+                <select name="vendor_id"
+                    id="vendor_id"
+                    class="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
+
+                    <option value="">
+                        Select Vendor
+                    </option>
 
                     @foreach ($vendors as $vendor)
+
                         <option value="{{ $vendor->id }}"
                             {{ old('vendor_id', $purchaseRequest->vendor_id ?? '') == $vendor->id ? 'selected' : '' }}>
+
                             {{ $vendor->company_name ?: $vendor->name }}
+
                         </option>
+
                     @endforeach
+
                 </select>
 
-                <span id="vendorIdErr" class="mt-1.5 block text-xs text-red-600"></span>
+                <span id="vendorIdErr"
+                    class="mt-1 block text-xs text-red-600"></span>
             </div>
 
 
-            {{-- Status --}}
+            {{-- Due Date --}}
             <div>
 
-                <label for="status" class="mb-2 block text-sm font-medium text-slate-700">
-                    Status
-                    <span class="text-red-500">*</span>
+                <label for="due_date"
+                    class="mb-1.5 block text-sm font-medium text-slate-700">
+
+                    Due Date
+
                 </label>
 
-                <select name="status" id="status"
-                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-                    required>
-                    <option value="">
-                        Select Status
-                    </option>
-
-                    <option value="draft"
-                        {{ old('status', $purchaseRequest->status ?? 'draft') === 'draft' ? 'selected' : '' }}>
-                        Draft
-                    </option>
-
-                    <option value="active"
-                        {{ old('status', $purchaseRequest->status ?? 'active') === 'active' ? 'selected' : '' }}>
-                        Active
-                    </option>
-
-
-                    <option value="pending"
-                        {{ old('status', $purchaseRequest->status ?? '') === 'pending' ? 'selected' : '' }}>
-                        Pending
-                    </option>
-
-                    <option value="completed"
-                        {{ old('status', $purchaseRequest->status ?? '') === 'completed' ? 'selected' : '' }}>
-                        Completed
-                    </option>
-                </select>
-
-                <span id="statusErr" class="mt-1 block text-xs text-red-600"></span>
+                <input type="date"
+                    name="due_date"
+                    id="due_date"
+                    value="{{ old('due_date', $purchaseRequest->due_date ?? '') }}"
+                    class="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
 
             </div>
 
-            {{-- address --}}
+
+            {{-- Delivery Address --}}
             <div>
 
-                <label for="delivery_address" class="mb-2 block text-sm font-medium text-slate-700">
+                <label for="delivery_address"
+                    class="mb-1.5 block text-sm font-medium text-slate-700">
+
                     Delivery Address
+
                 </label>
 
-                <textarea name="delivery_address" id="delivery_address" rows="3" placeholder="Enter delivery address..."
-                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200">{{ old('delivery_address', $purchaseRequest->delivery_address ?? '') }}</textarea>
-                <span id="deliveryAddressErr" class="mt-1 block text-xs text-red-600"></span>
+                <input type="text"
+                    name="delivery_address"
+                    id="delivery_address"
+                    value="{{ old('delivery_address', $purchaseRequest->delivery_address ?? '') }}"
+                    placeholder="Enter delivery location"
+                    class="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
+
+                <span id="deliveryAddressErr"
+                    class="mt-1 block text-xs text-red-600"></span>
 
             </div>
 
 
             {{-- Notes --}}
-            <div>
+            <div class="md:col-span-2 lg:col-span-3">
 
-                <label for="notes" class="mb-2 block text-sm font-medium text-slate-700">
+                <label for="notes"
+                    class="mb-1.5 block text-sm font-medium text-slate-700">
+
                     Notes
+
                 </label>
 
-                <textarea name="notes" id="notes" rows="3" placeholder="Enter notes..."
-                    class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200">{{ old('notes', $purchaseRequest->notes ?? '') }}</textarea>
+                <textarea name="notes"
+                    id="notes"
+                    rows="2"
+                    placeholder="Add any additional information or instructions..."
+                    class="w-full resize-none rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm leading-5 text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200">{{ old('notes', $purchaseRequest->notes ?? '') }}</textarea>
 
-                <span id="notesErr" class="mt-1 block text-xs text-red-600"></span>
+                <span id="notesErr"
+                    class="mt-1 block text-xs text-red-600"></span>
 
             </div>
 
@@ -113,60 +127,62 @@
     </div>
 
 
-    {{-- Items --}}
-    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    {{-- Items Workspace --}}
+    <div class="mt-6 overflow-hidden rounded-lg border border-slate-200 bg-white">
 
-        <div class="mb-5 flex items-center justify-between gap-4">
+        {{-- Items Header --}}
+        <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
 
             <div>
-
-                <h2 class="text-lg font-semibold text-slate-800">
-                    Raw Materials
+                <h2 class="text-base font-semibold text-slate-900">
+                    Request Items
                 </h2>
 
-                <p class="mt-1 text-sm text-slate-500">
-                    Add raw materials required in this purchase request.
+                <p class="mt-1 text-xs text-slate-500">
+                    Add the raw materials required for this purchase.
                 </p>
-
             </div>
 
 
-            <button type="button" id="addItemBtn"
-                class="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-900">
-                <i class="bx bx-plus text-lg"></i>
+            <button type="button"
+                id="addItemBtn"
+                class="inline-flex h-9 items-center gap-1.5 rounded-md bg-slate-900 px-3.5 text-sm font-medium text-white transition hover:bg-slate-800">
+
+                <i class="bx bx-plus"></i>
 
                 Add Item
+
             </button>
 
         </div>
 
 
+        {{-- Items Table --}}
         <div class="overflow-x-auto">
 
-            <table class="w-full min-w-[850px]">
+            <table class="w-full min-w-[900px]">
 
                 <thead>
 
                     <tr class="border-b border-slate-200 bg-slate-50">
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            Raw Material<sup>*</sup>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600">
+                            Raw Material
                         </th>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            Quantity<sup>*</sup>
+                        <th class="w-40 px-4 py-3 text-left text-xs font-semibold text-slate-600">
+                            Quantity
                         </th>
 
-                         <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            Unit Cost<sup>*</sup>
+                        <th class="w-44 px-4 py-3 text-left text-xs font-semibold text-slate-600">
+                            Unit Cost
                         </th>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            Unit<sup>*</sup>
+                        <th class="w-48 px-4 py-3 text-left text-xs font-semibold text-slate-600">
+                            Unit
                         </th>
 
-                        <th
-                            class="w-20 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <th class="w-16 px-4 py-3 text-center text-xs font-semibold text-slate-600">
                             Action
                         </th>
 
@@ -179,15 +195,15 @@
 
                     @if (isset($purchaseRequest) && $purchaseRequest->items->count())
 
-                        {{-- Existing Purchase Request Items --}}
                         @foreach ($purchaseRequest->items as $index => $item)
-                            <tr class="item-row border-b border-slate-100">
+
+                            <tr class="item-row border-b border-slate-100 last:border-0 hover:bg-slate-50">
 
                                 {{-- Raw Material --}}
-                                <td class="px-4 py-4">
+                                <td class="px-6 py-3">
 
                                     <select name="items[{{ $index }}][raw_material_id]"
-                                        class="raw-material-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                                        class="raw-material-select h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                                         required>
 
                                         <option value="">
@@ -195,18 +211,22 @@
                                         </option>
 
                                         @foreach ($rawMaterials as $rawMaterial)
+
                                             <option value="{{ $rawMaterial->id }}"
                                                 data-unit-id="{{ $rawMaterial->unit_id }}"
                                                 data-unit-name="{{ $rawMaterial->unit->name }}"
                                                 data-category-id="{{ $rawMaterial->unit->unit_category_id }}"
                                                 data-cost-price="{{ $rawMaterial->cost_price }}"
                                                 {{ $item->raw_material_id == $rawMaterial->id ? 'selected' : '' }}>
+
                                                 {{ $rawMaterial->name }}
 
                                                 @if ($rawMaterial->sku)
                                                     - {{ $rawMaterial->sku }}
                                                 @endif
+
                                             </option>
+
                                         @endforeach
 
                                     </select>
@@ -215,30 +235,38 @@
 
 
                                 {{-- Quantity --}}
-                                <td class="px-4 py-4">
+                                <td class="px-4 py-3">
 
-                                    <input type="text" inputmode="decimal" name="items[{{ $index }}][qty]"
-                                        value="{{ $item->qty }}" placeholder="Quantity"
-                                        class="qty-input w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                                    <input type="text"
+                                        inputmode="decimal"
+                                        name="items[{{ $index }}][qty]"
+                                        value="{{ $item->qty }}"
+                                        placeholder="0"
+                                        class="qty-input h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                                         required>
 
                                 </td>
 
+
                                 {{-- Unit Cost --}}
-                                <td class="px-4 py-4">
-                                    <input type="text" inputmode="decimal"
-                                        name="items[{{ $index }}][unit_cost]" value="{{ $item->unit_cost }}"
-                                        placeholder="Unit cost"
-                                        class="cost-input w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                                <td class="px-4 py-3">
+
+                                    <input type="text"
+                                        inputmode="decimal"
+                                        name="items[{{ $index }}][unit_cost]"
+                                        value="{{ $item->unit_cost }}"
+                                        placeholder="0.00"
+                                        class="cost-input h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                                         required>
+
                                 </td>
 
 
                                 {{-- Unit --}}
-                                <td class="px-4 py-4">
+                                <td class="px-4 py-3">
 
                                     <select name="items[{{ $index }}][unit_id]"
-                                        class="unit-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                                        class="unit-select h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                                         required>
 
                                         <option value="">
@@ -246,12 +274,16 @@
                                         </option>
 
                                         @foreach ($units as $unit)
+
                                             <option value="{{ $unit->id }}"
                                                 data-category-id="{{ $unit->unit_category_id }}"
                                                 {{ $item->unit_id == $unit->id ? 'selected' : '' }}>
+
                                                 {{ $unit->name }}
                                                 ({{ $unit->short_name }})
+
                                             </option>
+
                                         @endforeach
 
                                     </select>
@@ -259,27 +291,32 @@
                                 </td>
 
 
-                                {{-- Remove --}}
-                                <td class="px-4 py-4 text-center">
+                                {{-- Action --}}
+                                <td class="px-4 py-3 text-center">
 
                                     <button type="button"
-                                        class="remove-item inline-flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100">
+                                        class="remove-item inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                                        title="Remove item">
+
                                         <i class="bx bx-trash text-lg"></i>
+
                                     </button>
 
                                 </td>
 
                             </tr>
-                        @endforeach
-                    @else
-                        {{-- First New Item --}}
-                        <tr class="item-row border-b border-slate-100">
 
-                            {{-- Raw Material --}}
-                            <td class="px-4 py-4">
+                        @endforeach
+
+                    @else
+
+                        {{-- First Item --}}
+                        <tr class="item-row border-b border-slate-100 hover:bg-slate-50">
+
+                            <td class="px-6 py-3">
 
                                 <select name="items[0][raw_material_id]"
-                                    class="raw-material-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                                    class="raw-material-select h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                                     required>
 
                                     <option value="">
@@ -287,19 +324,21 @@
                                     </option>
 
                                     @foreach ($rawMaterials as $rawMaterial)
+
                                         <option value="{{ $rawMaterial->id }}"
                                             data-unit-id="{{ $rawMaterial->unit_id }}"
                                             data-unit-name="{{ $rawMaterial->unit->name }}"
                                             data-category-id="{{ $rawMaterial->unit->unit_category_id }}"
-                                            data-cost-price="{{ $rawMaterial->cost_price }}"
-                                            
-                                            >
+                                            data-cost-price="{{ $rawMaterial->cost_price }}">
+
                                             {{ $rawMaterial->name }}
 
                                             @if ($rawMaterial->sku)
                                                 - {{ $rawMaterial->sku }}
                                             @endif
+
                                         </option>
+
                                     @endforeach
 
                                 </select>
@@ -307,29 +346,35 @@
                             </td>
 
 
-                            {{-- Quantity --}}
-                            <td class="px-4 py-4">
-                                <input type="text" inputmode="decimal" name="items[0][qty]" value="1"
-                                    placeholder="Quantity" 
-                                    class="qty-input w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                            <td class="px-4 py-3">
+
+                                <input type="text"
+                                    inputmode="decimal"
+                                    name="items[0][qty]"
+                                    value="1"
+                                    placeholder="0"
+                                    class="qty-input h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                                     required>
 
                             </td>
 
 
-                            {{-- Unit Cost --}}
-                            <td class="px-4 py-4">
-                                <input type="text" inputmode="decimal" name="items[0][unit_cost]"
-                                    placeholder="Unit cost"
-                                    class="cost-input w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                            <td class="px-4 py-3">
+
+                                <input type="text"
+                                    inputmode="decimal"
+                                    name="items[0][unit_cost]"
+                                    placeholder="0.00"
+                                    class="cost-input h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                                     required>
+
                             </td>
 
-                            {{-- Unit --}}
-                            <td class="px-4 py-4">
+
+                            <td class="px-4 py-3">
 
                                 <select name="items[0][unit_id]"
-                                    class="unit-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                                    class="unit-select h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                                     required>
 
                                     <option value="">
@@ -337,11 +382,15 @@
                                     </option>
 
                                     @foreach ($units as $unit)
+
                                         <option value="{{ $unit->id }}"
                                             data-category-id="{{ $unit->unit_category_id }}">
+
                                             {{ $unit->name }}
                                             ({{ $unit->short_name }})
+
                                         </option>
+
                                     @endforeach
 
                                 </select>
@@ -349,12 +398,14 @@
                             </td>
 
 
-                            {{-- Remove --}}
-                            <td class="px-4 py-4 text-center">
+                            <td class="px-4 py-3 text-center">
 
                                 <button type="button"
-                                    class="remove-item inline-flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100">
+                                    class="remove-item inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                                    title="Remove item">
+
                                     <i class="bx bx-trash text-lg"></i>
+
                                 </button>
 
                             </td>
@@ -367,62 +418,73 @@
 
             </table>
 
+        </div>
 
 
+       
+
+    </div>
+
+
+    {{-- Summary --}}
+    <div class="mt-4 flex flex-col items-stretch justify-between gap-4 rounded-lg border border-slate-200 bg-white px-6 py-4 sm:flex-row sm:items-center">
+
+        <div class="flex flex-wrap items-center gap-x-8 gap-y-3">
+
+            <div>
+                <p class="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                    Items
+                </p>
+
+                <p id="totalItems"
+                    class="mt-0.5 text-lg font-semibold text-slate-900">
+                    0
+                </p>
+            </div>
+
+
+            <div>
+                <p class="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                    Quantity
+                </p>
+
+                <p id="totalQuantity"
+                    class="mt-0.5 text-lg font-semibold text-slate-900">
+                    0
+                </p>
+            </div>
 
         </div>
 
-        
+
+        <div class="border-t border-slate-200 pt-3 sm:border-l sm:border-t-0 sm:pl-8 sm:pt-0">
+
+            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                Estimated Total Cost
+            </p>
+
+            <p id="totalCost"
+                class="mt-0.5 text-xl font-semibold text-slate-900">
+                0.00
+            </p>
+
+        </div>
 
     </div>
 
-             
-{{-- Summary --}}
-<div class="mt-6 grid gap-4 sm:grid-cols-3">
 
-    <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
-        <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
-            Total Items
-        </p>
-        <p id="totalItems" class="mt-1 text-xl font-semibold text-slate-800">
-            0
-        </p>
-    </div>
 
-    <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
-        <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
-            Total Quantity
-        </p>
-        <p id="totalQuantity" class="mt-1 text-xl font-semibold text-slate-800">
-            0
-        </p>
-    </div>
-
-    <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
-        <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
-            Estimated Total Cost
-        </p>
-        <p id="totalCost" class="mt-1 text-xl font-semibold text-slate-800">
-            0.00
-        </p>
-    </div>
-
-</div>
-
-</div>
 
 {{-- Dynamic Item Template --}}
-
 <script type="text/template" id="itemRowTemplate">
 
-    <tr class="item-row border-b border-slate-100">
+    <tr class="item-row border-b border-slate-100 hover:bg-slate-50">
 
-        {{-- Raw Material --}}
-        <td class="px-4 py-4">
+        <td class="px-6 py-3">
 
             <select
                 name="items[__INDEX__][raw_material_id]"
-                class="raw-material-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                class="raw-material-select h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                 required
             >
 
@@ -439,11 +501,137 @@
                         data-category-id="{{ $rawMaterial->unit->unit_category_id }}"
                         data-cost-price="{{ $rawMaterial->cost_price }}"
                     >
+
                         {{ $rawMaterial->name }}
 
                         @if($rawMaterial->sku)
                             - {{ $rawMaterial->sku }}
                         @endif
+
+                    </option>
+
+                @endforeach
+
+            </select>
+
+        </td>
+
+
+        <td class="px-4 py-3">
+
+            <input
+                type="text"
+                inputmode="decimal"
+                name="items[__INDEX__][qty]"
+                value="1"
+                placeholder="0"
+                class="qty-input h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                required
+            >
+
+        </td>
+
+
+        <td class="px-4 py-3">
+
+            <input
+                type="text"
+                inputmode="decimal"
+                name="items[__INDEX__][unit_cost]"
+                placeholder="0.00"
+                class="cost-input h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                required
+            >
+
+        </td>
+
+
+        <td class="px-4 py-3">
+
+            <select
+                name="items[__INDEX__][unit_id]"
+                class="unit-select h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                required
+            >
+
+                <option value="">
+                    Select Unit
+                </option>
+
+                @foreach($units as $unit)
+
+                    <option
+                        value="{{ $unit->id }}"
+                        data-category-id="{{ $unit->unit_category_id }}"
+                    >
+
+                        {{ $unit->name }}
+                        ({{ $unit->short_name }})
+
+                    </option>
+
+                @endforeach
+
+            </select>
+
+        </td>
+
+
+        <td class="px-4 py-3 text-center">
+
+            <button
+                type="button"
+                class="remove-item inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                title="Remove item"
+            >
+
+                <i class="bx bx-trash text-lg"></i>
+
+            </button>
+
+        </td>
+
+    </tr>
+
+</script>
+
+
+{{-- =============================================================
+    Dynamic Item Template
+============================================================= --}}
+<script type="text/template" id="itemRowTemplate">
+
+    <tr class="item-row group transition hover:bg-slate-50/70">
+
+        {{-- Raw Material --}}
+        <td class="px-6 py-4">
+
+            <select
+                name="items[__INDEX__][raw_material_id]"
+                class="raw-material-select block h-11 w-full rounded-lg border border-slate-300 bg-white px-3.5 text-sm text-slate-900 shadow-sm outline-none transition hover:border-slate-400 focus:border-slate-700 focus:ring-2 focus:ring-slate-200"
+                required
+            >
+
+                <option value="">
+                    Select Raw Material
+                </option>
+
+                @foreach($rawMaterials as $rawMaterial)
+
+                    <option
+                        value="{{ $rawMaterial->id }}"
+                        data-unit-id="{{ $rawMaterial->unit_id }}"
+                        data-unit-name="{{ $rawMaterial->unit->name }}"
+                        data-category-id="{{ $rawMaterial->unit->unit_category_id }}"
+                        data-cost-price="{{ $rawMaterial->cost_price }}"
+                    >
+
+                        {{ $rawMaterial->name }}
+
+                        @if($rawMaterial->sku)
+                            - {{ $rawMaterial->sku }}
+                        @endif
+
                     </option>
 
                 @endforeach
@@ -462,23 +650,32 @@
                 name="items[__INDEX__][qty]"
                 value="1"
                 placeholder="Quantity"
-                class="qty-input w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                class="qty-input h-11 w-full rounded-lg border border-slate-300 bg-white px-3.5 text-sm text-slate-900 shadow-sm outline-none transition hover:border-slate-400 focus:border-slate-700 focus:ring-2 focus:ring-slate-200"
                 required
             >
 
         </td>
 
+
         {{-- Unit Cost --}}
         <td class="px-4 py-4">
 
-            <input
-                type="text"
-                inputmode="decimal"
-                name="items[__INDEX__][unit_cost]"
-                placeholder="Unit cost"
-                class="cost-input w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-                required
-            >
+            <div class="relative">
+
+                <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-xs font-medium text-slate-400">
+                    —
+                </span>
+
+                <input
+                    type="text"
+                    inputmode="decimal"
+                    name="items[__INDEX__][unit_cost]"
+                    placeholder="0.00"
+                    class="cost-input h-11 w-full rounded-lg border border-slate-300 bg-white pl-7 pr-3.5 text-sm text-slate-900 shadow-sm outline-none transition hover:border-slate-400 focus:border-slate-700 focus:ring-2 focus:ring-slate-200"
+                    required
+                >
+
+            </div>
 
         </td>
 
@@ -488,7 +685,7 @@
 
             <select
                 name="items[__INDEX__][unit_id]"
-                class="unit-select w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                class="unit-select block h-11 w-full rounded-lg border border-slate-300 bg-white px-3.5 text-sm text-slate-900 shadow-sm outline-none transition hover:border-slate-400 focus:border-slate-700 focus:ring-2 focus:ring-slate-200"
                 required
             >
 
@@ -502,8 +699,10 @@
                         value="{{ $unit->id }}"
                         data-category-id="{{ $unit->unit_category_id }}"
                     >
+
                         {{ $unit->name }}
                         ({{ $unit->short_name }})
+
                     </option>
 
                 @endforeach
@@ -518,9 +717,12 @@
 
             <button
                 type="button"
-                class="remove-item inline-flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100"
+                class="remove-item inline-flex h-10 w-10 items-center justify-center rounded-lg border border-transparent text-slate-400 transition hover:border-red-100 hover:bg-red-50 hover:text-red-600"
+                title="Remove item"
             >
+
                 <i class="bx bx-trash text-lg"></i>
+
             </button>
 
         </td>
@@ -529,7 +731,9 @@
 
 </script>
 
+
 @push('scripts')
+
 <script>
 $(document).ready(function () {
 
@@ -568,7 +772,6 @@ $(document).ready(function () {
         });
 
 
-        // Clear invalid selected unit
         const selectedOption = unitSelect.find("option:selected");
 
         if (
@@ -645,7 +848,6 @@ $(document).ready(function () {
             ) || 0;
 
 
-            // Count only rows with a selected raw material
             if (rawMaterial) {
                 totalItems++;
             }
@@ -683,12 +885,12 @@ $(document).ready(function () {
 
         filterUnits(item);
 
-        // Set default unit
         const unitId = selected.data("unit-id");
+
         item.find(".unit-select").val(unitId);
 
-        // Set material cost price
         const costPrice = selected.data("cost-price");
+
         item.find(".cost-input").val(costPrice ?? "");
 
         updateRawMaterials();
@@ -704,7 +906,6 @@ $(document).ready(function () {
         ".qty-input, .cost-input",
         function () {
 
-            // Allow digits and one decimal point
             this.value = this.value.replace(/[^0-9.]/g, "");
 
             const parts = this.value.split(".");
@@ -715,7 +916,6 @@ $(document).ready(function () {
                     "." +
                     parts.slice(1).join("");
             }
-
 
             updateSummary();
         }
@@ -738,7 +938,6 @@ $(document).ready(function () {
         container.append(template);
 
         itemIndex++;
-
 
         updateRawMaterials();
         updateSummary();
@@ -775,20 +974,15 @@ $(document).ready(function () {
     // Initial setup
     // -----------------------------------------
 
-    // Filter units for existing rows
     container.find(".item-row").each(function () {
         filterUnits($(this));
     });
 
-
-    // Hide already selected raw materials
     updateRawMaterials();
 
-
-    // Calculate initial summary
     updateSummary();
 
 });
-
 </script>
+
 @endpush

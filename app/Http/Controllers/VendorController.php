@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Vendor\StoreVendorRequest;
 use App\Http\Requests\Vendor\UpdateVendorRequest;
+use App\Models\PaymentTerm;
 use App\Models\Vendor;
+use Faker\Provider\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -15,7 +17,7 @@ class VendorController extends Controller
      */
     public function index()
     {
-        $vendors = Vendor::latest()->paginate(10);
+        $vendors = Vendor::with('paymentTerm')->latest()->paginate(10);
         return view('vendors.index', compact('vendors'));
     }
 
@@ -25,7 +27,8 @@ class VendorController extends Controller
      */
     public function create()
     {
-        return view('vendors.create');
+        $paymentTerms = PaymentTerm::orderBy('name')->get();
+        return view('vendors.create',compact('paymentTerms'));
     }
 
 
@@ -45,6 +48,7 @@ class VendorController extends Controller
                 'ntn'=>$validated['ntn'],
                 'contact_person' => $validated['contact_person'],
                 'address' => $validated['address'] ?? null,
+                'payment_term_id'=>$validated['payment_term_id'],
                 'is_active' => $validated['is_active'],
             ]);
             return response()->json(['message' => 'Vendor created successfully.'], 201);
@@ -60,6 +64,7 @@ class VendorController extends Controller
      */
     public function show(Vendor $vendor)
     {
+        $vendor->load(['paymentTerm']);
         return view('vendors.show', compact('vendor'));
     }
 
@@ -69,7 +74,9 @@ class VendorController extends Controller
      */
     public function edit(Vendor $vendor)
     {
-        return view('vendors.edit', compact('vendor'));
+        $paymentTerms = PaymentTerm::orderBy('name')->get();
+        $vendor->load('paymentTerm');
+        return view('vendors.edit', compact('vendor','paymentTerms'));
     }
 
 

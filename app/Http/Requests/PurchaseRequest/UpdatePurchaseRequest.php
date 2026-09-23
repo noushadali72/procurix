@@ -17,15 +17,30 @@ class UpdatePurchaseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => [
-                'required',
-                Rule::in([
-                    'completed',
-                    'pending',
-                    'active',
-                    'draft',
-                    'partially_closed'
-                ]),
+
+            // 'status' => [
+            //     'required',
+            //     Rule::in([
+            //         'completed',
+            //         'pending',
+            //         'active',
+            //         'draft',
+            //         'partially_closed',
+            //         'cancelled',
+            //         'sent'
+            //     ]),
+            // ],
+
+            'stage' => [
+                Rule::in(
+                    [
+                        'request',
+                        'confirmation',
+                        'purchase_order',
+                        'receiving',
+                        'completed'
+                    ]
+                )
             ],
 
             'notes' => [
@@ -61,7 +76,7 @@ class UpdatePurchaseRequest extends FormRequest
                 'numeric',
                 'gt:0',
             ],
-            'items.*.unit_cost'=>[
+            'items.*.unit_cost' => [
                 'nullable',
                 'numeric',
                 'gt:0'

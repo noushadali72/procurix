@@ -62,6 +62,11 @@ class StoreVendorRequest extends FormRequest
                 'nullable',
                 'string',
             ],
+            'payment_term_id'=>[
+                'nullable',
+                'integer',
+                'exists:payment_terms,id'
+            ],
 
             'is_active' => [
                 'nullable',

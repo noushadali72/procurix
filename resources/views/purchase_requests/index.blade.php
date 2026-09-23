@@ -79,7 +79,7 @@
                         </th>
 
 
-                        
+
                         <th class="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Actions
                         </th>
@@ -105,14 +105,14 @@
                                     </div>
 
                                     <div>
-                                        <a href="{{ route('purchase-requests.show',$purchaseRequest) }}">
-                                        <div class="font-medium text-gray-900">
-                                            {{ $purchaseRequest->request_number }}
-                                        </div>
+                                        <a href="{{ route('purchase-requests.show', $purchaseRequest) }}">
+                                            <div class="font-medium text-gray-900">
+                                                {{ $purchaseRequest->request_number }}
+                                            </div>
 
-                                        <div class="mt-0.5 text-xs text-gray-500">
-                                            Purchase request
-                                        </div>
+                                            <div class="mt-0.5 text-xs text-gray-500">
+                                                Purchase request
+                                            </div>
                                         </a>
                                     </div>
 
@@ -120,7 +120,7 @@
 
                             </td>
 
-                             {{-- Vendor --}}
+                            {{-- Vendor --}}
                             <td class="max-w-xs px-5 py-4">
 
                                 @if ($purchaseRequest->vendor)
@@ -148,13 +148,19 @@
                                         'completed' => 'bg-green-50 text-green-600',
                                         'pending' => 'bg-amber-50 text-amber-600',
                                         'active' => 'bg-blue-100 text-blue-700',
+                                        'sent' => 'bg-blue-100 text-blue-700',
+                                        'cancelled' => 'bg-red-100 text-red-700',
+                                        'partially_closed' => 'bg-yellow-100 text-yellow-700',
                                         default => 'bg-gray-100 text-gray-600',
                                     };
 
                                     $statusDot = match ($status) {
                                         'completed' => 'bg-green-500',
                                         'pending' => 'bg-amber-500',
-                                        'active'=>'bg-blue-500',
+                                        'active' => 'bg-blue-500',
+                                        'sent' => 'bg-blue-500',
+                                        'cancelled' => 'bg-red-500',
+                                        'partially_closed' => 'bg-yellow-500',
                                         default => 'bg-gray-400',
                                     };
                                 @endphp
@@ -163,7 +169,7 @@
                                     class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
                                     <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
 
-                                    {{ ucfirst($status) }}
+                                    {{ ucfirst(str_replace('_', ' ', $status)) }}
                                 </span>
 
                             </td>
@@ -211,7 +217,7 @@
                             </td>
 
 
-                          
+
 
                             {{-- Actions --}}
                             <td class="px-5 py-4">
@@ -225,12 +231,21 @@
                                         View
                                     </a> --}}
 
-                                    @if($purchaseRequest->status=='pending')
-                                    {{-- Approve --}}
-                                    <button data-purchase-request-id="{{ $purchaseRequest->id }}"
-                                        class="approve-btn cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-green-900 px-3 py-1.5 text-xs font-medium text-green-700 transition hover:bg-green-900 hover:text-white">
-                                        <i class="bx bx-edit-alt"></i>
-                                        Approve
+                                    @if ($purchaseRequest->status == 'pending')
+                                        {{-- Approve --}}
+                                        <button data-purchase-request-id="{{ $purchaseRequest->id }}"
+                                            class="approve-btn cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-green-900 px-3 py-1.5 text-xs font-medium text-green-700 transition hover:bg-green-900 hover:text-white">
+                                            <i class="bx bx-edit-alt"></i>
+                                            Approve
+                                        </button>
+                                    @endif
+
+                                    @if(!in_array($purchaseRequest->status,['completed','draft']))
+
+                                    
+                                    <button type="button" class="duplicate-pr cursor-pointer" data-id="{{ $purchaseRequest->id }}">
+                                        <i class="bx bx-copy"></i>
+                                        Duplicate
                                     </button>
                                     @endif
 
@@ -352,25 +367,25 @@
 
             });
 
-            function approve(){
-            
+            function approve() {
+
                 const button = $(this);
-                if(!confirm('Do you want to approve the Purchase Request?')){
+                if (!confirm('Do you want to approve the Purchase Request?')) {
                     return;
                 }
-                
-                var purchaseRequestId = $(this).data('purchase-request-id');
-                var url = "{{ route('purchase-requests.updateStatus',':id') }}";
-                url = url.replace(':id',purchaseRequestId);
 
-                button.prop('disabled',true);
+                var purchaseRequestId = $(this).data('purchase-request-id');
+                var url = "{{ route('purchase-requests.updateStatus', ':id') }}";
+                url = url.replace(':id', purchaseRequestId);
+
+                button.prop('disabled', true);
                 button.text('approving...');
 
                 $.ajax({
-                   url:url,
-                   type:"POST",
-                   success:function(res){
-                        showToast('success',res.message);
+                    url: url,
+                    type: "POST",
+                    success: function(res) {
+                        showToast('success', res.message);
                         button.hide();
                         button.closest('tr').find('.status').html(`
                                 <span
@@ -379,16 +394,43 @@
                                     Active
                                 </span>
                         `);
-                   },
-                   error:function(xhr){
-                        showToast('error',xhr.responseJSON?.message || 'Unable to update the status.');
-                   }
+                    },
+                    error: function(xhr) {
+                        showToast('error', xhr.responseJSON?.message || 'Unable to update the status.');
+                    }
 
                 });
             }
 
-            $(document).on('click','.approve-btn',approve);
+            $(document).on('click', '.approve-btn', approve);
 
+
+            // Duplicate pr
+
+            $(document).on('click', '.duplicate-pr', function() {
+                const id = $(this).data('id');
+
+                $.ajax({
+                    url: `/purchase-requests/${id}/duplicate`,
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        showToast('success', response.message);
+
+                        setTimeout(() => {
+                            window.location.href = response.redirect;
+                        }, 500);
+                    },
+                    error: function(xhr) {
+                        showToast(
+                            'error',
+                            xhr.responseJSON?.message || 'Unable to duplicate purchase request.'
+                        );
+                    }
+                });
+            });
         </script>
     @endpush
 

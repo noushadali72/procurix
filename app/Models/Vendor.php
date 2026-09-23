@@ -15,6 +15,7 @@ class Vendor extends Model
         'ntn',
         'address',
         'is_active',
+        'payment_term_id',
         
     ];
 
@@ -29,5 +30,8 @@ class Vendor extends Model
     } 
     public function vendorPayments(){
         return $this->hasManyThrough(VendorPayment::class, VendorBill::class);
+    }
+    public function paymentTerm(){
+        return $this->belongsTo(PaymentTerm::class);
     }
 }

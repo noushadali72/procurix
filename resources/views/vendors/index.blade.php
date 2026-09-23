@@ -13,10 +13,8 @@
             </p>
         </div>
 
-        <a
-            href="{{ route('vendors.create') }}"
-            class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
-        >
+        <a href="{{ route('vendors.create') }}"
+            class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
             <i class="bx bx-plus text-lg"></i>
             Add Vendor
         </a>
@@ -26,14 +24,16 @@
 
     {{-- Flash Messages --}}
     @if (session('success'))
-        <div class="mb-5 flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+        <div
+            class="mb-5 flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
             <i class="bx bx-check-circle text-lg"></i>
             <span>{{ session('success') }}</span>
         </div>
     @endif
 
     @if (session('error'))
-        <div class="mb-5 flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div
+            class="mb-5 flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             <i class="bx bx-error-circle text-lg"></i>
             <span>{{ session('error') }}</span>
         </div>
@@ -44,7 +44,8 @@
     <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
 
         {{-- Card Header --}}
-        <div class="flex flex-col gap-1 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+            class="flex flex-col gap-1 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
 
             <div>
                 <h3 class="text-sm font-semibold text-gray-900">
@@ -106,7 +107,6 @@
                 <tbody class="divide-y divide-gray-100">
 
                     @forelse ($vendors as $vendor)
-
                         <tr class="transition hover:bg-gray-50">
 
                             {{-- Number --}}
@@ -120,7 +120,8 @@
 
                                 <div class="flex items-center gap-3">
 
-                                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
+                                    <div
+                                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
                                         <i class="bx bx-store-alt text-lg"></i>
                                     </div>
 
@@ -177,19 +178,17 @@
                             <td class="px-5 py-4">
 
                                 @if ($vendor->is_active)
-
-                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-600">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-600">
                                         <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
                                         Active
                                     </span>
-
                                 @else
-
-                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
                                         <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>
                                         Inactive
                                     </span>
-
                                 @endif
 
                             </td>
@@ -201,41 +200,34 @@
                                 <div class="flex items-center justify-end gap-2">
 
                                     {{-- View --}}
-                                    <button
-                                        type="button"
-                                        class="view-vendor-btn inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
-                                        data-name="{{ $vendor->name }}"
+                                    <button type="button" class="view-vendor-btn inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white" data-name="{{ $vendor->name }}"
                                         data-company="{{ $vendor->company_name ?? '—' }}"
                                         data-contact="{{ $vendor->contact_person ?? '—' }}"
-                                        data-email="{{ $vendor->email ?? '—' }}"
-                                        data-ntn="{{ $vendor->ntn??'-' }}"
+                                        data-email="{{ $vendor->email ?? '—' }}" data-ntn="{{ $vendor->ntn ?? '—' }}"
                                         data-phone="{{ $vendor->phone ?? '—' }}"
+                                        data-payment-term="{{ $vendor->paymentTerm?->name ?? '—' }}"
+                                        data-payment-days="{{ $vendor->paymentTerm?->due_days ?? '' }}"
                                         data-address="{{ $vendor->address ?? '—' }}"
                                         data-status="{{ $vendor->is_active ? 'Active' : 'Inactive' }}"
-                                        data-created="{{ $vendor->created_at->format('d M Y') }}"
-                                    >
+                                        data-created="{{ $vendor->created_at->format('d M Y') }}">
                                         <i class="bx bx-show"></i>
                                         View
                                     </button>
 
 
                                     {{-- Edit --}}
-                                    <a
-                                        href="{{ route('vendors.edit', $vendor) }}"
-                                        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
-                                    >
+                                    <a href="{{ route('vendors.edit', $vendor) }}"
+                                        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white">
                                         <i class="bx bx-edit-alt"></i>
                                         Edit
                                     </a>
 
 
                                     {{-- Delete --}}
-                                    <button
-                                        type="button"
+                                    <button type="button"
                                         class="delete-vendor-btn inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-500 hover:text-white"
                                         data-url="{{ route('vendors.destroy', $vendor) }}"
-                                        data-name="{{ $vendor->name }}"
-                                    >
+                                        data-name="{{ $vendor->name }}">
                                         <i class="bx bx-trash"></i>
                                         Delete
                                     </button>
@@ -254,7 +246,8 @@
 
                                 <div class="mx-auto flex max-w-sm flex-col items-center">
 
-                                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+                                    <div
+                                        class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400">
                                         <i class="bx bx-store-alt text-2xl"></i>
                                     </div>
 
@@ -266,10 +259,8 @@
                                         Add your first vendor to start managing suppliers.
                                     </p>
 
-                                    <a
-                                        href="{{ route('vendors.create') }}"
-                                        class="mt-4 inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
-                                    >
+                                    <a href="{{ route('vendors.create') }}"
+                                        class="mt-4 inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800">
                                         <i class="bx bx-plus"></i>
                                         Add Vendor
                                     </a>
@@ -279,7 +270,6 @@
                             </td>
 
                         </tr>
-
                     @endforelse
 
                 </tbody>
@@ -291,27 +281,19 @@
 
         {{-- Pagination --}}
         @if ($vendors->hasPages())
-
             <div class="border-t border-gray-200 px-5 py-4">
                 {{ $vendors->links() }}
             </div>
-
         @endif
 
     </div>
 
 
     {{-- Vendor Details Modal --}}
-    <div
-        id="vendorModal"
-        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 px-4 py-6"
-    >
+    <div id="vendorModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 px-4 py-6">
 
-        <div
-            class="w-full max-w-lg overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl"
-            role="dialog"
-            aria-modal="true"
-        >
+        <div class="w-full max-w-lg overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl" role="dialog"
+            aria-modal="true">
 
             {{-- Modal Header --}}
             <div class="flex items-center justify-between border-b border-gray-200 px-5 py-4">
@@ -323,10 +305,7 @@
                     </div>
 
                     <div>
-                        <h3
-                            id="modalVendorName"
-                            class="text-base font-semibold text-gray-900"
-                        ></h3>
+                        <h3 id="modalVendorName" class="text-base font-semibold text-gray-900"></h3>
 
                         <p class="text-xs text-gray-500">
                             Vendor details
@@ -335,12 +314,9 @@
 
                 </div>
 
-                <button
-                    type="button"
-                    id="closeVendorModal"
+                <button type="button" id="closeVendorModal"
                     class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-xl text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
-                    aria-label="Close"
-                >
+                    aria-label="Close">
                     <i class="bx bx-x"></i>
                 </button>
 
@@ -380,10 +356,25 @@
 
                 <div>
                     <p class="text-xs font-medium uppercase tracking-wide text-gray-400">
+                        Payment Term
+                    </p>
+
+                    <p id="modalVendorPaymentTerm" class="mt-1 text-sm font-medium text-gray-900">
+                        —
+                    </p>
+
+                    <p id="modalVendorPaymentDays" class="mt-1 text-xs text-gray-500"></p>
+                </div>
+
+
+                <div>
+                    <p class="text-xs font-medium uppercase tracking-wide text-gray-400">
                         ntn
                     </p>
                     <p id="modalVendorntn" class="mt-1 text-sm font-medium text-gray-900"></p>
                 </div>
+
+
 
 
                 <div>
@@ -404,10 +395,7 @@
                     <p class="text-xs font-medium uppercase tracking-wide text-gray-400">
                         Address
                     </p>
-                    <p
-                        id="modalVendorAddress"
-                        class="mt-1 whitespace-pre-line text-sm font-medium text-gray-900"
-                    ></p>
+                    <p id="modalVendorAddress" class="mt-1 whitespace-pre-line text-sm font-medium text-gray-900"></p>
                 </div>
 
             </div>
@@ -416,11 +404,8 @@
             {{-- Modal Footer --}}
             <div class="flex justify-end border-t border-gray-200 px-5 py-4">
 
-                <button
-                    type="button"
-                    id="closeVendorModalBottom"
-                    class="inline-flex cursor-pointer items-center rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-                >
+                <button type="button" id="closeVendorModalBottom"
+                    class="inline-flex cursor-pointer items-center rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
                     Close
                 </button>
 
@@ -432,10 +417,9 @@
 
 
     @push('scripts')
-
         <script>
             // View Vendor
-            $(document).on('click', '.view-vendor-btn', function () {
+            $(document).on('click', '.view-vendor-btn', function() {
                 const button = $(this);
 
                 $('#modalVendorName').text(button.data('name'));
@@ -447,6 +431,12 @@
                 $('#modalVendorStatus').text(button.data('status'));
                 $('#modalVendorCreated').text(button.data('created'));
                 $('#modalVendorAddress').text(button.data('address'));
+                $('#modalVendorPaymentTerm').text(button.data('payment-term') || '—');
+                const paymentDays = button.data('payment-days');
+                $('#modalVendorPaymentDays').text(
+                    paymentDays ? `Due in ${paymentDays} days` : ''
+                );
+
 
                 $('#vendorModal')
                     .removeClass('hidden')
@@ -468,7 +458,7 @@
 
 
             // Close on backdrop click
-            $('#vendorModal').on('click', function (e) {
+            $('#vendorModal').on('click', function(e) {
                 if (e.target === this) {
                     closeVendorModal();
                 }
@@ -476,7 +466,7 @@
 
 
             // Close with Escape
-            $(document).on('keydown', function (e) {
+            $(document).on('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closeVendorModal();
                 }
@@ -502,18 +492,18 @@
                         'Accept': 'application/json'
                     },
 
-                    success: function (response) {
+                    success: function(response) {
                         showToast(
                             'success',
                             response.message || 'Vendor deleted successfully.'
                         );
 
-                        setTimeout(function () {
+                        setTimeout(function() {
                             window.location.reload();
                         }, 800);
                     },
 
-                    error: function (xhr) {
+                    error: function(xhr) {
                         showToast(
                             'error',
                             xhr.responseJSON?.message || 'Unable to delete vendor.'
@@ -524,11 +514,10 @@
                 });
             }
 
-            $(document).on('click', '.delete-vendor-btn', function () {
+            $(document).on('click', '.delete-vendor-btn', function() {
                 deleteVendor($(this));
             });
         </script>
-
     @endpush
 
 </x-layouts.app>

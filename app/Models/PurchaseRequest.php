@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class PurchaseRequest extends Model
@@ -13,7 +14,8 @@ class PurchaseRequest extends Model
         'notes',
         'due_date',
         'delivery_address',
-        'vendor_id'
+        'vendor_id',
+        'stage'
     ];
 
    protected static function booted(){
@@ -37,7 +39,7 @@ class PurchaseRequest extends Model
         return $this->belongsTo(Vendor::class);
     }
 
-    public function purchaseOrder(){
+    public function purchaseOrder(): HasOne {
         return $this->hasOne(PurchaseOrder::class);
     }
 

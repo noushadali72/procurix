@@ -1,48 +1,100 @@
 <x-layouts.app title="Create Purchase Request">
+<div class="max-w-6xl">
+    {{-- Page Header --}}
+    <div class="mb-6">
 
-    <div class="mb-6 flex items-center justify-between">
+        {{-- Breadcrumb --}}
+        <nav class="mb-4 flex items-center gap-2 text-xs text-slate-500">
 
-        <div>
-            <h1 class="text-2xl font-bold text-slate-900">
-                Create Purchase Request
-            </h1>
+            <a href="{{ route('admin.dashboard') }}" class="transition hover:text-slate-900">
+                Dashboard
+            </a>
 
-            <p class="mt-1 text-sm text-slate-500">
-                Create a new raw material purchase request.
-            </p>
+            <i class="bx bx-chevron-right text-sm text-slate-400"></i>
+
+            <a href="{{ route('purchase-requests.index') }}" class="transition hover:text-slate-900">
+                Purchase Requests
+            </a>
+
+            <i class="bx bx-chevron-right text-sm text-slate-400"></i>
+
+            <span class="font-medium text-slate-700">
+                New Request
+            </span>
+
+        </nav>
+
+
+        {{-- Header --}}
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+
+            <div>
+
+                <div class="flex items-center gap-3">
+
+                    <h1 class="text-xl font-semibold tracking-tight text-slate-900">
+                        New Purchase Request
+                    </h1>
+
+                    <span class="rounded-md bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600">
+                        Draft
+                    </span>
+
+                </div>
+
+                <p class="mt-1 text-sm text-slate-500">
+                    Create a purchase request for required raw materials.
+                </p>
+
+            </div>
+
+
+            <a href="{{ route('purchase-requests.index') }}"
+                class="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-3.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+
+                <i class="bx bx-arrow-back"></i>
+
+                Purchase Requests
+
+            </a>
+
         </div>
-
-
-        <a href="{{ route('purchase-requests.index') }}"
-            class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
-            <i class="bx bx-arrow-back"></i>
-
-            Back
-        </a>
 
     </div>
 
 
+    {{-- Purchase Request Form --}}
     <form id="purchaseRequestForm" action="{{ route('purchase-requests.store') }}" method="POST" novalidate>
 
         @csrf
 
         @include('purchase_requests._form')
 
+        <input type="hidden" name="purchase_request_id" id="purchaseRequestId" value="{{ $purchaseRequest?->id }}">
 
-        <div class="mt-6 flex justify-end gap-3">
+
+        {{-- Form Actions --}}
+        <div class="mt-6 flex items-center justify-end gap-3 border-t border-slate-200 pt-5">
 
             <a href="{{ route('purchase-requests.index') }}"
-                class="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                class="inline-flex h-10 items-center rounded-md border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
                 Cancel
             </a>
 
+            <button type="button" id="saveDraft"
+                class="inline-flex h-10 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60">
+
+                <i class="bx bx-save"></i>
+                Save Draft
+
+            </button>
 
             <button type="submit" id="submitBtn"
-                class="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60">
-                <i class="bx bx-save"></i>
+                class="inline-flex h-10 items-center gap-2 rounded-md bg-slate-900 px-5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60">
 
+                <i class="bx bx-send"></i>
                 Send RFQ
+
             </button>
 
         </div>
@@ -50,52 +102,59 @@
     </form>
 
 
-
     {{-- Add Vendor Modal --}}
     <div id="vendorModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+
         <div class="flex min-h-screen items-center justify-center px-4 py-8">
 
             {{-- Overlay --}}
-            <div id="vendorModalOverlay" class="fixed inset-0 bg-black/50"></div>
+            <div id="vendorModalOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-[1px]">
+            </div>
+
 
             {{-- Modal --}}
-            <div class="relative z-10 w-full max-w-3xl rounded-xl bg-white shadow-xl">
+            <div
+                class="relative z-10 w-full max-w-3xl overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl">
 
-                {{-- Header --}}
-                <div class="flex items-center justify-between border-b px-6 py-4">
+                {{-- Modal Header --}}
+                <div class="flex items-start justify-between border-b border-slate-200 px-6 py-4">
 
                     <div>
-                        <h2 class="text-lg font-semibold text-gray-900">
+                        <h2 class="text-lg font-semibold text-slate-900">
                             Add Vendor
                         </h2>
 
-                        <p class="mt-1 text-sm text-gray-500">
+                        <p class="mt-1 text-sm text-slate-500">
                             Enter the vendor details.
                         </p>
                     </div>
 
+
                     <button type="button" id="closeVendorModal"
-                        class="rounded-lg p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900">
+                        class="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700">
+
                         <i class="bx bx-x text-2xl"></i>
+
                     </button>
 
                 </div>
 
 
-                {{-- Form --}}
+                {{-- Vendor Form --}}
                 <form id="vendorForm" method="POST" action="{{ route('vendors.store') }}" novalidate>
+
                     @csrf
 
-                    <div class="grid grid-cols-1 gap-6 p-6 md:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-x-5 gap-y-5 p-6 md:grid-cols-2">
 
                         {{-- Name --}}
                         <div>
-                            <label for="vendor_name" class="mb-1 block text-sm font-medium text-gray-700">
+                            <label for="vendor_name" class="mb-1.5 block text-sm font-medium text-slate-700">
                                 Name
                             </label>
 
                             <input type="text" id="vendor_name" name="name" placeholder="Enter vendor name"
-                                class="w-full rounded-lg border-gray-300 px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
 
                             <span id="vendorNameErr" class="mt-1 block text-sm text-red-600"></span>
                         </div>
@@ -103,13 +162,13 @@
 
                         {{-- Company Name --}}
                         <div>
-                            <label for="vendor_company_name" class="mb-1 block text-sm font-medium text-gray-700">
+                            <label for="vendor_company_name" class="mb-1.5 block text-sm font-medium text-slate-700">
                                 Company Name
                             </label>
 
                             <input type="text" id="vendor_company_name" name="company_name"
                                 placeholder="Enter company name"
-                                class="w-full rounded-lg border-gray-300 px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
 
                             <span id="vendorCompanyNameErr" class="mt-1 block text-sm text-red-600"></span>
                         </div>
@@ -117,13 +176,13 @@
 
                         {{-- Contact Person --}}
                         <div>
-                            <label for="vendor_contact_person" class="mb-1 block text-sm font-medium text-gray-700">
+                            <label for="vendor_contact_person" class="mb-1.5 block text-sm font-medium text-slate-700">
                                 Contact Person
                             </label>
 
                             <input type="text" id="vendor_contact_person" name="contact_person"
                                 placeholder="Enter contact person"
-                                class="w-full rounded-lg border-gray-300 px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
 
                             <span id="vendorContactPersonErr" class="mt-1 block text-sm text-red-600"></span>
                         </div>
@@ -131,12 +190,12 @@
 
                         {{-- Email --}}
                         <div>
-                            <label for="vendor_email" class="mb-1 block text-sm font-medium text-gray-700">
+                            <label for="vendor_email" class="mb-1.5 block text-sm font-medium text-slate-700">
                                 Email
                             </label>
 
                             <input type="email" id="vendor_email" name="email" placeholder="Enter email address"
-                                class="w-full rounded-lg border-gray-300 px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
 
                             <span id="vendorEmailErr" class="mt-1 block text-sm text-red-600"></span>
                         </div>
@@ -144,37 +203,39 @@
 
                         {{-- Phone --}}
                         <div>
-                            <label for="vendor_phone" class="mb-1 block text-sm font-medium text-gray-700">
+                            <label for="vendor_phone" class="mb-1.5 block text-sm font-medium text-slate-700">
                                 Phone
                             </label>
 
                             <input type="text" id="vendor_phone" name="phone" placeholder="Enter phone number"
-                                class="w-full rounded-lg border-gray-300 px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
 
                             <span id="vendorPhoneErr" class="mt-1 block text-sm text-red-600"></span>
                         </div>
 
+
                         {{-- NTN --}}
                         <div>
-                            <label for="vendor_ntn" class="mb-1 block text-sm font-medium text-gray-700">
+                            <label for="vendor_ntn" class="mb-1.5 block text-sm font-medium text-slate-700">
                                 NTN
                             </label>
 
                             <input type="text" id="vendor_ntn" name="ntn" placeholder="Enter NTN"
-                                class="w-full rounded-lg border-gray-300 px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
 
                             <span id="vendorNtnErr" class="mt-1 block text-sm text-red-600"></span>
                         </div>
 
 
-                        {{-- Active --}}
+                        {{-- Status --}}
                         <div>
-                            <label for="vendor_is_active" class="mb-1 block text-sm font-medium text-gray-700">
+                            <label for="vendor_is_active" class="mb-1.5 block text-sm font-medium text-slate-700">
                                 Status
                             </label>
 
                             <select id="vendor_is_active" name="is_active"
-                                class="w-full rounded-lg border-gray-300 bg-white px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
+
                                 <option value="1" selected>
                                     Active
                                 </option>
@@ -182,6 +243,7 @@
                                 <option value="0">
                                     Inactive
                                 </option>
+
                             </select>
 
                             <span id="vendorIsActiveErr" class="mt-1 block text-sm text-red-600"></span>
@@ -190,34 +252,42 @@
 
                         {{-- Address --}}
                         <div class="md:col-span-2">
-                            <label for="vendor_address" class="mb-1 block text-sm font-medium text-gray-700">
+
+                            <label for="vendor_address" class="mb-1.5 block text-sm font-medium text-slate-700">
                                 Address
                             </label>
 
-                            <textarea id="vendor_address" name="address" rows="4" placeholder="Enter vendor address"
-                                class="w-full rounded-lg border-gray-300 px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500"></textarea>
+                            <textarea id="vendor_address" name="address" rows="3" placeholder="Enter vendor address"
+                                class="min-h-[90px] w-full resize-y rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm leading-6 text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200"></textarea>
 
                             <span id="vendorAddressErr" class="mt-1 block text-sm text-red-600"></span>
+
                         </div>
 
                     </div>
 
 
-                    {{-- Footer --}}
-                    <div class="flex justify-end gap-3 border-t bg-gray-50 px-6 py-4">
+                    {{-- Modal Footer --}}
+                    <div
+                        class="flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4 sm:flex-row sm:justify-end">
 
                         <button type="button" id="cancelVendorModal"
-                            class="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100">
+                            class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-100">
+
                             Cancel
+
                         </button>
 
+
                         <button type="submit" id="saveVendorBtn"
-                            class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60">
+                            class="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-800 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60">
+
                             <i class="bx bx-save"></i>
 
                             <span id="saveVendorBtnText">
                                 Save Vendor
                             </span>
+
                         </button>
 
                     </div>
@@ -225,12 +295,14 @@
                 </form>
 
             </div>
-        </div>
-    </div>
 
+        </div>
+
+    </div>
+</div>
 
     @push('scripts')
-        {{-- Add Vendor Script  --}}
+        {{-- Add Vendor Script --}}
         <script>
             $(document).ready(function() {
 
@@ -257,18 +329,15 @@
                 // Submit vendor
                 $('#vendorForm').on('submit', function(e) {
                     e.preventDefault();
+
                     const $form = $(this);
                     const $button = $('#saveVendorBtn');
                     const originalText = $('#saveVendorBtnText').text();
 
-                    // Clear previous errors
                     $('#vendorForm span[id$="Err"]').text('');
 
-                    $button
-                        .prop('disabled', true);
-
-                    $('#saveVendorBtnText')
-                        .text('Saving...');
+                    $button.prop('disabled', true);
+                    $('#saveVendorBtnText').text('Saving...');
 
 
                     $.ajax({
@@ -289,8 +358,6 @@
 
                             closeVendorModal();
 
-                            // Refresh quotation page so the new vendor
-                            // appears in the dropdown.
                             setTimeout(function() {
                                 window.location.reload();
                             }, 500);
@@ -317,8 +384,7 @@
                                     };
 
                                     if (errorMap[field]) {
-                                        $(errorMap[field])
-                                            .text(messages[0]);
+                                        $(errorMap[field]).text(messages[0]);
                                     }
 
                                     return true;
@@ -335,12 +401,8 @@
                         },
 
                         complete: function() {
-
-                            $button
-                                .prop('disabled', false);
-
-                            $('#saveVendorBtnText')
-                                .text(originalText);
+                            $button.prop('disabled', false);
+                            $('#saveVendorBtnText').text(originalText);
                         }
                     });
 
@@ -350,82 +412,204 @@
         </script>
 
 
-
+        {{-- Purchase Request Script --}}
         <script>
-            $('#purchaseRequestForm').on('submit', function(e) {
-                e.preventDefault();
+            $(document).ready(function() {
 
-                clearErrors();
+                let draftSaveTimer = null;
+                let draftSaving = false;
 
-                const form = $(this);
-                const button = form.find('#submitBtn');
+                $('#purchaseRequestForm').on('submit', function(e) {
+                    e.preventDefault();
 
-                button.prop('disabled', true);
+                    clearErrors();
 
-                $.ajax({
-                    url: form.attr('action'),
-                    type: 'POST',
-                    data: form.serialize(),
-                    headers: {
-                        'Accept': 'application/json'
-                    },
+                    const form = $(this);
+                    const button = $('#submitBtn');
 
-                    success: function(response) {
-                        showToast('success', response.message);
+                    button.prop('disabled', true);
 
-                        setTimeout(function() {
-                            window.location.href = response.redirect;
-                        }, 800);
-                    },
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: 'POST',
+                        data: form.serialize(),
 
-                    error: function(xhr) {
-                        button.prop('disabled', false);
+                        headers: {
+                            Accept: 'application/json'
+                        },
 
-                        if (xhr.status === 422) {
-                            showValidationErrors(
-                                xhr.responseJSON?.errors || {}
+                        success: function(response) {
+
+                            showToast(
+                                'success',
+                                response.message
                             );
-                            return;
+
+                            setTimeout(function() {
+                                window.location.href = response.redirect;
+                            }, 800);
+                        },
+
+                        error: function(xhr) {
+
+                            button.prop('disabled', false);
+
+                            if (xhr.status === 422) {
+
+                                showValidationErrors(
+                                    xhr.responseJSON?.errors || {}
+                                );
+
+                                return;
+                            }
+
+                            showToast(
+                                'error',
+                                xhr.responseJSON?.message ||
+                                'Something went wrong.'
+                            );
                         }
-
-                        showToast(
-                            'error',
-                            xhr.responseJSON?.message ||
-                            'Something went wrong.'
-                        );
-                    }
+                    });
                 });
-            });
 
 
-            function clearErrors() {
-                $('#statusErr').text('');
-                $('#notesErr').text('');
-                $('#deliveryAddressErr').text('');
-                $("#vendorIdErr").text('');
-            }
+                $('#saveDraft').on('click', function() {
+                    saveDraft(true);
+                });
 
 
-            function showValidationErrors(errors) {
-                $('#statusErr').text(errors.status?.[0] || '');
-                $('#notesErr').text(errors.notes?.[0] || '');
-                $('#deliveryAddressErr').text(
-                    errors.delivery_address?.[0] || ''
+                /*
+                 * Autosave on form changes
+                 */
+                $('#purchaseRequestForm').on(
+                    'change input',
+                    'input:not([type="hidden"]), select, textarea',
+                    function() {
+                        scheduleDraftSave();
+                    }
                 );
-                $('#vendorIdErr').text(errors.vendor_id?.[0]||'');
 
-                let itemErrorShown = false;
 
-                $.each(errors, function(key, messages) {
-                    if (
-                        !itemErrorShown &&
-                        (key === 'items' || key.startsWith('items.'))
-                    ) {
-                        showToast('error', messages[0]);
-                        itemErrorShown = true;
+                function scheduleDraftSave() {
+
+                    clearTimeout(draftSaveTimer);
+
+                    draftSaveTimer = setTimeout(function() {
+                        saveDraft(false);
+                    }, 1000);
+                }
+
+
+                function saveDraft(showMessage = false) {
+
+                    if (draftSaving) {
+                        return;
                     }
-                });
-            }
+
+                    const form = $('#purchaseRequestForm');
+                    const button = $('#saveDraft');
+
+                    draftSaving = true;
+
+                    if (showMessage) {
+                        button.prop('disabled', true);
+                    }
+
+
+                    $.ajax({
+                        url: "{{ route('purchase-requests.saveDraft') }}",
+                        type: 'POST',
+                        data: form.serialize(),
+
+                        headers: {
+                            Accept: 'application/json'
+                        },
+
+                        success: function(response) {
+
+                            $('#purchaseRequestId')
+                                .val(response.id);
+
+                            if (showMessage) {
+
+                                showToast(
+                                    'success',
+                                    response.message ||
+                                    'Draft saved successfully.'
+                                );
+                            }
+                        },
+
+                        error: function(xhr) {
+
+                            if (showMessage) {
+
+                                showToast(
+                                    'error',
+                                    xhr.responseJSON?.message ||
+                                    'Unable to save draft.'
+                                );
+                            }
+                        },
+
+                        complete: function() {
+
+                            draftSaving = false;
+
+                            if (showMessage) {
+                                button.prop('disabled', false);
+                            }
+                        }
+                    });
+                }
+
+
+                function clearErrors() {
+
+                    $('#notesErr').text('');
+                    $('#deliveryAddressErr').text('');
+                    $('#vendorIdErr').text('');
+                }
+
+
+                function showValidationErrors(errors) {
+
+                    $('#notesErr').text(
+                        errors.notes?.[0] || ''
+                    );
+
+                    $('#deliveryAddressErr').text(
+                        errors.delivery_address?.[0] || ''
+                    );
+
+                    $('#vendorIdErr').text(
+                        errors.vendor_id?.[0] || ''
+                    );
+
+
+                    let itemErrorShown = false;
+
+                    $.each(errors, function(key, messages) {
+
+                        if (
+                            !itemErrorShown &&
+                            (
+                                key === 'items' ||
+                                key.startsWith('items.')
+                            )
+                        ) {
+
+                            showToast(
+                                'error',
+                                messages[0]
+                            );
+
+                            itemErrorShown = true;
+                        }
+                    });
+                }
+
+            });
         </script>
     @endpush
 

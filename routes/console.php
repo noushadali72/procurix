@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('stock:watch')->hourly();
 Schedule::command('quotation:watch')->hourly();
+Schedule::command('purchaserequest:watch')->hourly();

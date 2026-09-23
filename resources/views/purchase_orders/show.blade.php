@@ -1,35 +1,50 @@
 <x-layouts.app title="Purchase Order">
 
-    {{-- Header --}}
-    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class=" max-w-7xl">
 
-        <div>
-            <a href="{{ route('purchase-orders.index') }}"
-                class="inline-flex items-center text-sm font-medium text-gray-500 transition hover:text-gray-900">
-                <i class="bx bx-arrow-back mr-1.5"></i>
-                Back to Orders
+        {{-- Breadcrumb --}}
+        <nav class="mb-5 flex items-center gap-2 text-xs text-slate-500">
+            <a href="{{ route('admin.dashboard') }}" class="transition hover:text-slate-800">
+                Dashboard
             </a>
 
-            <div class="mt-3">
-                <div class="flex flex-wrap items-center gap-2">
+            <i class="bx bx-chevron-right text-sm text-slate-400"></i>
 
-                    <h2 class="text-xl font-semibold text-gray-900">
+            <a href="{{ route('purchase-orders.index') }}" class="transition hover:text-slate-800">
+                Purchase Orders
+            </a>
+
+            <i class="bx bx-chevron-right text-sm text-slate-400"></i>
+
+            <span class="font-medium text-slate-700">
+                {{ $purchaseOrder->order_number }}
+            </span>
+        </nav>
+
+
+        {{-- Header --}}
+        <div class="mb-6 flex flex-col gap-4 border-b border-slate-200 pb-5 lg:flex-row lg:items-end lg:justify-between">
+
+            <div>
+                <div class="flex flex-wrap items-center gap-3">
+
+                    <h1 class="text-xl font-semibold tracking-tight text-slate-900">
                         Purchase Order #{{ $purchaseOrder->order_number }}
-                    </h2>
+                    </h1>
 
                     @php
                         $statusClass = match ($purchaseOrder->status) {
-                            'received' => 'bg-green-50 text-green-700',
+                            'received' => 'bg-emerald-50 text-emerald-700',
                             'partially_received' => 'bg-amber-50 text-amber-700',
                             'cancelled' => 'bg-red-50 text-red-700',
-                            default => 'bg-gray-100 text-gray-700',
+                            default => 'bg-slate-100 text-slate-700',
                         };
 
                         $statusDot = match ($purchaseOrder->status) {
-                            'received' => 'bg-green-500',
+                            'received' => 'bg-emerald-500',
                             'partially_received' => 'bg-amber-500',
                             'cancelled' => 'bg-red-500',
-                            default => 'bg-gray-400',
+                            default => 'bg-slate-400',
                         };
 
                         $statusLabel = match ($purchaseOrder->status) {
@@ -38,365 +53,44 @@
                         };
                     @endphp
 
-                    <span
-                        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
+                    <span class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] font-semibold {{ $statusClass }}">
                         <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
                         {{ $statusLabel }}
                     </span>
 
                 </div>
 
-                <p class="mt-1 text-sm text-gray-500">
+                <p class="mt-1 text-sm text-slate-500">
                     Review purchase order details, materials, and receiving records.
                 </p>
             </div>
-        </div>
 
 
-        {{-- Header Actions --}}
-        <div class="flex items-center gap-2">
-
-            @if (in_array($purchaseOrder->status, ['placed', 'partially_received']))
-                <a href="{{ route('goods-receipts.create', $purchaseOrder) }}"
-                    class="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
-                    Receive Materials
-                </a>
-            @endif
-
-            @if ($purchaseOrder->vendorBill)
-                <a href="{{ route('vendor-bills.show', $purchaseOrder->vendorBill) }}"
-                    class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
-                    <i class="bx bx-receipt mr-1.5"></i>
-                    View Vendor Bill
-                </a>
-            @elseif ($purchaseOrder->status === 'received')
-                <button type="button" id="generateBill" data-url="{{ route('vendor-bills.generate', $purchaseOrder) }}"
-                    class="rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white cursor-pointer transition hover:bg-gray-800">
-                    Generate Bill
-                </button>
-            @endif
-
-        </div>
-
-    </div>
-
-
-    {{-- Flash Messages --}}
-    @if (session('success'))
-        <div class="mb-6 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4">
-
-            <p class="mb-2 text-sm font-medium text-red-700">
-                Please review the following errors:
-            </p>
-
-            <ul class="list-inside list-disc space-y-1 text-sm text-red-700">
-
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-
-            </ul>
-
-        </div>
-    @endif
-
-
-    {{-- Order Information --}}
-    <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-sm">
-
-        <div class="border-b border-gray-200 px-6 py-4">
-
-            <h3 class="font-semibold text-gray-900">
-                Order Information
-            </h3>
-
-            <p class="mt-1 text-sm text-gray-500">
-                Basic purchase order and vendor information.
-            </p>
-
-        </div>
-
-        <div class="grid grid-cols-1 gap-x-8 gap-y-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
-
-            {{-- Order Number --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Order Number
-                </p>
-
-                <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $purchaseOrder->order_number }}
-                </p>
-            </div>
-
-
-            {{-- Vendor --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Vendor
-                </p>
-
-                <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $purchaseOrder->vendor->company_name ?: $purchaseOrder->vendor->name }}
-                </p>
-            </div>
-
-   
-            {{-- Purchase Request --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Purchase Request
-                </p>
-
-                <a href="{{ route('purchase-requests.show',$purchaseOrder->purchaseRequest) }}" class="mt-1.5 font-semibold text-blue-900 underline">
-                    PR-{{ $purchaseOrder->purchaseRequest->request_number }}
-                </a>
-            </div>
-
-
-            {{-- Order Date --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Order Date
-                </p>
-
-                <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $purchaseOrder->order_date->format('d M Y') }}
-                </p>
-            </div>
-
-
-            {{-- Status --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Status
-                </p>
-
-                <div class="mt-1.5">
-
-                    <span
-                        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
-                        <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
-                        {{ $statusLabel }}
-                    </span>
-
-                </div>
-            </div>
-
-
-            {{-- Received Date --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Received Date
-                </p>
-
-                <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $purchaseOrder->received_date?->format('d M Y') ?? '-' }}
-                </p>
-            </div>
-
-
-            {{-- Notes --}}
-            @if ($purchaseOrder->notes)
-                <div class="border-t border-gray-100 pt-5 sm:col-span-2 lg:col-span-3">
-
-                    <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                        Notes
-                    </p>
-
-                    <p class="mt-2 whitespace-pre-line text-sm leading-6 text-gray-700">
-                        {{ $purchaseOrder->notes }}
-                    </p>
-
-                </div>
-            @endif
-
-        </div>
-
-    </div>
-
-
-    {{-- Order Items --}}
-    <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-sm">
-
-        <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-
-            <div>
-                <h3 class="font-semibold text-gray-900">
-                    Order Items
-                </h3>
-
-                <p class="mt-1 text-sm text-gray-500">
-                    Materials included in this purchase order.
-                </p>
-            </div>
-
-            <span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
-                {{ $purchaseOrder->items->count() }} Items
-            </span>
-
-        </div>
-
-
-        <div class="overflow-x-auto">
-
-            <table class="w-full min-w-[800px] text-left text-sm">
-
-                <thead class="border-b border-gray-200 bg-gray-50">
-
-                    <tr class="text-xs font-medium uppercase tracking-wide text-gray-500">
-
-                        <th class="px-6 py-3.5">
-                            Raw Material
-                        </th>
-
-                        <th class="px-6 py-3.5">
-                            Ordered
-                        </th>
-
-                        <th class="px-6 py-3.5">
-                            Received
-                        </th>
-
-                        <th class="px-6 py-3.5">
-                            Unit
-                        </th>
-
-                        <th class="px-6 py-3.5">
-                            Unit Cost
-                        </th>
-
-                        <th class="px-6 py-3.5 text-right">
-                            Total
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody class="divide-y divide-gray-100">
-
-                    @forelse($purchaseOrder->items as $item)
-                        <tr class="transition hover:bg-gray-50">
-
-                            <td class="px-6 py-4">
-
-                                <p class="font-medium text-gray-900">
-                                    {{ $item->rawMaterial->name }}
-                                </p>
-
-                                @if ($item->rawMaterial->sku)
-                                    <p class="mt-0.5 text-xs text-gray-500">
-                                        {{ $item->rawMaterial->sku }}
-                                    </p>
-                                @endif
-
-                            </td>
-
-                            <td class="px-6 py-4 font-medium text-gray-900">
-                                {{ $item->qty }}
-                            </td>
-
-                            <td class="px-6 py-4 font-medium text-gray-900">
-                                {{ $item->goodsReceiptItems->sum('qty') }}
-                            </td>
-
-                            <td class="px-6 py-4 text-gray-600">
-                                {{ $item->unit->short_name ?? $item->unit->name }}
-                            </td>
-
-                            <td class="px-6 py-4 text-gray-700">
-                                {{ number_format($item->unit_cost, 2) }}
-                            </td>
-
-                            <td class="px-6 py-4 text-right font-semibold text-gray-900">
-                                {{ number_format($item->total, 2) }}
-                            </td>
-
-                        </tr>
-
-                    @empty
-
-                        <tr>
-                            <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">
-                                No order items found.
-                            </td>
-                        </tr>
-                    @endforelse
-
-                </tbody>
-
-
-                <tfoot class="border-t border-gray-200 bg-gray-50">
-
-                    <tr>
-
-                        <td colspan="4" class="px-6 py-4 text-right text-sm font-semibold text-gray-700">
-                            Grand Total
-                        </td>
-
-                        <td class="px-6 py-4 text-right">
-
-                            <span class="text-lg font-bold text-gray-900">
-                                {{ number_format($purchaseOrder->total, 2) }}
-                            </span>
-
-                        </td>
-
-                    </tr>
-
-                </tfoot>
-
-            </table>
-
-        </div>
-
-    </div>
-
-
-    {{-- Goods Receipts --}}
-    <div class="rounded-xl border border-gray-200 bg-white shadow-sm mb-8">
-
-        <div
-            class="flex flex-col gap-3 border-b border-gray-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-
-            <div>
-
-                <h3 class="font-semibold text-gray-900">
-                    Goods Receipts
-                </h3>
-
-                <p class="mt-1 text-sm text-gray-500">
-                    Receiving records for this purchase order.
-                </p>
-
-            </div>
-
-
-            <div class="flex items-center gap-2">
-
-                <span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
-                    {{ $purchaseOrder->goodsReceipts->count() }} Receipts
-                </span>
+            {{-- Header Actions --}}
+            <div class="flex flex-wrap items-center gap-2">
 
                 @if (in_array($purchaseOrder->status, ['placed', 'partially_received']))
                     <a href="{{ route('goods-receipts.create', $purchaseOrder) }}"
-                        class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
-                        New Receipt
+                        class="inline-flex items-center gap-2 rounded-md bg-slate-800 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-900">
+                        <i class="bx bx-package"></i>
+                        Receive Materials
                     </a>
+                @endif
+
+                @if ($purchaseOrder->vendorBill)
+                    <a href="{{ route('vendor-bills.show', $purchaseOrder->vendorBill) }}"
+                        class="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                        <i class="bx bx-receipt"></i>
+                        View Vendor Bill
+                    </a>
+                @elseif ($purchaseOrder->status === 'received')
+                    <button type="button"
+                        id="generateBill"
+                        data-url="{{ route('vendor-bills.generate', $purchaseOrder) }}"
+                        class="inline-flex items-center gap-2 rounded-md bg-slate-800 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60">
+                        <i class="bx bx-receipt"></i>
+                        Generate Bill
+                    </button>
                 @endif
 
             </div>
@@ -404,149 +98,492 @@
         </div>
 
 
-        <div class="overflow-x-auto">
+        {{-- Flash Messages --}}
+        @if (session('success'))
+            <div class="mb-5 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                {{ session('success') }}
+            </div>
+        @endif
 
-            @if ($purchaseOrder->goodsReceipts->count())
+        @if (session('error'))
+            <div class="mb-5 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {{ session('error') }}
+            </div>
+        @endif
 
-                <table class="w-full min-w-[750px] text-left text-sm">
+        @if ($errors->any())
+            <div class="mb-5 rounded-md border border-red-200 bg-red-50 p-4">
 
-                    <thead class="border-b border-gray-200 bg-gray-50">
+                <p class="mb-2 text-sm font-medium text-red-700">
+                    Please review the following errors:
+                </p>
 
-                        <tr class="text-xs font-medium uppercase tracking-wide text-gray-500">
+                <ul class="list-inside list-disc space-y-1 text-sm text-red-700">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
 
-                            <th class="px-6 py-3.5">
-                                GRN Number
-                            </th>
-
-                            <th class="px-6 py-3.5">
-                                Received Date
-                            </th>
-
-                            <th class="px-6 py-3.5">
-                                Items
-                            </th>
-
-                            <th class="px-6 py-3.5">
-                                Received Qty
-                            </th>
-
-                            <th class="px-6 py-3.5">
-                                Notes
-                            </th>
-
-                            <th class="px-6 py-3.5 text-right">
-                                Action
-                            </th>
-
-                        </tr>
-
-                    </thead>
+            </div>
+        @endif
 
 
-                    <tbody class="divide-y divide-gray-100">
+        <div class="space-y-5">
 
-                        @foreach ($purchaseOrder->goodsReceipts as $receipt)
-                            <tr class="transition hover:bg-gray-50">
+            {{-- Order Information --}}
+            <section class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
 
-                                <td class="px-6 py-4">
+                <div class="border-b border-slate-200 px-5 py-4">
+                    <h2 class="text-sm font-semibold text-slate-900">
+                        Order Information
+                    </h2>
 
-                                    <p class="font-semibold text-gray-900">
-                                        {{ $receipt->grn_number }}
-                                    </p>
-
-                                </td>
-
-
-                                <td class="px-6 py-4 text-gray-600">
-                                    {{ $receipt->received_date->format('d M Y') }}
-                                </td>
+                    <p class="mt-0.5 text-xs text-slate-500">
+                        Basic purchase order and vendor information.
+                    </p>
+                </div>
 
 
-                                <td class="px-6 py-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
 
-                                    <span
-                                        class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
-                                        {{ $receipt->items->count() }} Items
-                                    </span>
+                    {{-- Order Number --}}
+                    <div class="border-b border-slate-100 px-5 py-4 lg:border-r">
+                        <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                            Order Number
+                        </p>
 
-                                </td>
-
-                                <td class="px-6 py-4">
-
-                                    <span
-                                        class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
-                                        {{ $receipt->items->sum('qty') }}
-                                    </span>
-
-                                </td>
-
-                                <td class="max-w-xs px-6 py-4 text-gray-600">
-
-                                    @if ($receipt->notes)
-                                        <span class="block truncate" title="{{ $receipt->notes }}">
-                                            {{ $receipt->notes }}
-                                        </span>
-                                    @else
-                                        <span class="text-gray-400">
-                                            -
-                                        </span>
-                                    @endif
-
-                                </td>
-
-
-                                <td class="px-6 py-4 text-right">
-
-                                    <a href="{{ route('goods-receipts.show', $receipt) }}"
-                                        class="rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-gray-50 transition hover:bg-gray-800">
-                                        View
-                                    </a>
-
-                                </td>
-
-                            </tr>
-                        @endforeach
-
-                    </tbody>
-
-                </table>
-            @else
-                <div class="flex flex-col items-center justify-center px-6 py-12 text-center">
-
-                    <div
-                        class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400">
-                        <i class="bx bx-package text-2xl"></i>
+                        <p class="mt-1 text-sm font-semibold text-slate-900">
+                            {{ $purchaseOrder->order_number }}
+                        </p>
                     </div>
 
-                    <h3 class="font-medium text-gray-900">
-                        No goods receipts yet
-                    </h3>
 
-                    <p class="mt-1 text-sm text-gray-500">
-                        Create a goods receipt when materials arrive.
-                    </p>
+                    {{-- Vendor --}}
+                    <div class="border-b border-slate-100 px-5 py-4 lg:border-r">
+                        <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                            Vendor
+                        </p>
+
+                        <p class="mt-1 text-sm font-semibold text-slate-900">
+                            {{ $purchaseOrder->vendor->company_name ?: $purchaseOrder->vendor->name }}
+                        </p>
+                    </div>
+
+
+                    {{-- Purchase Request --}}
+                    <div class="border-b border-slate-100 px-5 py-4">
+                        <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                            Purchase Request
+                        </p>
+
+                        <a href="{{ route('purchase-requests.show', $purchaseOrder->purchaseRequest) }}"
+                            class="mt-1 inline-flex text-sm font-semibold text-slate-800 underline decoration-slate-300 underline-offset-2 transition hover:decoration-slate-700">
+                            {{ $purchaseOrder->purchaseRequest->request_number }}
+                        </a>
+                    </div>
+
+
+                    {{-- Order Date --}}
+                    <div class="border-b border-slate-100 px-5 py-4 lg:border-r">
+                        <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                            Order Date
+                        </p>
+
+                        <p class="mt-1 text-sm font-semibold text-slate-900">
+                            {{ $purchaseOrder->order_date->format('d M Y') }}
+                        </p>
+                    </div>
+
+
+                    {{-- Status --}}
+                    <div class="border-b border-slate-100 px-5 py-4 lg:border-r">
+                        <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                            Status
+                        </p>
+
+                        <div class="mt-1">
+                            <span class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-semibold {{ $statusClass }}">
+                                <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
+                                {{ $statusLabel }}
+                            </span>
+                        </div>
+                    </div>
+
+
+                    {{-- Received Date --}}
+                    <div class="border-b border-slate-100 px-5 py-4">
+                        <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                            Received Date
+                        </p>
+
+                        <p class="mt-1 text-sm font-semibold text-slate-900">
+                            {{ $purchaseOrder->received_date?->format('d M Y') ?? '—' }}
+                        </p>
+                    </div>
+
+
+                    {{-- Notes --}}
+                    @if ($purchaseOrder->notes)
+                        <div class="px-5 py-4 md:col-span-2 lg:col-span-3">
+
+                            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                                Notes
+                            </p>
+
+                            <p class="mt-1 text-sm leading-6 text-slate-700">
+                                {{ $purchaseOrder->notes }}
+                            </p>
+
+                        </div>
+                    @endif
 
                 </div>
 
-            @endif
+            </section>
+
+
+            {{-- Order Items --}}
+            <section class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+
+                <div class="flex flex-col gap-2 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+
+                    <div>
+                        <h2 class="text-sm font-semibold text-slate-900">
+                            Order Items
+                        </h2>
+
+                        <p class="mt-0.5 text-xs text-slate-500">
+                            Materials included in this purchase order.
+                        </p>
+                    </div>
+
+                    <span class="text-xs font-medium text-slate-500">
+                        {{ $purchaseOrder->items->count() }}
+                        {{ Str::plural('item', $purchaseOrder->items->count()) }}
+                    </span>
+
+                </div>
+
+
+                <div class="overflow-x-auto">
+
+                    <table class="w-full min-w-[800px] text-left text-sm">
+
+                        <thead class="border-b border-slate-200 bg-slate-50">
+
+                            <tr class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+
+                                <th class="px-5 py-3">
+                                    Raw Material
+                                </th>
+
+                                <th class="px-5 py-3 text-right">
+                                    Ordered
+                                </th>
+
+                                <th class="px-5 py-3 text-right">
+                                    Received
+                                </th>
+
+                                <th class="px-5 py-3">
+                                    Unit
+                                </th>
+
+                                <th class="px-5 py-3 text-right">
+                                    Unit Cost
+                                </th>
+
+                                <th class="px-5 py-3 text-right">
+                                    Total
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody class="divide-y divide-slate-100">
+
+                            @forelse ($purchaseOrder->items as $item)
+
+                                <tr class="transition hover:bg-slate-50">
+
+                                    <td class="px-5 py-3.5">
+
+                                        <p class="font-medium text-slate-900">
+                                            {{ $item->rawMaterial->name }}
+                                        </p>
+
+                                        @if ($item->rawMaterial->sku)
+                                            <p class="mt-0.5 text-xs text-slate-400">
+                                                {{ $item->rawMaterial->sku }}
+                                            </p>
+                                        @endif
+
+                                    </td>
+
+
+                                    <td class="px-5 py-3.5 text-right font-medium text-slate-900">
+                                        {{ $item->qty }}
+                                    </td>
+
+
+                                    <td class="px-5 py-3.5 text-right font-medium text-slate-900">
+                                        {{ $item->goodsReceiptItems->sum('qty') }}
+                                    </td>
+
+
+                                    <td class="px-5 py-3.5 text-slate-600">
+                                        {{ $item->unit->short_name ?? $item->unit->name }}
+                                    </td>
+
+
+                                    <td class="px-5 py-3.5 text-right text-slate-700">
+                                        {{ number_format($item->unit_cost, 2) }}
+                                    </td>
+
+
+                                    <td class="px-5 py-3.5 text-right font-semibold text-slate-900">
+                                        {{ number_format($item->total, 2) }}
+                                    </td>
+
+                                </tr>
+
+                            @empty
+
+                                <tr>
+                                    <td colspan="6" class="px-5 py-10 text-center text-sm text-slate-500">
+                                        No order items found.
+                                    </td>
+                                </tr>
+
+                            @endforelse
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                {{-- Amount Summary --}}
+                <div class="grid grid-cols-3 border-t border-slate-200 bg-slate-50">
+
+                    <div class="px-5 py-3">
+                        <p class="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                            Items
+                        </p>
+
+                        <p class="mt-0.5 text-sm font-semibold text-slate-900">
+                            {{ $purchaseOrder->items->count() }}
+                        </p>
+                    </div>
+
+
+                    <div class="border-l border-slate-200 px-5 py-3">
+                        <p class="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                            Total Quantity
+                        </p>
+
+                        <p class="mt-0.5 text-sm font-semibold text-slate-900">
+                            {{ $purchaseOrder->items->sum('qty') }}
+                        </p>
+                    </div>
+
+
+                    <div class="border-l border-slate-200 px-5 py-3 text-right">
+                        <p class="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                            Grand Total
+                        </p>
+
+                        <p class="mt-0.5 text-base font-bold text-slate-900">
+                            {{ number_format($purchaseOrder->total, 2) }}
+                        </p>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            {{-- Goods Receipts --}}
+            <section class="mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+
+                <div class="flex flex-col gap-3 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+
+                    <div>
+                        <h2 class="text-sm font-semibold text-slate-900">
+                            Goods Receipts
+                        </h2>
+
+                        <p class="mt-0.5 text-xs text-slate-500">
+                            Receiving records for this purchase order.
+                        </p>
+                    </div>
+
+
+                    <div class="flex items-center gap-2">
+
+                        <span class="text-xs font-medium text-slate-500">
+                            {{ $purchaseOrder->goodsReceipts->count() }}
+                            {{ Str::plural('receipt', $purchaseOrder->goodsReceipts->count()) }}
+                        </span>
+
+                        @if (in_array($purchaseOrder->status, ['placed', 'partially_received']))
+                            <a href="{{ route('goods-receipts.create', $purchaseOrder) }}"
+                                class="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                                <i class="bx bx-plus"></i>
+                                New Receipt
+                            </a>
+                        @endif
+
+                    </div>
+
+                </div>
+
+
+                <div class="overflow-x-auto">
+
+                    @if ($purchaseOrder->goodsReceipts->count())
+
+                        <table class="w-full min-w-[750px] text-left text-sm">
+
+                            <thead class="border-b border-slate-200 bg-slate-50">
+
+                                <tr class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+
+                                    <th class="px-5 py-3">
+                                        GRN Number
+                                    </th>
+
+                                    <th class="px-5 py-3">
+                                        Received Date
+                                    </th>
+
+                                    <th class="px-5 py-3">
+                                        Items
+                                    </th>
+
+                                    <th class="px-5 py-3">
+                                        Received Qty
+                                    </th>
+
+                                    <th class="px-5 py-3">
+                                        Notes
+                                    </th>
+
+                                    <th class="px-5 py-3 text-right">
+                                        Action
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody class="divide-y divide-slate-100">
+
+                                @foreach ($purchaseOrder->goodsReceipts as $receipt)
+
+                                    <tr class="transition hover:bg-slate-50">
+
+                                        <td class="px-5 py-3.5 font-semibold text-slate-900">
+                                            {{ $receipt->grn_number }}
+                                        </td>
+
+
+                                        <td class="px-5 py-3.5 text-slate-600">
+                                            {{ $receipt->received_date->format('d M Y') }}
+                                        </td>
+
+
+                                        <td class="px-5 py-3.5 text-slate-600">
+                                            {{ $receipt->items->count() }}
+                                        </td>
+
+
+                                        <td class="px-5 py-3.5 font-medium text-slate-700">
+                                            {{ $receipt->items->sum('qty') }}
+                                        </td>
+
+
+                                        <td class="max-w-xs px-5 py-3.5 text-slate-600">
+
+                                            @if ($receipt->notes)
+                                                <span class="block truncate" title="{{ $receipt->notes }}">
+                                                    {{ $receipt->notes }}
+                                                </span>
+                                            @else
+                                                <span class="text-slate-400">—</span>
+                                            @endif
+
+                                        </td>
+
+
+                                        <td class="px-5 py-3.5 text-right">
+
+                                            <a href="{{ route('goods-receipts.show', $receipt) }}"
+                                                class="inline-flex items-center gap-1.5 rounded-md bg-slate-800 px-3 py-2 text-xs font-medium text-white transition hover:bg-slate-900">
+                                                View
+                                                <i class="bx bx-right-arrow-alt"></i>
+                                            </a>
+
+                                        </td>
+
+                                    </tr>
+
+                                @endforeach
+
+                            </tbody>
+
+                        </table>
+
+                    @else
+
+                        <div class="flex flex-col items-center justify-center px-6 py-12 text-center">
+
+                            <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-slate-100 text-slate-400">
+                                <i class="bx bx-package text-xl"></i>
+                            </div>
+
+                            <h3 class="text-sm font-semibold text-slate-900">
+                                No goods receipts yet
+                            </h3>
+
+                            <p class="mt-1 text-xs text-slate-500">
+                                Create a goods receipt when materials arrive.
+                            </p>
+
+                        </div>
+
+                    @endif
+
+                </div>
+
+            </section>
 
         </div>
 
     </div>
 
+
     @push('scripts')
+
         <script>
             $(document).ready(function() {
 
                 $('#generateBill').on('click', function() {
+
                     const button = $(this);
                     const url = button.data('url');
+
                     if (!confirm('Do you want to generate the vendor bill?')) {
                         return;
                     }
+
                     button
                         .prop('disabled', true)
-                        .text('Generating...');
+                        .html('<i class="bx bx-loader-alt bx-spin"></i> Generating...');
 
                     $.ajax({
                         url: url,
@@ -557,25 +594,32 @@
                         headers: {
                             'Accept': 'application/json'
                         },
+
                         success: function(response) {
+
                             showToast(
                                 'success',
                                 response.message
                             );
+
                             setTimeout(function() {
                                 window.location.reload();
                             }, 800);
+
                         },
+
                         error: function(xhr) {
+
                             button
                                 .prop('disabled', false)
-                                .text('Generate Bill');
+                                .html('<i class="bx bx-receipt"></i> Generate Bill');
 
                             showToast(
                                 'error',
                                 xhr.responseJSON?.message ??
                                 'Unable to generate vendor bill.'
                             );
+
                         }
                     });
 
@@ -583,5 +627,7 @@
 
             });
         </script>
+
     @endpush
+
 </x-layouts.app>

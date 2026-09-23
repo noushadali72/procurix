@@ -76,6 +76,7 @@ function clearVendorErrors() {
     $("#phoneErr").text("");
     $("#isActiveErr").text("");
     $("#addressErr").text("");
+    $("#paymentTermErr").text("");
 }
 
 function showVendorErrors(errors) {
@@ -86,6 +87,7 @@ function showVendorErrors(errors) {
     $("#phoneErr").text(errors.phone?.[0] || "");
     $("#isActiveErr").text(errors.is_active?.[0] || "");
     $("#addressErr").text(errors.address?.[0] || "");
+    $("#paymentTermErr").text(errors.payment_term_id?.[0] || "");
 }
 
 function updateVendor() {

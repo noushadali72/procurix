@@ -252,9 +252,9 @@
                     {{-- Vendor Bills --}}
                     <a href="{{ route('vendor-bills.index') }}"
                         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
-                        {{ request()->routeIs('vendor-bills.*')
-                            ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+            {{ request()->routeIs('vendor-bills.*')
+                ? 'bg-gray-800 text-white'
+                : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
 
                         <i class="bx bx-receipt text-[20px]"></i>
                         <span>Vendor Bills</span>
@@ -265,12 +265,25 @@
                     {{-- Vendor Payments --}}
                     <a href="{{ route('vendor-payments.index') }}"
                         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
-                        {{ request()->routeIs('vendor-payments.*')
-                            ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+            {{ request()->routeIs('vendor-payments.*')
+                ? 'bg-gray-800 text-white'
+                : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
 
                         <i class="bx bx-money text-[20px]"></i>
                         <span>Vendor Payments</span>
+
+                    </a>
+
+
+                    {{-- Payment Terms --}}
+                    <a href="{{ route('payment-terms.index') }}"
+                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
+            {{ request()->routeIs('payment-terms.*')
+                ? 'bg-gray-800 text-white'
+                : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
+                        <i class="bx bx-time-five text-[20px]"></i>
+                        <span>Payment Terms</span>
 
                     </a>
 

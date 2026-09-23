@@ -18,32 +18,51 @@ class StorePurchaseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => [
-                'required',
-                Rule::in([
-                    'completed',
-                    'pending',
-                    'active',
-                    'draft',
-                    'partially_closed'
-                    
-                ]),
+            'purchase_request_id' => [
+                'nullable',
+                'integer',
+                'exists:purchase_requests,id',
+            ],
+            // 'status' => [
+            //     'required',
+            //     Rule::in([
+            //         'completed',
+            //         'pending',
+            //         'active',
+            //         'draft',
+            //         'partially_closed',
+            //         'cancelled',
+            //         'sent'
+
+            //     ]),
+            // ],
+            'stage' => [
+                Rule::in(
+                    [
+                        'request',
+                        'confirmation',
+                        'purchase_order',
+                        'receiving',
+                        'completed'
+                    ]
+                )
             ],
 
             'notes' => [
                 'nullable',
                 'string',
             ],
-            'due_date'=>'nullable|date',
-            'delivery_address'=>[
+            'due_date' => 'nullable|date',
+            'delivery_address' => [
                 'nullable',
                 'string',
                 'max:255'
             ],
-            'vendor_id'=>[
+            'vendor_id' => [
                 'required',
                 'exists:vendors,id'
             ],
+          
 
             'items' => [
                 'required',
@@ -63,7 +82,7 @@ class StorePurchaseRequest extends FormRequest
                 'numeric',
                 'gt:0',
             ],
-            'items.*.unit_cost'=>[
+            'items.*.unit_cost' => [
                 'required',
                 'numeric',
                 'gt:0'
@@ -122,8 +141,8 @@ class StorePurchaseRequest extends FormRequest
             'status.required' => 'The status is required.',
             'status.in' => 'The selected status is invalid.',
 
-            'vendor_id.required'=>'Select the vendor first.',
-            'vendor_id.exists'=>'Selected vendor doesn\'t exists.',
+            'vendor_id.required' => 'Select the vendor first.',
+            'vendor_id.exists' => 'Selected vendor doesn\'t exists.',
 
             'items.required' => 'At least one item is required.',
             'items.array' => 'The items must be valid.',
@@ -132,7 +151,7 @@ class StorePurchaseRequest extends FormRequest
             'items.*.raw_material_id.required' => 'Please select a raw material.',
             'items.*.raw_material_id.exists' => 'The selected raw material is invalid.',
             'items.*.raw_material_id.distinct' =>
-                'The selected raw material has already been added. Please choose a different raw material.',
+            'The selected raw material has already been added. Please choose a different raw material.',
 
             'items.*.qty.required' => 'The quantity is required.',
             'items.*.qty.numeric' => 'The quantity must be a number.',

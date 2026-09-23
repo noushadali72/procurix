@@ -231,7 +231,7 @@
 
                         <tr>
 
-                            <td colspan="8" class="px-6 py-12 text-center">
+                            <td colspan="10" class="px-6 py-12 text-center">
 
                                 <h3 class="font-medium text-slate-900">
                                     No payments recorded

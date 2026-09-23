@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('ntn')->nullable();
             $table->text('address')->nullable();
+            $table->foreignId('payment_term_id')->nullable()->constrained('payment_terms')->nullOnDelete();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

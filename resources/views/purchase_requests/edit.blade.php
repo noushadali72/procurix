@@ -392,7 +392,7 @@
 
 
             function clearErrors() {
-                $('#statusErr').text('');
+                // $('#statusErr').text('');
                 $('#notesErr').text('');
                 $('#deliveryAddressErr').text('');
             }
@@ -400,9 +400,9 @@
 
             function showValidationErrors(errors) {
 
-                $('#statusErr').text(
-                    errors.status?.[0] || ''
-                );
+                // $('#statusErr').text(
+                //     errors.status?.[0] || ''
+                // );
                 $('#notesErr').text(
                     errors.notes?.[0] || ''
                 );

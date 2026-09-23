@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('purchase_requests', function (Blueprint $table) {
             $table->id();
             $table->string('request_number');
-            $table->enum('status',['completed','pending','active','partially_closed','draft'])->default('pending');
+            $table->enum('status',['completed','pending','active','partially_closed','draft','cancelled','sent','expired'])->default('pending');
+            $table->enum('stage',['request','confirmation','purchase_order','receiving','completed','cancelled'])->default('request');
             $table->text('notes')->nullable();
             $table->date('due_date')->nullable();
             $table->text('delivery_address')->nullable();
