@@ -132,6 +132,18 @@
 
                     </a>
 
+                    {{-- Warehouses --}}
+                    <a href="{{ route('warehouses.index') }}"
+                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition
+                        {{ request()->routeIs('warehouses.*')
+                            ? 'bg-gray-800 text-white'
+                            : 'text-gray-400 hover:bg-gray-900 hover:text-white' }}">
+
+                        <i class="bx bx-buildings text-[20px]"></i>
+                        <span>Warehouses</span>
+
+                    </a>
+
                 </div>
 
             </div>

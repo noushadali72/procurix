@@ -13,6 +13,7 @@ use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\RawMaterialController;
+use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
@@ -46,6 +47,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('raw-materials', RawMaterialController::class)->except(['show']);
     Route::resource('units', UnitController::class);
     Route::resource('categories', CategoryController::class);
+    Route::resource('warehouses', WarehouseController::class)->only(['index', 'store', 'update', 'destroy']);
 
     // Procurement
     Route::get('/purchase-requests/raw-material/{rawMaterial}', [PurchaseRequestController::class, 'rawMaterial'])->name('purchase-requests.raw-material');
@@ -56,20 +58,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('purchase-requests/save-draft', [PurchaseRequestController::class, 'saveDraft'])->name('purchase-requests.saveDraft');
     Route::post('purchase-requests/{pr}/duplicate', [PurchaseRequestController::class, 'duplicate'])->name('purchase-requests.duplicate');
     // Route::get('purchase-requests/{purchaseRequest}/compare',[PurchaseRequestController::class, 'compare'])->name('purchase-requests.compare');
-    Route::get(
-    'purchase-requests/{purchaseRequest}/compare',
-    [PurchaseRequestController::class, 'compare']
-)->name('purchase-requests.compare');
-
-Route::post(
-    'purchase-requests/{purchaseRequest}/compare/confirm',
-    [PurchaseRequestController::class, 'confirmComparison']
-)->name('purchase-requests.compare.confirm');
-
-Route::post(
-    'purchase-requests/{purchaseRequest}/resend-rfq',
-    [PurchaseRequestController::class, 'resendRfq']
-)->name('purchase-requests.resend-rfq');
+    Route::get('purchase-requests/{purchaseRequest}/compare',[PurchaseRequestController::class, 'compare'])->name('purchase-requests.compare');
+    Route::post('purchase-requests/{purchaseRequest}/compare/confirm',[PurchaseRequestController::class, 'confirmComparison'])->name('purchase-requests.compare.confirm');
+    Route::post('purchase-requests/{purchaseRequest}/resend-rfq',[PurchaseRequestController::class, 'resendRfq'])->name('purchase-requests.resend-rfq');
     Route::resource('vendors', VendorController::class);
     Route::resource('quotations', QuotationController::class)->except('create');
     Route::get('quotations/create/{purchaseRequest}', [QuotationController::class, 'create'])->name('quotations.create');
