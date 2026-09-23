@@ -199,6 +199,7 @@
                                                 data-unit-id="{{ $rawMaterial->unit_id }}"
                                                 data-unit-name="{{ $rawMaterial->unit->name }}"
                                                 data-category-id="{{ $rawMaterial->unit->unit_category_id }}"
+                                                data-cost-price="{{ $rawMaterial->cost_price }}"
                                                 {{ $item->raw_material_id == $rawMaterial->id ? 'selected' : '' }}>
                                                 {{ $rawMaterial->name }}
 
@@ -289,7 +290,10 @@
                                         <option value="{{ $rawMaterial->id }}"
                                             data-unit-id="{{ $rawMaterial->unit_id }}"
                                             data-unit-name="{{ $rawMaterial->unit->name }}"
-                                            data-category-id="{{ $rawMaterial->unit->unit_category_id }}">
+                                            data-category-id="{{ $rawMaterial->unit->unit_category_id }}"
+                                            data-cost-price="{{ $rawMaterial->cost_price }}"
+                                            
+                                            >
                                             {{ $rawMaterial->name }}
 
                                             @if ($rawMaterial->sku)
@@ -433,6 +437,7 @@
                         data-unit-id="{{ $rawMaterial->unit_id }}"
                         data-unit-name="{{ $rawMaterial->unit->name }}"
                         data-category-id="{{ $rawMaterial->unit->unit_category_id }}"
+                        data-cost-price="{{ $rawMaterial->cost_price }}"
                     >
                         {{ $rawMaterial->name }}
 
@@ -674,20 +679,17 @@ $(document).ready(function () {
     container.on("change", ".raw-material-select", function () {
 
         const item = $(this).closest(".item-row");
+        const selected = $(this).find("option:selected");
 
         filterUnits(item);
 
+        // Set default unit
+        const unitId = selected.data("unit-id");
+        item.find(".unit-select").val(unitId);
 
-        // Select raw material's default unit
-        if (!item.find(".unit-select").val()) {
-
-            const unitId = $(this)
-                .find("option:selected")
-                .data("unit-id");
-
-            item.find(".unit-select").val(unitId);
-        }
-
+        // Set material cost price
+        const costPrice = selected.data("cost-price");
+        item.find(".cost-input").val(costPrice ?? "");
 
         updateRawMaterials();
         updateSummary();
