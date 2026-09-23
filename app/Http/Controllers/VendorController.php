@@ -48,7 +48,7 @@ class VendorController extends Controller
                 'ntn'=>$validated['ntn'],
                 'contact_person' => $validated['contact_person'],
                 'address' => $validated['address'] ?? null,
-                'payment_term_id'=>$validated['payment_term_id'],
+                'payment_term_id'=>$validated['payment_term_id']??null,
                 'is_active' => $validated['is_active'],
             ]);
             return response()->json(['message' => 'Vendor created successfully.'], 201);

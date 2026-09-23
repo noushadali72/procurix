@@ -169,6 +169,36 @@ class PurchaseRequestController extends Controller
             compact('pr', 'quotations')
         );
     }
+
+    public function resendRfq(PurchaseRequest $purchaseRequest): JsonResponse
+    {
+        if ($purchaseRequest->stage !== 'confirmation') {
+            return response()->json([
+                'message' => 'RFQ can only be resent during the confirmation stage.',
+            ], 422);
+        }
+
+        $purchaseRequest->load([
+            'vendor',
+            'items.rawMaterial',
+            'items.unit',
+        ]);
+
+        SendRfqMail::dispatch($purchaseRequest);
+
+        $purchaseRequest->activities()->create([
+            'action' => 'RFQ Resent.',
+            'description' => 'RFQ resent to ' . $purchaseRequest->vendor->name . '.',
+            'user_id' => Auth::id(),
+            'vendor_id' => $purchaseRequest->vendor_id,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'RFQ sent to vendor successfully.',
+        ]);
+    }
+
     /**
      * Show create form.
      */
@@ -222,6 +252,7 @@ class PurchaseRequestController extends Controller
             'vendor_id' => 'nullable|exists:vendors,id',
             'delivery_address' => 'nullable|string',
             'notes' => 'nullable|string',
+            'due_date' => 'nullable|date',
 
             'items' => 'nullable|array',
             'items.*.raw_material_id' => 'nullable|integer|exists:raw_materials,id',
@@ -244,6 +275,7 @@ class PurchaseRequestController extends Controller
                     'vendor_id' => $validated['vendor_id'] ?? null,
                     'notes' => $validated['notes'] ?? null,
                     'delivery_address' => $validated['delivery_address'] ?? null,
+                    'due_date' => $validated['due_date'],
                 ]);
 
                 $purchaseRequest->items()->delete();
@@ -259,6 +291,7 @@ class PurchaseRequestController extends Controller
                     'vendor_id' => $validated['vendor_id'] ?? null,
                     'notes' => $validated['notes'] ?? null,
                     'delivery_address' => $validated['delivery_address'] ?? null,
+                    'due_date' => $validated['due_date'],
                 ]);
 
                 $action = 'Purchase Request Draft Created.';
@@ -424,7 +457,7 @@ class PurchaseRequestController extends Controller
 
                 $requestItem->update([
                     'status' => 'cancelled',
-                    'stage'=>'cancelled'
+                    'stage' => 'cancelled'
                 ]);
 
                 $requestItem->activities()->create([
@@ -584,16 +617,18 @@ class PurchaseRequestController extends Controller
         ]);
 
         return match ($purchaseRequest->stage) {
-            'request' => view('purchase_requests.create', 
-            [
-                'purchaseRequest' => $purchaseRequest,
-                'rawMaterials' => RawMaterial::with('unit.unitCategory')->orderBy('name')->get(),
-                'units' => Unit::with('unitCategory')->orderBy('name')->get(),
-                'vendors' => Vendor::orderBy('name')->get(),
-            ]),
+            'request' => view(
+                'purchase_requests.create',
+                [
+                    'purchaseRequest' => $purchaseRequest,
+                    'rawMaterials' => RawMaterial::with('unit.unitCategory')->orderBy('name')->get(),
+                    'units' => Unit::with('unitCategory')->orderBy('name')->get(),
+                    'vendors' => Vendor::orderBy('name')->get(),
+                ]
+            ),
 
             'confirmation' => view('purchase_requests.confirmation', compact('purchaseRequest')),
-            'cancelled'=>view('purchase_requests.show',compact('purchaseRequest')),
+            'cancelled' => view('purchase_requests.show', compact('purchaseRequest')),
             'purchase_order',
             'receiving' => view('purchase_orders.show', ['purchaseOrder' => $purchaseRequest->purchaseOrder]),
             default => view('purchase_requests.show', compact('purchaseRequest')),
@@ -681,7 +716,10 @@ class PurchaseRequestController extends Controller
         return response()->json([
             'message' => 'Purchase request updated successfully.',
             'id' => $purchaseRequest->id,
-            'redirect' => route('purchase-requests.index'),
+            'redirect' => route(
+                'purchase-requests.confirmation',
+                $purchaseRequest
+            ),
         ]);
     }
 

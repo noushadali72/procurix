@@ -65,6 +65,11 @@ Route::post(
     'purchase-requests/{purchaseRequest}/compare/confirm',
     [PurchaseRequestController::class, 'confirmComparison']
 )->name('purchase-requests.compare.confirm');
+
+Route::post(
+    'purchase-requests/{purchaseRequest}/resend-rfq',
+    [PurchaseRequestController::class, 'resendRfq']
+)->name('purchase-requests.resend-rfq');
     Route::resource('vendors', VendorController::class);
     Route::resource('quotations', QuotationController::class)->except('create');
     Route::get('quotations/create/{purchaseRequest}', [QuotationController::class, 'create'])->name('quotations.create');

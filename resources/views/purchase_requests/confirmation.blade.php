@@ -311,29 +311,28 @@
 
 
             {{-- Confirmation Notice --}}
-            <section class="rounded-lg border border-amber-200 bg-amber-50 px-5 py-4">
+            <section class="rounded-lg border border-slate-200 bg-slate-50 px-5 py-4">
 
                 <div class="flex gap-3">
 
-                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-amber-100">
-                        <i class="bx bx-info-circle text-lg text-amber-600"></i>
+                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white">
+                        <i class="bx bx-info-circle text-lg text-slate-500"></i>
                     </div>
 
                     <div>
-                        <h3 class="text-sm font-semibold text-amber-800">
-                            Ready to confirm?
+                        <h3 class="text-sm font-semibold text-slate-800">
+                            Review Purchase Request
                         </h3>
 
-                        <p class="mt-0.5 text-sm leading-5 text-amber-700">
-                            Confirming this request will create a purchase order using the vendor
-                            and item details shown above.
+                        <p class="mt-0.5 text-sm leading-5 text-slate-600">
+                            You can edit the request or resend the RFQ to the vendor before
+                            confirming the purchase order.
                         </p>
                     </div>
 
                 </div>
 
             </section>
-
 
             {{-- Actions --}}
             <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end">
@@ -346,13 +345,36 @@
 
                 </a>
 
-                <a href="{{ route('purchase-requests.compare', $purchaseRequest) }}"
-                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50">
-                    <i class="bx bx-git-compare text-lg"></i>
-                    Compare Purchase Requests
+                {{-- Edit RFQ --}}
+                <a href="{{ route('purchase-requests.edit', $purchaseRequest) }}"
+                    class="inline-flex items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+
+                    <i class="bx bx-edit"></i>
+                    Edit RFQ
+
                 </a>
 
+                {{-- Resend RFQ --}}
+                <button type="button" id="resendRfqBtn"
+                    class="inline-flex items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
 
+                    <i class="bx bx-send"></i>
+
+                    <span id="resendRfqBtnText">
+                        Resend RFQ
+                    </span>
+
+                </button>
+
+                <a href="{{ route('purchase-requests.compare', $purchaseRequest) }}"
+                    class="inline-flex items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+
+                    <i class="bx bx-git-compare"></i>
+                    Compare Purchase Requests
+
+                </a>
+
+                {{-- Confirm Order --}}
                 <button type="button" id="confirmPurchaseRequestBtn"
                     class="inline-flex items-center justify-center gap-2 rounded-md bg-slate-800 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60">
 
@@ -421,6 +443,51 @@
 
                         }
 
+                    });
+
+                });
+
+
+
+                $('#resendRfqBtn').on('click', function() {
+
+                    const button = $(this);
+                    const buttonText = $('#resendRfqBtnText');
+
+                    button.prop('disabled', true);
+                    buttonText.text('Sending...');
+
+                    $.ajax({
+                        url: "{{ route('purchase-requests.resend-rfq', $purchaseRequest) }}",
+                        type: 'POST',
+
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+
+                        success: function(response) {
+
+                            showToast(
+                                'success',
+                                response.message || 'RFQ sent successfully.'
+                            );
+
+                            button.prop('disabled', false);
+                            buttonText.text('Resend RFQ');
+                        },
+
+                        error: function(xhr) {
+
+                            button.prop('disabled', false);
+                            buttonText.text('Resend RFQ');
+
+                            showToast(
+                                'error',
+                                xhr.responseJSON?.message ||
+                                'Unable to resend RFQ.'
+                            );
+                        }
                     });
 
                 });

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('stage',['request','confirmation','purchase_order','receiving','completed','cancelled'])->default('request');
             $table->text('notes')->nullable();
             $table->date('due_date')->nullable();
+            // $table->date('receive_date')->nullable();
             $table->text('delivery_address')->nullable();
             $table->foreignId('vendor_id')->nullable()->constrained('vendors')->restrictOnDelete();
             $table->timestamps();

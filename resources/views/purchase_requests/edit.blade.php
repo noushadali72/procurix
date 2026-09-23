@@ -368,7 +368,7 @@
 
                         button.prop('disabled', false);
                         setTimeout(function() {
-                            window.location.href = "{{ route('purchase-requests.index') }}";
+                            window.location.href = response.redirect;
                         }, 500)
                     },
 
