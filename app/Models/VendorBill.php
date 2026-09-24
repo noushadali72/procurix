@@ -5,48 +5,79 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-#[Fillable(['purchase_order_id','vendor_id','bill_number','bill_date','due_date','subtotal','tax','total','status','notes'])]
+
+#[Fillable(['purchase_order_id', 'vendor_id', 'bill_number', 'bill_date', 'due_date', 'subtotal', 'tax', 'total', 'status', 'notes'])]
 class VendorBill extends Model
 {
-    protected static function booted(){
+    protected static function booted()
+    {
 
-        static::creating(function($vb){
+        static::creating(function ($vb) {
             $vb->bill_number = static::generateBillNumber();
         });
     }
-    public function items(){
+    public function items()
+    {
         return $this->hasMany(VendorBillItem::class);
     }
 
-    public function vendor(){
+    public function vendor()
+    {
         return $this->belongsTo(Vendor::class);
     }
-    public function purchaseOrder(){
+    public function purchaseOrder()
+    {
         return $this->belongsTo(PurchaseOrder::class);
     }
-    public function vendorPayments(){
+    public function vendorPayments()
+    {
         return $this->hasMany(VendorPayment::class);
     }
 
-    public function getPaidAmountAttribute(){
-        return $this->vendorPayments()->where('status','successful')->sum('amount');
-    }
-    public function getDueAmountAttribute(){
-        $paidAmount = $this->paid_amount;
-        return max(($this->total - $paidAmount),0);
+    public function getPaidAmountAttribute()
+    {
+        return $this->vendorPayments()->where('status', 'successful')->sum('amount');
     }
 
-    private static function generateBillNumber(){
-         do {
-                $bill_number = 'PR-' . strtoupper(Str::random(7));
-            } while (
-                VendorBill::where(
-                    'bill_number',
-                    $bill_number
-                )->exists()
-            );
+    public function getCreditedAmountAttribute()
+    {
+        return $this->creditApplications()
+            ->sum('amount');
+    }
+
+    public function getDueAmountAttribute()
+    {
+        return max(
+            (float) $this->total
+                - (float) $this->paid_amount
+                - (float) $this->credited_amount,
+            0
+        );
+    }
+
+    private static function generateBillNumber()
+    {
+        do {
+            $bill_number = 'PR-' . strtoupper(Str::random(7));
+        } while (
+            VendorBill::where(
+                'bill_number',
+                $bill_number
+            )->exists()
+        );
 
 
-            return $bill_number;
+        return $bill_number;
+    }
+
+
+    public function vendorCredits()
+    {
+        return $this->hasMany(VendorCredit::class);
+    }
+
+    public function creditApplications()
+    {
+        return $this->hasMany(VendorCreditApplication::class);
     }
 }

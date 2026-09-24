@@ -33,4 +33,8 @@ class GoodsReceipt extends Model
     {
         return $this->hasMany(GoodsReceiptAttachment::class);
     }
+    public function purchaseReturns(): HasMany
+    {
+        return $this->hasMany(PurchaseReturn::class);
+    }
 }

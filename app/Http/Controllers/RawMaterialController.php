@@ -17,9 +17,7 @@ class RawMaterialController extends Controller
      */
     public function index(): View
     {
-        $rawMaterials = RawMaterial::with(['unit','category'])
-            ->latest()
-            ->paginate(10);
+        $rawMaterials = RawMaterial::with(['unit','category'])->paginate(10);
 
         return view('raw_materials.index', compact('rawMaterials'));
     }

@@ -4,10 +4,8 @@
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
         <div>
-            <a
-                href="{{ route('vendor-bills.index') }}"
-                class="inline-flex items-center text-sm font-medium text-gray-500 transition hover:text-gray-900"
-            >
+            <a href="{{ route('vendor-bills.index') }}"
+                class="inline-flex items-center text-sm font-medium text-gray-500 transition hover:text-gray-900">
                 <i class="bx bx-arrow-back mr-1.5"></i>
                 Back to Vendor Bills
             </a>
@@ -44,8 +42,7 @@
                     @endphp
 
                     <span
-                        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}"
-                    >
+                        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
                         <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
                         {{ $statusLabel }}
                     </span>
@@ -62,21 +59,15 @@
         {{-- Header Actions --}}
         <div class="flex items-center gap-2">
 
-            <a
-                href="{{ route('vendor-bills.generatepdf', $vendorBill) }}"
-                target="_blank"
-                class="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
-            >
+            <a href="{{ route('vendor-bills.generatepdf', $vendorBill) }}" target="_blank"
+                class="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
                 <i class="bx bx-file"></i>
                 Generate PDF
             </a>
 
             @if ($vendorBill->due_amount > 0)
-                <button
-                    type="button"
-                    id="openPaymentModal"
-                    class="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
-                >
+                <button type="button" id="openPaymentModal"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
                     <i class="bx bx-money"></i>
                     Record Payment
                 </button>
@@ -122,7 +113,7 @@
                 </p>
 
                 <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $vendorBill->vendor->company_name ?? $vendorBill->vendor->name ?? '-' }}
+                    {{ $vendorBill->vendor->company_name ?? ($vendorBill->vendor->name ?? '-') }}
                 </p>
             </div>
 
@@ -132,7 +123,8 @@
                     Purchase Order
                 </p>
 
-                <a href="{{ route('purchase-orders.show',$vendorBill->purchaseOrder) }}" class="mt-1.5 font-semibold text-blue-900 underline">
+                <a href="{{ route('purchase-orders.show', $vendorBill->purchaseOrder) }}"
+                    class="mt-1.5 font-semibold text-blue-900 underline">
                     {{ $vendorBill->purchaseOrder->order_number ?? '-' }}
                 </a>
             </div>
@@ -144,9 +136,7 @@
                 </p>
 
                 <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $vendorBill->bill_date
-                        ? \Carbon\Carbon::parse($vendorBill->bill_date)->format('d M Y')
-                        : '-' }}
+                    {{ $vendorBill->bill_date ? \Carbon\Carbon::parse($vendorBill->bill_date)->format('d M Y') : '-' }}
                 </p>
             </div>
 
@@ -157,9 +147,7 @@
                 </p>
 
                 <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $vendorBill->due_date
-                        ? \Carbon\Carbon::parse($vendorBill->due_date)->format('d M Y')
-                        : '-' }}
+                    {{ $vendorBill->due_date ? \Carbon\Carbon::parse($vendorBill->due_date)->format('d M Y') : '-' }}
                 </p>
             </div>
 
@@ -171,8 +159,7 @@
 
                 <div class="mt-1.5">
                     <span
-                        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}"
-                    >
+                        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
                         <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
                         {{ $statusLabel }}
                     </span>
@@ -207,7 +194,7 @@
                 </p>
 
                 <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $vendorBill->vendor->company_name ?? $vendorBill->vendor->name ?? '-' }}
+                    {{ $vendorBill->vendor->company_name ?? ($vendorBill->vendor->name ?? '-') }}
                 </p>
             </div>
 
@@ -217,7 +204,7 @@
                 </p>
 
                 <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $vendorBill->vendor->phone ?? $vendorBill->vendor->contact_no ?? '-' }}
+                    {{ $vendorBill->vendor->phone ?? ($vendorBill->vendor->contact_no ?? '-') }}
                 </p>
             </div>
 
@@ -292,15 +279,12 @@
                 <tbody class="divide-y divide-gray-100">
 
                     @forelse ($vendorBill->items as $item)
-
                         <tr class="transition hover:bg-gray-50">
 
                             <td class="px-6 py-4">
 
                                 <p class="font-medium text-gray-900">
-                                    {{ $item->product->name
-                                        ?? $item->rawMaterial->name
-                                        ?? '-' }}
+                                    {{ $item->product->name ?? ($item->rawMaterial->name ?? '-') }}
                                 </p>
 
                                 @if ($item->rawMaterial?->sku)
@@ -312,7 +296,7 @@
                             </td>
 
                             <td class="px-6 py-4 text-gray-600">
-                                {{ $item->unit->short_name ?? $item->unit->name ?? '-' }}
+                                {{ $item->unit->short_name ?? ($item->unit->name ?? '-') }}
                             </td>
 
                             <td class="px-6 py-4 text-right font-medium text-gray-900">
@@ -336,7 +320,6 @@
                                 No bill items found.
                             </td>
                         </tr>
-
                     @endforelse
 
                 </tbody>
@@ -352,18 +335,16 @@
     <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-sm">
 
         <div class="border-b border-gray-200 px-6 py-4">
-
             <h3 class="font-semibold text-gray-900">
                 Financial Summary
             </h3>
-
         </div>
 
         <div class="p-6">
 
             <div class="ml-auto max-w-sm space-y-3">
 
-                <div class="flex items-center justify-between text-sm">
+                <div class="flex justify-between text-sm">
                     <span class="text-gray-500">
                         Subtotal
                     </span>
@@ -373,7 +354,8 @@
                     </span>
                 </div>
 
-                <div class="flex items-center justify-between text-sm">
+
+                <div class="flex justify-between text-sm">
                     <span class="text-gray-500">
                         Tax
                     </span>
@@ -383,31 +365,55 @@
                     </span>
                 </div>
 
-                @if (isset($vendorBill->discount))
-                    <div class="flex items-center justify-between text-sm">
+
+                <div class="flex justify-between border-t border-gray-200 pt-3">
+                    <span class="font-semibold text-gray-700">
+                        Total
+                    </span>
+
+                    <span class="font-semibold text-gray-900">
+                        {{ number_format($vendorBill->total, 2) }}
+                    </span>
+                </div>
+
+
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">
+                        Paid
+                    </span>
+
+                    <span class="font-medium text-green-700">
+                        {{ number_format($vendorBill->paid_amount, 2) }}
+                    </span>
+                </div>
+
+
+                @if ($vendorBill->credited_amount > 0)
+                    <div class="flex justify-between text-sm">
                         <span class="text-gray-500">
-                            Discount
+                            Vendor Credit
                         </span>
 
-                        <span class="font-medium text-gray-900">
-                            {{ number_format($vendorBill->discount, 2) }}
+                        <span class="font-medium text-amber-700">
+                            {{ number_format($vendorBill->credited_amount, 2) }}
                         </span>
                     </div>
                 @endif
 
-                <div class="border-t border-gray-200 pt-3">
 
-                    <div class="flex items-center justify-between">
+                <div class="flex justify-between border-t border-gray-200 pt-3">
 
-                        <span class="font-semibold text-gray-700">
-                            Total
-                        </span>
+                    <span class="font-semibold text-gray-900">
+                        Outstanding
+                    </span>
 
-                        <span class="text-lg font-bold text-gray-900">
-                            {{ number_format($vendorBill->total, 2) }}
-                        </span>
+                    <span
+                        class="text-lg font-bold
+                    {{ $vendorBill->due_amount > 0 ? 'text-red-600' : 'text-green-700' }}">
 
-                    </div>
+                        {{ number_format($vendorBill->due_amount, 2) }}
+
+                    </span>
 
                 </div>
 
@@ -417,10 +423,8 @@
 
     </div>
 
-
     {{-- Notes --}}
     @if ($vendorBill->notes)
-
         <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-sm">
 
             <div class="border-b border-gray-200 px-6 py-4">
@@ -440,192 +444,196 @@
             </div>
 
         </div>
-
     @endif
 
-{{-- Payment Modal --}}
-<div id="paymentModal"
-    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4">
+    {{-- Payment Modal --}}
+    <div id="paymentModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4">
 
-    {{-- Modal Container --}}
-    <div
-        class="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden
+        {{-- Modal Container --}}
+        <div
+            class="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden
                rounded-xl border border-gray-200 bg-white
                shadow-[0_20px_60px_-15px_rgba(0,0,0,0.30)]">
 
-        {{-- Header --}}
-        <div
-            class="flex shrink-0 items-center justify-between
+            {{-- Header --}}
+            <div
+                class="flex shrink-0 items-center justify-between
                    border-b border-gray-200 bg-white px-5 py-4">
 
-            <div>
+                <div>
 
-                <h3 class="font-semibold text-gray-900">
-                    Make Payment
-                </h3>
+                    <h3 class="font-semibold text-gray-900">
+                        Make Payment
+                    </h3>
 
-                <p class="mt-1 text-sm text-gray-500">
-                    Record a payment for this vendor bill.
-                </p>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Record a payment for this vendor bill.
+                    </p>
 
-            </div>
+                </div>
 
-            <button type="button"
-                id="closePaymentModal"
-                class="flex h-9 w-9 items-center justify-center
+                <button type="button" id="closePaymentModal"
+                    class="flex h-9 w-9 items-center justify-center
                        rounded-lg border border-gray-200
                        text-gray-400 shadow-sm transition
                        hover:bg-gray-50 hover:text-gray-700">
 
-                <i class="bx bx-x text-2xl"></i>
+                    <i class="bx bx-x text-2xl"></i>
 
-            </button>
+                </button>
 
-        </div>
-
-
-        {{-- Form --}}
-        <form id="paymentForm"
-            action="{{ route('vendor-payments.store', $vendorBill) }}"
-            method="POST"
-            enctype="multipart/form-data"
-            class="flex min-h-0 flex-1 flex-col">
-
-            @csrf
+            </div>
 
 
-            {{-- Scrollable Form Body --}}
-            <div class="flex-1 overflow-y-auto px-5 py-4">
+            {{-- Form --}}
+            <form id="paymentForm" action="{{ route('vendor-payments.store', $vendorBill) }}" method="POST"
+                enctype="multipart/form-data" class="flex min-h-0 flex-1 flex-col">
 
-                <div class="space-y-4">
-
-                    {{-- Outstanding --}}
-                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
-
-                        <div class="flex items-center justify-between">
-
-                            <span class="text-sm text-gray-500">
-                                Outstanding Amount
-                            </span>
-
-                            <span class="font-semibold text-gray-900">
-                                {{ number_format($vendorBill->due_amount, 2) }}
-                            </span>
-
-                        </div>
-
-                    </div>
+                @csrf
 
 
-                    {{-- Amount + Payment Method --}}
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {{-- Scrollable Form Body --}}
+                <div class="flex-1 overflow-y-auto px-5 py-4">
 
-                        {{-- Amount --}}
-                        <div>
+                    <div class="space-y-4">
 
-                            <label for="payment_amount"
-                                class="mb-1.5 block text-sm font-medium text-gray-700">
-                                Payment Amount
-                            </label>
+                        {{-- Outstanding --}}
+                        <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
 
-                            <input type="number"
-                                step="0.01"
-                                min="0.01"
-                                max="{{ $vendorBill->due_amount }}"
-                                value="{{ $vendorBill->due_amount }}"
-                                id="payment_amount"
-                                name="amount"
-                                placeholder="Enter amount"
-                                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+                            <div class="flex items-center justify-between">
 
-                            <p data-error="amount"
-                                class="mt-1 hidden text-xs text-red-600">
-                            </p>
+                                <span class="text-sm text-gray-500">
+                                    Outstanding Amount
+                                </span>
+
+                                <span class="font-semibold text-gray-900">
+                                    {{ number_format($vendorBill->due_amount, 2) }}
+                                </span>
+
+                            </div>
 
                         </div>
 
 
-                        {{-- Payment Method --}}
-                        <div>
+                        {{-- Amount + Payment Method --}}
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
-                            <label for="payment_method"
-                                class="mb-1.5 block text-sm font-medium text-gray-700">
+                            {{-- Amount --}}
+                            <div>
 
-                                Payment Method
-                                <span class="text-red-500">*</span>
+                                <label for="payment_amount" class="mb-1.5 block text-sm font-medium text-gray-700">
+                                    Payment Amount
+                                </label>
 
-                            </label>
+                                <input type="number" step="0.01" min="0.01"
+                                    max="{{ $vendorBill->due_amount }}" value="{{ $vendorBill->due_amount }}"
+                                    id="payment_amount" name="amount" placeholder="Enter amount"
+                                    class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
 
-                            <select id="payment_method"
-                                name="payment_method"
-                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+                                <p data-error="amount" class="mt-1 hidden text-xs text-red-600">
+                                </p>
 
-                                <option value="">
-                                    Select Method
-                                </option>
-
-                                <option value="cash">
-                                    Cash
-                                </option>
-
-                                <option value="bank_transfer">
-                                    Bank Transfer
-                                </option>
-
-                                <option value="cheque">
-                                    Cheque
-                                </option>
-
-                                <option value="card">
-                                    Card
-                                </option>
-
-                                <option value="other">
-                                    Other
-                                </option>
-
-                            </select>
-
-                            <p data-error="payment_method"
-                                class="mt-1 hidden text-xs text-red-600">
-                            </p>
-
-                        </div>
-
-                    </div>
+                            </div>
 
 
-                    {{-- Payment Date + Transaction ID --}}
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            {{-- Payment Method --}}
+                            <div>
 
-                        {{-- Payment Date --}}
-                        <div>
+                                <label for="payment_method" class="mb-1.5 block text-sm font-medium text-gray-700">
 
-                            <label for="payment_date"
-                                class="mb-1.5 block text-sm font-medium text-gray-700">
-                                Payment Date
-                            </label>
+                                    Payment Method
+                                    <span class="text-red-500">*</span>
 
-                            <input type="date"
-                                id="payment_date"
-                                name="payment_date"
-                                value="{{ now()->toDateString() }}"
-                                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+                                </label>
 
-                            <p data-error="payment_date"
-                                class="mt-1 hidden text-xs text-red-600">
-                            </p>
+                                <select id="payment_method" name="payment_method"
+                                    class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+
+                                    <option value="">
+                                        Select Method
+                                    </option>
+
+                                    <option value="cash">
+                                        Cash
+                                    </option>
+
+                                    <option value="bank_transfer">
+                                        Bank Transfer
+                                    </option>
+
+                                    <option value="cheque">
+                                        Cheque
+                                    </option>
+
+                                    <option value="card">
+                                        Card
+                                    </option>
+
+                                    <option value="other">
+                                        Other
+                                    </option>
+
+                                </select>
+
+                                <p data-error="payment_method" class="mt-1 hidden text-xs text-red-600">
+                                </p>
+
+                            </div>
 
                         </div>
 
 
-                        {{-- Transaction ID --}}
+                        {{-- Payment Date + Transaction ID --}}
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                            {{-- Payment Date --}}
+                            <div>
+
+                                <label for="payment_date" class="mb-1.5 block text-sm font-medium text-gray-700">
+                                    Payment Date
+                                </label>
+
+                                <input type="date" id="payment_date" name="payment_date"
+                                    value="{{ now()->toDateString() }}"
+                                    class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+
+                                <p data-error="payment_date" class="mt-1 hidden text-xs text-red-600">
+                                </p>
+
+                            </div>
+
+
+                            {{-- Transaction ID --}}
+                            <div>
+
+                                <label for="transaction_id" class="mb-1.5 block text-sm font-medium text-gray-700">
+
+                                    Transaction ID
+
+                                    <span class="font-normal text-gray-400">
+                                        (Optional)
+                                    </span>
+
+                                </label>
+
+                                <input type="text" id="transaction_id" name="transaction_id"
+                                    placeholder="Transaction ID"
+                                    class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+
+                                <p data-error="transaction_id" class="mt-1 hidden text-xs text-red-600">
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- Payment Proof --}}
                         <div>
 
-                            <label for="transaction_id"
-                                class="mb-1.5 block text-sm font-medium text-gray-700">
+                            <label for="payment_proof" class="mb-1.5 block text-sm font-medium text-gray-700">
 
-                                Transaction ID
+                                Payment Proof
 
                                 <span class="font-normal text-gray-400">
                                     (Optional)
@@ -633,40 +641,9 @@
 
                             </label>
 
-                            <input type="text"
-                                id="transaction_id"
-                                name="transaction_id"
-                                placeholder="Transaction ID"
-                                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
-
-                            <p data-error="transaction_id"
-                                class="mt-1 hidden text-xs text-red-600">
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    {{-- Payment Proof --}}
-                    <div>
-
-                        <label for="payment_proof"
-                            class="mb-1.5 block text-sm font-medium text-gray-700">
-
-                            Payment Proof
-
-                            <span class="font-normal text-gray-400">
-                                (Optional)
-                            </span>
-
-                        </label>
-
-                        <input type="file"
-                            accept="image/png,image/jpg,image/jpeg"
-                            id="payment_proof"
-                            name="payment_proof"
-                            class="block w-full rounded-lg border border-gray-300
+                            <input type="file" accept="image/png,image/jpg,image/jpeg" id="payment_proof"
+                                name="payment_proof"
+                                class="block w-full rounded-lg border border-gray-300
                                    bg-white px-3 py-2 text-sm text-gray-600
                                    file:mr-3 file:rounded-md file:border-0
                                    file:bg-gray-100 file:px-3 file:py-1.5
@@ -674,184 +651,176 @@
                                    file:text-gray-700
                                    hover:file:bg-gray-200">
 
-                        <p data-error="payment_proof"
-                            class="mt-1 hidden text-xs text-red-600">
-                        </p>
+                            <p data-error="payment_proof" class="mt-1 hidden text-xs text-red-600">
+                            </p>
 
-                    </div>
+                        </div>
 
 
-                    {{-- Notes --}}
-                    <div>
+                        {{-- Notes --}}
+                        <div>
 
-                        <label for="payment_notes"
-                            class="mb-1.5 block text-sm font-medium text-gray-700">
+                            <label for="payment_notes" class="mb-1.5 block text-sm font-medium text-gray-700">
 
-                            Notes
+                                Notes
 
-                            <span class="font-normal text-gray-400">
-                                (Optional)
-                            </span>
+                                <span class="font-normal text-gray-400">
+                                    (Optional)
+                                </span>
 
-                        </label>
+                            </label>
 
-                        <textarea id="payment_notes"
-                            name="notes"
-                            rows="2"
-                            placeholder="Enter payment notes"
-                            class="w-full resize-none rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"></textarea>
+                            <textarea id="payment_notes" name="notes" rows="2" placeholder="Enter payment notes"
+                                class="w-full resize-none rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"></textarea>
 
-                        <p data-error="notes"
-                            class="mt-1 hidden text-xs text-red-600">
-                        </p>
+                            <p data-error="notes" class="mt-1 hidden text-xs text-red-600">
+                            </p>
+
+                        </div>
 
                     </div>
 
                 </div>
 
-            </div>
 
-
-            {{-- Fixed Footer --}}
-            <div
-                class="flex shrink-0 justify-end gap-3
+                {{-- Fixed Footer --}}
+                <div
+                    class="flex shrink-0 justify-end gap-3
                        border-t border-gray-200 bg-white px-5 py-4">
 
-                <button type="button"
-                    id="cancelPayment"
-                    class="rounded-lg border border-gray-300
+                    <button type="button" id="cancelPayment"
+                        class="rounded-lg border border-gray-300
                            bg-white px-4 py-2 text-sm font-medium
                            text-gray-700 shadow-sm transition
                            hover:bg-gray-50">
 
-                    Cancel
+                        Cancel
 
-                </button>
+                    </button>
 
-                <button type="submit"
-                    id="submitPayment"
-                    class="inline-flex items-center gap-1.5
+                    <button type="submit" id="submitPayment"
+                        class="inline-flex items-center gap-1.5
                            rounded-lg bg-gray-900 px-4 py-2
                            text-sm font-medium text-white
                            shadow-sm transition hover:bg-gray-800">
 
-                    <i class="bx bx-check"></i>
+                        <i class="bx bx-check"></i>
 
-                    Record Payment
+                        Record Payment
 
-                </button>
+                    </button>
 
-            </div>
+                </div>
 
-        </form>
+            </form>
+
+        </div>
 
     </div>
 
-</div>
 
+    @push('scripts')
+        <script>
+            $(function() {
 
-@push('scripts')
-<script>
-    $(function () {
-
-        function openPaymentModal() {
-            $('#paymentModal')
-                .removeClass('hidden')
-                .addClass('flex');
-        }
-
-        function closePaymentModal() {
-            $('#paymentModal')
-                .removeClass('flex')
-                .addClass('hidden');
-        }
-
-        function clearPaymentErrors() {
-            $('[data-error]').addClass('hidden').text('');
-        }
-
-        function showPaymentErrors(errors) {
-            $.each(errors, function (field, messages) {
-                const error = $('[data-error="' + field + '"]');
-
-                if (error.length) {
-                    error
+                function openPaymentModal() {
+                    $('#paymentModal')
                         .removeClass('hidden')
-                        .text(messages[0]);
+                        .addClass('flex');
                 }
-            });
-        }
 
-        $('#openPaymentModal').on('click', openPaymentModal);
-        $('#closePaymentModal, #cancelPayment').on('click', closePaymentModal);
-        $('#paymentModal').on('click', function (e) {
-            if (e.target === this) {
-                closePaymentModal();
-            }
-        });
+                function closePaymentModal() {
+                    $('#paymentModal')
+                        .removeClass('flex')
+                        .addClass('hidden');
+                }
 
-        $('#paymentForm').on('submit', function (e) {
-            e.preventDefault();
+                function clearPaymentErrors() {
+                    $('[data-error]').addClass('hidden').text('');
+                }
 
-            const form = $(this);
-            const button = $('#submitPayment');
+                function showPaymentErrors(errors) {
+                    $.each(errors, function(field, messages) {
+                        const error = $('[data-error="' + field + '"]');
 
-            clearPaymentErrors();
+                        if (error.length) {
+                            error
+                                .removeClass('hidden')
+                                .text(messages[0]);
+                        }
+                    });
+                }
 
-            button
-                .prop('disabled', true)
-                .html(`
+                $('#openPaymentModal').on('click', openPaymentModal);
+                $('#closePaymentModal, #cancelPayment').on('click', closePaymentModal);
+                $('#paymentModal').on('click', function(e) {
+                    if (e.target === this) {
+                        closePaymentModal();
+                    }
+                });
+
+                $('#paymentForm').on('submit', function(e) {
+                    e.preventDefault();
+
+                    const form = $(this);
+                    const button = $('#submitPayment');
+
+                    clearPaymentErrors();
+
+                    button
+                        .prop('disabled', true)
+                        .html(`
                     <i class="bx bx-loader-alt bx-spin"></i>
                     Processing...
                 `);
 
-            var formData = new FormData(form[0]);
-            $.ajax({
-                url: form.attr('action'),
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
+                    var formData = new FormData(form[0]);
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
 
-                success: function (response) {
-                    $('#paymentForm')[0].reset();
-                    showToast('success', response.message);
-                    setTimeout(function () {
-                        window.location.reload();
-                    }, 500);
-                },
+                        success: function(response) {
+                            $('#paymentForm')[0].reset();
+                            showToast('success', response.message);
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 500);
+                        },
 
-                error: function (xhr) {
-                    if (xhr.status === 422) {
-                        const response = xhr.responseJSON;
+                        error: function(xhr) {
+                            if (xhr.status === 422) {
+                                const response = xhr.responseJSON;
 
-                        if (response.errors) {
-                            showPaymentErrors(response.errors);
-                        }
+                                if (response.errors) {
+                                    showPaymentErrors(response.errors);
+                                }
 
-                        if (response.message) {
-                            showToast('error', response.message);
-                        }
-                    } else {
-                        showToast(
-                            'error',
-                            xhr.responseJSON?.message || 'Something went wrong.'
-                        );
-                    }
+                                if (response.message) {
+                                    showToast('error', response.message);
+                                }
+                            } else {
+                                showToast(
+                                    'error',
+                                    xhr.responseJSON?.message || 'Something went wrong.'
+                                );
+                            }
 
-                    button
-                        .prop('disabled', false)
-                        .html(`
+                            button
+                                .prop('disabled', false)
+                                .html(`
                             <i class="bx bx-check"></i>
                             Record Payment
                         `);
-                }
-            });
-        });
+                        }
+                    });
+                });
 
-    });
-</script>
-@endpush
+            });
+        </script>
+    @endpush
 
 
 </x-layouts.app>

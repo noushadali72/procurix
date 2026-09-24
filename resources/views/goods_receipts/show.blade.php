@@ -56,8 +56,13 @@
                     Purchase Order
                 </a>
 
-                <button type="button"
-                    id="delete-grn"
+                <a href="{{ route('purchase-returns.create', $goodsReceipt) }}"
+                    class="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-slate-900">
+                    <i class="bx bx-undo text-base"></i>
+                    Return Materials
+                </a>
+
+                <button type="button" id="delete-grn"
                     class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-red-700">
                     <i class="bx bx-trash text-base"></i>
                     Delete
@@ -68,9 +73,11 @@
 
 
         {{-- Receipt Summary --}}
-        <div class="mb-6 overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+        <div
+            class="mb-6 overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
 
-            <div class="grid grid-cols-1 divide-y divide-gray-200 sm:grid-cols-3 sm:divide-x sm:divide-y-0 dark:divide-gray-700">
+            <div
+                class="grid grid-cols-1 divide-y divide-gray-200 sm:grid-cols-3 sm:divide-x sm:divide-y-0 dark:divide-gray-700">
 
                 <div class="px-5 py-4">
                     <p class="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
@@ -139,7 +146,8 @@
 
 
         {{-- Received Materials --}}
-        <div class="mb-6 overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+        <div
+            class="mb-6 overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
 
             <div class="flex items-center justify-between border-b border-gray-200 px-5 py-4 dark:border-gray-700">
 
@@ -153,7 +161,8 @@
                     </p>
                 </div>
 
-                <span class="rounded-md bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                <span
+                    class="rounded-md bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300">
                     {{ $goodsReceipt->items->count() }} {{ Str::plural('Item', $goodsReceipt->items->count()) }}
                 </span>
 
@@ -163,7 +172,8 @@
 
                 <table class="w-full text-left text-sm">
 
-                    <thead class="border-b border-gray-200 bg-gray-50 text-xs font-medium uppercase tracking-wide text-gray-500 dark:border-gray-700 dark:bg-gray-700/50 dark:text-gray-400">
+                    <thead
+                        class="border-b border-gray-200 bg-gray-50 text-xs font-medium uppercase tracking-wide text-gray-500 dark:border-gray-700 dark:bg-gray-700/50 dark:text-gray-400">
                         <tr>
                             <th class="px-5 py-3.5">Material</th>
                             <th class="px-5 py-3.5">Ordered</th>
@@ -175,7 +185,6 @@
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
 
                         @forelse ($goodsReceipt->items as $item)
-
                             @php
                                 $orderItem = $item->purchaseOrderItem;
                             @endphp
@@ -186,7 +195,8 @@
 
                                     <div class="flex items-center gap-3">
 
-                                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-300">
+                                        <div
+                                            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-300">
                                             <i class="bx bx-package text-lg"></i>
                                         </div>
 
@@ -215,7 +225,8 @@
 
                                 <td class="px-5 py-4">
 
-                                    <span class="inline-flex items-center rounded-md bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700 dark:bg-green-900/20 dark:text-green-400">
+                                    <span
+                                        class="inline-flex items-center rounded-md bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700 dark:bg-green-900/20 dark:text-green-400">
                                         {{ $item->qty }}
                                         {{ $item->unit->short_name ?? '' }}
                                     </span>
@@ -234,7 +245,8 @@
                             <tr>
                                 <td colspan="4" class="px-5 py-12 text-center">
 
-                                    <div class="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-700">
+                                    <div
+                                        class="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-700">
                                         <i class="bx bx-package text-xl"></i>
                                     </div>
 
@@ -248,7 +260,6 @@
 
                                 </td>
                             </tr>
-
                         @endforelse
 
                     </tbody>
@@ -277,7 +288,8 @@
                         </p>
                     </div>
 
-                    <span class="rounded-md bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                    <span
+                        class="rounded-md bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300">
                         {{ $goodsReceipt->attachments->count() }}
                     </span>
 
@@ -289,23 +301,24 @@
 
                 @if ($goodsReceipt->attachments->count())
 
-                    <div class="divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-700 dark:border-gray-700">
+                    <div
+                        class="divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-700 dark:border-gray-700">
 
                         @foreach ($goodsReceipt->attachments as $attachment)
-
                             <div id="attachment-{{ $attachment->id }}"
                                 class="flex items-center justify-between gap-4 px-4 py-3.5">
 
-                                <a href="{{ Storage::url($attachment->file_path) }}"
-                                    target="_blank"
+                                <a href="{{ Storage::url($attachment->file_path) }}" target="_blank"
                                     class="flex min-w-0 items-center gap-3">
 
-                                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-300">
+                                    <div
+                                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-300">
                                         <i class="bx bx-file text-lg"></i>
                                     </div>
 
                                     <div class="min-w-0">
-                                        <p class="truncate text-sm font-medium text-gray-800 hover:text-blue-600 dark:text-gray-200 dark:hover:text-blue-400">
+                                        <p
+                                            class="truncate text-sm font-medium text-gray-800 hover:text-blue-600 dark:text-gray-200 dark:hover:text-blue-400">
                                             {{ basename($attachment->file_path) }}
                                         </p>
 
@@ -324,16 +337,15 @@
                                 </button>
 
                             </div>
-
                         @endforeach
 
                     </div>
-
                 @else
+                    <div
+                        class="rounded-lg border border-dashed border-gray-300 px-5 py-8 text-center dark:border-gray-600">
 
-                    <div class="rounded-lg border border-dashed border-gray-300 px-5 py-8 text-center dark:border-gray-600">
-
-                        <div class="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-700">
+                        <div
+                            class="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-700">
                             <i class="bx bx-paperclip text-xl"></i>
                         </div>
 

@@ -11,6 +11,7 @@ use App\Http\Controllers\PaymentTermController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PurchaseRequestController;
+use App\Http\Controllers\PurchaseReturnController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\WarehouseController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VendorBillController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\VendorCreditController;
 use App\Http\Controllers\VendorPaymentController;
 use Illuminate\Support\Facades\Route;
 
@@ -58,9 +60,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('purchase-requests/save-draft', [PurchaseRequestController::class, 'saveDraft'])->name('purchase-requests.saveDraft');
     Route::post('purchase-requests/{pr}/duplicate', [PurchaseRequestController::class, 'duplicate'])->name('purchase-requests.duplicate');
     // Route::get('purchase-requests/{purchaseRequest}/compare',[PurchaseRequestController::class, 'compare'])->name('purchase-requests.compare');
-    Route::get('purchase-requests/{purchaseRequest}/compare',[PurchaseRequestController::class, 'compare'])->name('purchase-requests.compare');
-    Route::post('purchase-requests/{purchaseRequest}/compare/confirm',[PurchaseRequestController::class, 'confirmComparison'])->name('purchase-requests.compare.confirm');
-    Route::post('purchase-requests/{purchaseRequest}/resend-rfq',[PurchaseRequestController::class, 'resendRfq'])->name('purchase-requests.resend-rfq');
+    Route::get('purchase-requests/{purchaseRequest}/compare', [PurchaseRequestController::class, 'compare'])->name('purchase-requests.compare');
+    Route::post('purchase-requests/{purchaseRequest}/compare/confirm', [PurchaseRequestController::class, 'confirmComparison'])->name('purchase-requests.compare.confirm');
+    Route::post('purchase-requests/{purchaseRequest}/resend-rfq', [PurchaseRequestController::class, 'resendRfq'])->name('purchase-requests.resend-rfq');
     Route::resource('vendors', VendorController::class);
     Route::resource('quotations', QuotationController::class)->except('create');
     Route::get('quotations/create/{purchaseRequest}', [QuotationController::class, 'create'])->name('quotations.create');
@@ -87,6 +89,31 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/manufacturing/manufacture', [ManufacturingController::class, 'manufacture'])->name('manufacturing.manufacture');
     Route::post('manufacturing/autosave', [ManufacturingController::class, 'autoSave'])->name('manufacturing.autosave');
 
+
+    // Purchase Returns
+
+    Route::get(
+        'purchase-returns',
+        [PurchaseReturnController::class, 'index']
+    )->name('purchase-returns.index');
+
+    Route::get(
+        'purchase-returns/{purchaseReturn}',
+        [PurchaseReturnController::class, 'show']
+    )->name('purchase-returns.show');
+
+    Route::get(
+        'goods-receipts/{goodsReceipt}/returns/create',
+        [PurchaseReturnController::class, 'create']
+    )->name('purchase-returns.create');
+
+    Route::post(
+        'goods-receipts/{goodsReceipt}/returns',
+        [PurchaseReturnController::class, 'store']
+    )->name('purchase-returns.store');
+
+
+
     // Finance
     Route::resource('vendor-bills', VendorBillController::class)->except('create', 'show');
     Route::get('vendor-bills/{purchaseOrder}/create', [VendorBillController::class, 'create'])->name('vendor-bills.create');
@@ -97,6 +124,29 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('vendor-payments/{vendorBill}', [VendorPaymentController::class, 'store'])->name('vendor-payments.store');
     Route::resource('payment-terms', PaymentTermController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::view('test', 'test.index');
+
+
+    // Vendor Credits
+
+    Route::get(
+        'vendor-credits',
+        [VendorCreditController::class, 'index']
+    )->name('vendor-credits.index');
+
+    Route::get(
+        'vendor-credits/{vendorCredit}',
+        [VendorCreditController::class, 'show']
+    )->name('vendor-credits.show');
+
+    Route::post(
+        'vendor-credits/{vendorCredit}/apply',
+        [VendorCreditController::class, 'apply']
+    )->name('vendor-credits.apply');
+
+    Route::post(
+        'vendor-credits/{vendorCredit}/refund',
+        [VendorCreditController::class, 'refund']
+    )->name('vendor-credits.refund');
     // Logout
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });
