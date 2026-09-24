@@ -174,33 +174,25 @@ class VendorBillController extends Controller
                  * Recheck inside transaction so two requests cannot
                  * intentionally generate the same bill through normal flow.
                  */
-                if (
-                    VendorBill::where(
-                        'purchase_order_id',
-                        $purchaseOrder->id
-                    )->exists()
+                if (VendorBill::where('purchase_order_id',$purchaseOrder->id)->exists()
                 ) {
                     throw new \RuntimeException(
                         'Vendor bill already exists for this purchase order.'
                     );
                 }
 
+                $term = $purchaseOrder->vendor->paymentTerm;
+                $due_days = $term->due_days;
+                
                 $vendorBill = VendorBill::create([
                     'purchase_order_id' => $purchaseOrder->id,
                     'vendor_id' => $purchaseOrder->vendor_id,
-
                     'bill_date' => now()->toDateString(),
-
-                    'due_date' => now()
-                        ->addDays(3)
-                        ->toDateString(),
-
+                    'due_date' => now()->addDays($due_days??3)->toDateString(),
                     'subtotal' => 0,
                     'tax' => 0,
                     'total' => 0,
-
                     'status' => 'unpaid',
-
                     'notes' => '',
                 ]);
 

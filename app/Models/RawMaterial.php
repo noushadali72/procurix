@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Observers\RawMaterialObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[ObservedBy(RawMaterialObserver::class)]
 class RawMaterial extends Model
 {
     protected $fillable = [
@@ -27,7 +30,8 @@ class RawMaterial extends Model
     {
         return $this->belongsTo(Unit::class);
     }
-    public function category(){
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
     public function manufacturingFormulaItems(): HasMany
@@ -40,15 +44,17 @@ class RawMaterial extends Model
         return $this->hasMany(PurchaseRequestItem::class);
     }
 
-    public function hasPurchaseRequest(){
-        $pr = PurchaseRequest::where('status','draft')->where('raw_material_id',$this->id)->first();    
-        if($pr){
-            return true;
-        }
-        return false;
+    public function hasPurchaseRequest()
+    {
+        return  PurchaseRequest::where('status', 'draft')
+
+            ->whereHas('items', function ($q) {
+                $q->where('raw_material_id', $this->id);
+            })->exists();
     }
 
-    public function activities(){
+    public function activities()
+    {
         return $this->hasMany(RawMaterialActivity::class);
     }
 }

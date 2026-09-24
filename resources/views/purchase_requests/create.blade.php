@@ -29,22 +29,23 @@
 
         @include('purchase_requests._form')
 
-
         <div class="mt-6 flex justify-end gap-3">
-
             <a href="{{ route('purchase-requests.index') }}"
                 class="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
                 Cancel
             </a>
 
+            <button type="button" id="saveDraftBtn"
+                class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60">
+                <i class="bx bx-save"></i>
+                <span>Save Draft</span>
+            </button>
 
             <button type="submit" id="submitBtn"
                 class="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60">
-                <i class="bx bx-save"></i>
-
+                <i class="bx bx-send"></i>
                 Send RFQ
             </button>
-
         </div>
 
     </form>
@@ -228,101 +229,220 @@
         </div>
     </div>
 
-
     @push('scripts')
-        {{-- Add Vendor Script  --}}
         <script>
             $(document).ready(function() {
 
-                // Open modal
-                $('#openVendorModal').on('click', function() {
-                    $('#vendorModal').removeClass('hidden');
-                });
+                const form = $('#purchaseRequestForm');
+                const saveDraftBtn = $('#saveDraftBtn');
 
+                let draftId = null;
+                let autoSaveTimer = null;
+                let isSavingDraft = false;
 
-                // Close modal
-                function closeVendorModal() {
-                    $('#vendorModal').addClass('hidden');
-                    $('#vendorForm')[0].reset();
-                    $('.text-red-600').text('');
+                /*
+                |--------------------------------------------------------------------------
+                | Save Draft
+                |--------------------------------------------------------------------------
+                */
+
+                function saveDraft(showToastMessage = false) {
+
+                    if (isSavingDraft) {
+                        return;
+                    }
+
+                    isSavingDraft = true;
+
+                    const buttonText = saveDraftBtn.find('span');
+
+                    saveDraftBtn.prop('disabled', true);
+                    buttonText.text('Saving...');
+
+                    let data = form.serializeArray();
+
+                    if (draftId) {
+                        data.push({
+                            name: 'purchase_request_id',
+                            value: draftId
+                        });
+                    }
+
+                    $.ajax({
+                        url: "{{ route('purchase-requests.save-draft') }}",
+                        type: 'POST',
+                        data: $.param(data),
+                        headers: {
+                            'Accept': 'application/json'
+                        },
+
+                        success: function(response) {
+
+                            draftId = response.id;
+
+                            if (showToastMessage) {
+                                showToast(
+                                    'success',
+                                    response.message || 'Draft saved successfully.'
+                                );
+                            }
+                        },
+
+                        error: function(xhr) {
+
+                            if (xhr.status === 422) {
+                                showValidationErrors(
+                                    xhr.responseJSON?.errors || {}
+                                );
+
+                                if (showToastMessage) {
+                                    showToast(
+                                        'error',
+                                        'Please fix the validation errors.'
+                                    );
+                                }
+
+                                return;
+                            }
+
+                            if (showToastMessage) {
+                                showToast(
+                                    'error',
+                                    xhr.responseJSON?.message ||
+                                    'Unable to save draft.'
+                                );
+                            }
+                        },
+
+                        complete: function() {
+
+                            isSavingDraft = false;
+
+                            saveDraftBtn.prop('disabled', false);
+                            buttonText.text('Save Draft');
+                        }
+                    });
                 }
 
 
-                $('#closeVendorModal, #cancelVendorModal, #vendorModalOverlay')
-                    .on('click', function() {
-                        closeVendorModal();
-                    });
+                /*
+                |--------------------------------------------------------------------------
+                | Manual Save Draft
+                |--------------------------------------------------------------------------
+                */
+
+                saveDraftBtn.on('click', function() {
+                    saveDraft(true);
+                });
 
 
-                // Submit vendor
-                $('#vendorForm').on('submit', function(e) {
+                /*
+                |--------------------------------------------------------------------------
+                | Auto Save
+                |--------------------------------------------------------------------------
+                */
+
+                function scheduleAutoSave() {
+
+                    clearTimeout(autoSaveTimer);
+
+                    autoSaveTimer = setTimeout(function() {
+                        saveDraft(false);
+                    }, 700);
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Auto Save When Form Fields Change
+                |--------------------------------------------------------------------------
+                */
+
+                form.on(
+                    'change',
+                    'select, textarea, input:not([type="hidden"])',
+                    function() {
+                        scheduleAutoSave();
+                    }
+                );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Auto Save When User Changes Material / Quantity / Unit / Cost
+                |--------------------------------------------------------------------------
+                */
+
+                form.on(
+                    'input',
+                    'input[name*="[qty]"], input[name*="[unit_cost]"]',
+                    function() {
+                        scheduleAutoSave();
+                    }
+                );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Auto Save After Adding / Removing Material Rows
+                |--------------------------------------------------------------------------
+                */
+
+                $(document).on(
+                    'click',
+                    '#addItem, .add-item, .remove-item, .remove-row, [data-remove-item]',
+                    function() {
+                        scheduleAutoSave();
+                    }
+                );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Normal Purchase Request Submit
+                |--------------------------------------------------------------------------
+                */
+
+                form.on('submit', function(e) {
+
                     e.preventDefault();
-                    const $form = $(this);
-                    const $button = $('#saveVendorBtn');
-                    const originalText = $('#saveVendorBtnText').text();
 
-                    // Clear previous errors
-                    $('#vendorForm span[id$="Err"]').text('');
+                    clearErrors();
 
-                    $button
-                        .prop('disabled', true);
+                    const button = $('#submitBtn');
 
-                    $('#saveVendorBtnText')
-                        .text('Saving...');
-
+                    button.prop('disabled', true);
 
                     $.ajax({
-                        url: $form.attr('action'),
+                        url: form.attr('action'),
                         type: 'POST',
-                        data: $form.serialize(),
+                        data: form.serialize(),
 
                         headers: {
-                            Accept: 'application/json'
+                            'Accept': 'application/json'
                         },
 
                         success: function(response) {
 
                             showToast(
                                 'success',
-                                response.message || 'Vendor created successfully.'
+                                response.message
                             );
 
-                            closeVendorModal();
-
-                            // Refresh quotation page so the new vendor
-                            // appears in the dropdown.
                             setTimeout(function() {
-                                window.location.reload();
-                            }, 500);
+                                window.location.href = response.redirect;
+                            }, 800);
                         },
 
                         error: function(xhr) {
 
+                            button.prop('disabled', false);
+
                             if (xhr.status === 422) {
 
-                                const errors =
-                                    xhr.responseJSON?.errors || {};
-
-                                $.each(errors, function(field, messages) {
-
-                                    const errorMap = {
-                                        name: '#vendorNameErr',
-                                        company_name: '#vendorCompanyNameErr',
-                                        contact_person: '#vendorContactPersonErr',
-                                        email: '#vendorEmailErr',
-                                        phone: '#vendorPhoneErr',
-                                        ntn: '#vendorNtnErr',
-                                        is_active: '#vendorIsActiveErr',
-                                        address: '#vendorAddressErr'
-                                    };
-
-                                    if (errorMap[field]) {
-                                        $(errorMap[field])
-                                            .text(messages[0]);
-                                    }
-
-                                    return true;
-                                });
+                                showValidationErrors(
+                                    xhr.responseJSON?.errors || {}
+                                );
 
                                 return;
                             }
@@ -330,102 +450,71 @@
                             showToast(
                                 'error',
                                 xhr.responseJSON?.message ||
-                                'Unable to create vendor.'
+                                'Something went wrong.'
                             );
-                        },
-
-                        complete: function() {
-
-                            $button
-                                .prop('disabled', false);
-
-                            $('#saveVendorBtnText')
-                                .text(originalText);
                         }
                     });
-
                 });
 
-            });
-        </script>
+
+                /*
+                |--------------------------------------------------------------------------
+                | Clear Validation Errors
+                |--------------------------------------------------------------------------
+                */
+
+                function clearErrors() {
+
+                    $('#statusErr').text('');
+                    $('#notesErr').text('');
+                    $('#deliveryAddressErr').text('');
+                    $('#vendorIdErr').text('');
+                }
 
 
+                /*
+                |--------------------------------------------------------------------------
+                | Show Validation Errors
+                |--------------------------------------------------------------------------
+                */
 
-        <script>
-            $('#purchaseRequestForm').on('submit', function(e) {
-                e.preventDefault();
+                function showValidationErrors(errors) {
 
-                clearErrors();
+                    $('#statusErr').text(
+                        errors.status?.[0] || ''
+                    );
 
-                const form = $(this);
-                const button = form.find('#submitBtn');
+                    $('#notesErr').text(
+                        errors.notes?.[0] || ''
+                    );
 
-                button.prop('disabled', true);
+                    $('#deliveryAddressErr').text(
+                        errors.delivery_address?.[0] || ''
+                    );
 
-                $.ajax({
-                    url: form.attr('action'),
-                    type: 'POST',
-                    data: form.serialize(),
-                    headers: {
-                        'Accept': 'application/json'
-                    },
+                    $('#vendorIdErr').text(
+                        errors.vendor_id?.[0] || ''
+                    );
 
-                    success: function(response) {
-                        showToast('success', response.message);
+                    let itemErrorShown = false;
 
-                        setTimeout(function() {
-                            window.location.href = response.redirect;
-                        }, 800);
-                    },
+                    $.each(errors, function(key, messages) {
 
-                    error: function(xhr) {
-                        button.prop('disabled', false);
-
-                        if (xhr.status === 422) {
-                            showValidationErrors(
-                                xhr.responseJSON?.errors || {}
+                        if (
+                            !itemErrorShown &&
+                            (key === 'items' || key.startsWith('items.'))
+                        ) {
+                            showToast(
+                                'error',
+                                messages[0]
                             );
-                            return;
+
+                            itemErrorShown = true;
                         }
+                    });
+                }
 
-                        showToast(
-                            'error',
-                            xhr.responseJSON?.message ||
-                            'Something went wrong.'
-                        );
-                    }
-                });
             });
-
-
-            function clearErrors() {
-                $('#statusErr').text('');
-                $('#notesErr').text('');
-                $('#deliveryAddressErr').text('');
-                $("#vendorIdErr").text('');
-            }
-
-
-            function showValidationErrors(errors) {
-                $('#statusErr').text(errors.status?.[0] || '');
-                $('#notesErr').text(errors.notes?.[0] || '');
-                $('#deliveryAddressErr').text(
-                    errors.delivery_address?.[0] || ''
-                );
-                $('#vendorIdErr').text(errors.vendor_id?.[0]||'');
-
-                let itemErrorShown = false;
-
-                $.each(errors, function(key, messages) {
-                    if (
-                        !itemErrorShown &&
-                        (key === 'items' || key.startsWith('items.'))
-                    ) {
-                        showToast('error', messages[0]);
-                        itemErrorShown = true;
-                    }
-                });
-            }
         </script>
     @endpush
 

@@ -34,10 +34,7 @@ class PurchaseRequestController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view(
-            'purchase_requests.index',
-            compact('purchaseRequests')
-        );
+        return view('purchase_requests.index', compact('purchaseRequests'));
     }
 
     public function confirm(PurchaseRequest $purchaseRequest)
@@ -285,7 +282,6 @@ class PurchaseRequestController extends Controller
             } else {
 
                 $purchaseRequest = PurchaseRequest::create([
-                    'request_number' => $this->generateRequestNumber(),
                     'status' => 'draft',
                     'stage' => 'request',
                     'vendor_id' => $validated['vendor_id'] ?? null,
@@ -484,7 +480,7 @@ class PurchaseRequestController extends Controller
 
         $duplicate = DB::transaction(function () use ($pr) {
             $purchaseRequest = PurchaseRequest::create([
-                'request_number' => $this->generateRequestNumber(),
+               
                 'status' => 'draft',
                 'stage' => 'request',
                 'vendor_id' => $pr->vendor_id,
@@ -539,7 +535,6 @@ class PurchaseRequestController extends Controller
 
             if (!$purchaseRequest) {
                 $purchaseRequest = PurchaseRequest::create([
-                    'request_number' => $this->generateRequestNumber(),
                     'status' => 'sent',
                     'notes' => $validated['notes'] ?? null,
                     'delivery_address' => $validated['delivery_address'] ?? null,
@@ -770,23 +765,6 @@ class PurchaseRequestController extends Controller
         ]);
     }
 
-
-    /**
-     * Generate unique purchase request number.
-     */
-    private function generateRequestNumber(): string
-    {
-        do {
-            $requestNumber =
-                'PR-' . strtoupper(Str::random(7));
-        } while (
-            PurchaseRequest::where(
-                'request_number',
-                $requestNumber
-            )->exists()
-        );
-        return $requestNumber;
-    }
 
     private function getComparablePurchaseRequests(
         PurchaseRequest $purchaseRequest

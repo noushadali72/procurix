@@ -35,7 +35,7 @@ class UpdateVendorBillRequest extends FormRequest
             'tax'=>['nullable','numeric','gt:0'],
             'status'=>[
                 'nullable',
-                'in:paid,partially_paid,unpaid,pending'
+                'in:paid,partially_paid,unpaid,pending,overdue'
             ],
             'notes'=>['nullable','string','max:255']
         ];
@@ -58,7 +58,7 @@ class UpdateVendorBillRequest extends FormRequest
             'tax.numeric'=>'Tax must be valid number.',
             'tax.gt'=>'Tax must be greater than 0.',
 
-            'status.in'=>'Status must be either: Paid, Unpaid, Partially Paid, or pending.',
+            'status.in'=>'Status must be either: Paid, Unpaid, Partially Paid, Overdue, or pending.',
             'notes.string'=>'Notes must be valid text.',
             'notes.max'=>'Notes must be less than 255 chars.'
         ];

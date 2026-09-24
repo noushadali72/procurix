@@ -8,6 +8,7 @@ use App\Models\RawMaterial;
 use App\Models\Unit;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class RawMaterialController extends Controller
@@ -15,11 +16,31 @@ class RawMaterialController extends Controller
     /**
      * Display a listing of raw materials.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $rawMaterials = RawMaterial::with(['unit','category'])->paginate(10);
+        $categories = Category::all();
 
-        return view('raw_materials.index', compact('rawMaterials'));
+        $min_price = $request->input('min_price');
+        $max_price = $request->input('max_price');
+
+        $rawMaterials = RawMaterial::query()->when($request->filled('searchQuery'), function($query) use($request) {
+
+            $searchQuery = $request->input('searchQuery');
+
+            $query->whereLike('name',"%{$searchQuery}%")->orWhereLike('description',"%{$searchQuery}%");
+
+        })
+        ->when($request->filled('category_id'),function($query) use($request){
+            $category_id = $request->input('category_id');
+            $query->where('category_id',$category_id);
+        })
+        
+        
+        
+        
+        ->with(['unit','category'])->paginate(10);
+
+        return view('raw_materials.index', compact('rawMaterials','categories'));
     }
 
 

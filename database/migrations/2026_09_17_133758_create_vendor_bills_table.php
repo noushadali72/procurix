@@ -22,7 +22,7 @@ return new class extends Migration
             $table->decimal('subtotal',20,2)->default(0);
             $table->decimal('tax',10,2)->default(0);
             $table->decimal('total',20,2)->default(0);
-            $table->enum('status',['paid','partially_paid','unpaid','pending',])->default('unpaid');
+            $table->enum('status',['paid','partially_paid','unpaid','pending','overdue'])->default('unpaid');
             $table->text('notes')->nullable();
             $table->timestamps();
         });

@@ -57,7 +57,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('purchase-requests/{purchaseRequest}/update-status', [PurchaseRequestController::class, 'updateStatus'])->name('purchase-requests.updateStatus');
     Route::post('purchase-requests/{purchaseRequest}/confirm', [PurchaseRequestController::class, 'confirm'])->name('purchase-requests.confirm');
     Route::get('purchase-requests/{purchaseRequest}/confirmation', [PurchaseRequestController::class, 'confirmation'])->name('purchase-requests.confirmation');
-    Route::post('purchase-requests/save-draft', [PurchaseRequestController::class, 'saveDraft'])->name('purchase-requests.saveDraft');
+    Route::post('purchase-requests/save-draft', [PurchaseRequestController::class, 'saveDraft'])->name('purchase-requests.save-draft');
     Route::post('purchase-requests/{pr}/duplicate', [PurchaseRequestController::class, 'duplicate'])->name('purchase-requests.duplicate');
     // Route::get('purchase-requests/{purchaseRequest}/compare',[PurchaseRequestController::class, 'compare'])->name('purchase-requests.compare');
     Route::get('purchase-requests/{purchaseRequest}/compare', [PurchaseRequestController::class, 'compare'])->name('purchase-requests.compare');

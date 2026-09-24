@@ -9,5 +9,6 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('stock:watch')->hourly();
-Schedule::command('quotation:watch')->hourly();
-Schedule::command('purchaserequest:watch')->hourly();
+Schedule::command('quotation:watch')->dailyAt('00:05');
+Schedule::command('purchaserequest:watch')->dailyAt('00:05');
+Schedule::command('vendorBills:watch')->dailyAt('00:05');
