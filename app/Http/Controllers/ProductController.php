@@ -19,9 +19,12 @@ class ProductController extends Controller
         $min_price = $request->input('min_price');
         $max_price = $request->input('max_price');
 
-        $products = Product::query()->when($request->filled('searchQuery'),  function ($q) use ($request) {
+        $products = Product::query()->when($request->filled('searchQuery'),  function ($query) use ($request) {
             $searchQuery = $request->input('searchQuery');
-            $q->where('name', "LIKE", "%{$searchQuery}%")->orWhere('description', "LIKE", "%{$searchQuery}%");
+            $query->where(function($q) use($searchQuery){
+                $q->where('name', "LIKE", "%{$searchQuery}%")->orWhere('description', "LIKE", "%{$searchQuery}%");
+            });
+           
         })
             ->when($request->filled('category_id'), function ($q) use ($request) {
                 $category_id = $request->input('category_id');
@@ -37,7 +40,11 @@ class ProductController extends Controller
                 $q->where('sale_price',">",$min_price);
             })
             
-            ->with(['unit', 'category'])->latest()->paginate(10);
+            ->with(['unit', 'category'])
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->withQueryString();
+            
         if (!$request->ajax()) {
             return view('products.index', compact('products','categories'));
         }

@@ -152,19 +152,14 @@
         {{-- Filter Actions --}}
         <div class="mt-3 flex items-center justify-end gap-2">
 
-            @if (request()->filled('search') ||
+            @if (request()->filled('searchQuery') ||
                     request()->filled('category_id') ||
                     request()->filled('min_price') ||
                     request()->filled('max_price'))
                 <a href="{{ route('products.index') }}"
-                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300
-                    bg-white px-4 py-2 text-sm font-medium text-gray-600 transition
-                    hover:border-gray-400 hover:bg-gray-50">
-
-                    <i class="bx bx-x text-lg"></i>
-
-                    Clear
-
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3.5 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white">
+                    <i class="bx bx-reset"></i>
+                    Reset
                 </a>
             @endif
 

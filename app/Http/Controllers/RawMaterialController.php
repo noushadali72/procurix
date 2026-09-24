@@ -20,27 +20,33 @@ class RawMaterialController extends Controller
     {
         $categories = Category::all();
 
-        $min_price = $request->input('min_price');
-        $max_price = $request->input('max_price');
+        $rawMaterials = RawMaterial::query()
+            ->when($request->filled('searchQuery'), function ($query) use ($request) {
+                $search = $request->input('searchQuery');
 
-        $rawMaterials = RawMaterial::query()->when($request->filled('searchQuery'), function($query) use($request) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereLike('name', "%{$search}%")
+                        ->orWhereLike('description', "%{$search}%");
+                });
+            })
+            ->when($request->filled('category_id'), function ($query) use ($request) {
+                $query->where('category_id', $request->category_id);
+            })
+            ->when($request->filled('min_price'), function ($query) use ($request) {
+                $query->where('cost_price', '>=', $request->min_price);
+            })
+            ->when($request->filled('max_price'), function ($query) use ($request) {
+                $query->where('cost_price', '<=', $request->max_price);
+            })
+            ->with(['unit', 'category'])
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->withQueryString();
 
-            $searchQuery = $request->input('searchQuery');
-
-            $query->whereLike('name',"%{$searchQuery}%")->orWhereLike('description',"%{$searchQuery}%");
-
-        })
-        ->when($request->filled('category_id'),function($query) use($request){
-            $category_id = $request->input('category_id');
-            $query->where('category_id',$category_id);
-        })
-        
-        
-        
-        
-        ->with(['unit','category'])->paginate(10);
-
-        return view('raw_materials.index', compact('rawMaterials','categories'));
+        return view('raw_materials.index', compact(
+            'rawMaterials',
+            'categories'
+        ));
     }
 
 
@@ -52,7 +58,7 @@ class RawMaterialController extends Controller
         $units = Unit::orderBy('name')->get();
         $categories = Category::orderBy('name')->get();
 
-        return view('raw_materials.create', compact('units','categories'));
+        return view('raw_materials.create', compact('units', 'categories'));
     }
 
 
@@ -78,11 +84,11 @@ class RawMaterialController extends Controller
     {
         $units = Unit::orderBy('name')->get();
         $categories = Category::orderBy('name')->get();
-        $rawMaterial->load(['category','unit']);
+        $rawMaterial->load(['category', 'unit']);
 
         return view(
             'raw_materials.edit',
-            compact('rawMaterial', 'units','categories')
+            compact('rawMaterial', 'units', 'categories')
         );
     }
 
@@ -116,13 +122,11 @@ class RawMaterialController extends Controller
             return response()->json([
                 'message' => 'Raw material deleted successfully.',
             ]);
-
         } catch (\Throwable $e) {
 
             return response()->json([
                 'message' => 'Raw material cannot be deleted because it may be used in other records.',
             ], 409);
-
         }
     }
 }
