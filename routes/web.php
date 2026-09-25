@@ -10,6 +10,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PaymentTermController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\PurchaseRequestActivityController;
 use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\PurchaseReturnController;
 use App\Http\Controllers\QuotationController;
@@ -147,6 +148,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         'vendor-credits/{vendorCredit}/refund',
         [VendorCreditController::class, 'refund']
     )->name('vendor-credits.refund');
+
+
+    // Activiteis
+    Route::get('purchase-request-activities/{purchaseRequest}',[PurchaseRequestActivityController::class,'index'])->name('purchase-requests.activities.index');
     // Logout
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });

@@ -9,13 +9,17 @@ use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
 use App\Models\RawMaterial;
 use App\Models\Unit;
+use App\Services\PurchaseRequestActivityService as ServicesPurchaseRequestActivityService;
 use App\Services\UnitConversionService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use PurchaseRequestActivityService;
 
 class GoodsReceiptController extends Controller
 {
+    public function __construct(private ServicesPurchaseRequestActivityService $activity) {}
     public function index()
     {
         $goodsReceipts = GoodsReceipt::with([
@@ -47,6 +51,10 @@ class GoodsReceiptController extends Controller
             'items.rawMaterial.unit.unitCategory',
             'items.unit.unitCategory',
             'items.goodsReceiptItems.unit',
+            'purchaseRequest.activities',
+            'purchaseRequest.activities.user',
+            'purchaseRequest.activities.vendor',
+
         ]);
 
         $units = Unit::with('unitCategory')
@@ -79,7 +87,8 @@ class GoodsReceiptController extends Controller
             $validated,
             $purchaseOrder,
             $request,
-            $conversion
+            $conversion,
+
         ) {
             $goodsReceipt = GoodsReceipt::create([
                 'purchase_order_id' => $purchaseOrder->id,
@@ -173,6 +182,16 @@ class GoodsReceiptController extends Controller
              * Update purchase order status.
              */
             $this->updatePurchaseOrderStatus($purchaseOrder, $conversion);
+
+            // Activity Logging
+            $this->activity->log(
+                $purchaseOrder->purchaseRequest,
+                Auth::user(),
+                $purchaseOrder->vendor,
+                "Goods Receipt Created.",
+                "GRN:{$goodsReceipt->grn_number} Created materials received PO number: {$purchaseOrder->order_number}",
+                $goodsReceipt
+            );
             return $goodsReceipt;
         });
 
@@ -193,6 +212,9 @@ class GoodsReceiptController extends Controller
             'items.purchaseOrderItem.unit',
             'items.unit',
             'attachments',
+            'purchaseOrder.purchaseRequest.activities',
+            'purchaseOrder.purchaseRequest.activities.vendor',
+            'purchaseOrder.purchaseRequest.activities.user',
         ]);
 
         return view(
@@ -206,12 +228,19 @@ class GoodsReceiptController extends Controller
         try {
             $attachments = $goodsReceipt->attachments;
 
-            $goodsReceipt->delete();
+            // Activity Logging
+            $this->activity->log(
+                $goodsReceipt->purchaseOrder->purchaseRequest,
+                Auth::user(),
+                $goodsReceipt->purchaseOrder->vendor,
+                "Goods receipt deleted.",
+                "GRN {$goodsReceipt->grn_number} deleted.",
+            );
 
+            $goodsReceipt->delete();
             foreach ($attachments as $attachment) {
                 Storage::disk('public')->delete($attachment->file_path);
             }
-
             return response()->json([
                 'message' => 'Goods receipt deleted successfully.',
                 'redirect' => route('goods-receipts.index')
@@ -255,6 +284,7 @@ class GoodsReceiptController extends Controller
     ): void {
         $purchaseOrder->load([
             'items.unit',
+
             'items.goodsReceiptItems.unit',
             'purchaseRequest'
         ]);
@@ -295,11 +325,19 @@ class GoodsReceiptController extends Controller
             if ($purchaseOrder->purchaseRequest) {
                 $purchaseOrder->purchaseRequest->update([
                     'status' => 'completed',
-                    'stage'=>'completed'
+                    'stage' => 'completed'
                 ]);
             }
 
 
+            // Activity Logging
+            $this->activity->log(
+                $purchaseOrder->purchaseRequest,
+                Auth::user(),
+                $purchaseOrder->vendor,
+                "All Materials received.",
+                "All materials received."
+            );
             return;
         }
 
@@ -309,12 +347,22 @@ class GoodsReceiptController extends Controller
                 'received_date' => null,
             ]);
 
-             if ($purchaseOrder->purchaseRequest) {
-                    $purchaseOrder->purchaseRequest->update([
-                        'stage' => 'receiving',
-                        'status'=>'partially_closed'
-                    ]);
-                }
+            if ($purchaseOrder->purchaseRequest) {
+                $purchaseOrder->purchaseRequest->update([
+                    'stage' => 'receiving',
+                    'status' => 'partially_closed'
+                ]);
+            }
+
+
+            // Activity Logging
+            $this->activity->log(
+                $purchaseOrder->purchaseRequest,
+                Auth::user(),
+                $purchaseOrder->vendor,
+                "Partial Materials received.",
+                "Partial materials received."
+            );
 
 
             return;

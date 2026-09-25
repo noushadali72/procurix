@@ -13,14 +13,18 @@ use App\Models\RawMaterial;
 use Illuminate\Http\Request;
 use App\Models\Unit;
 use App\Models\Vendor;
+use App\Services\PurchaseRequestActivityService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+
 class PurchaseRequestController extends Controller
 {
+
+    public function __construct(private PurchaseRequestActivityService $activity) {}
     /**
      * Display purchase requests.
      */
@@ -111,12 +115,16 @@ class PurchaseRequestController extends Controller
                 'status' => 'active',
             ]);
 
-            $purchaseRequest->activities()->create([
-                'action' => 'Purchase Order Created.',
-                'description' => "Purchase Order {$order->order_number} created.",
-                'user_id' => Auth::id(),
-                'vendor_id' => $purchaseRequest->vendor_id,
-            ]);
+            // Activity Logging
+            $this->activity->log(
+                $purchaseRequest,
+                Auth::user(),
+                $purchaseRequest->vendor,
+                "Purchase Order Created.",
+                "Purchase Order {$order->order_number} created.",
+                $order
+            );
+
 
             return $order;
         });
@@ -130,7 +138,7 @@ class PurchaseRequestController extends Controller
 
     public function confirmation(PurchaseRequest $purchaseRequest)
     {
-        $purchaseRequest->load(['items.rawMaterial', 'items.unit', 'vendor']);
+        $purchaseRequest->load(['items.rawMaterial', 'items.unit', 'vendor','activities']);
 
         return view('purchase_requests.confirmation', compact('purchaseRequest'));
     }
@@ -183,12 +191,15 @@ class PurchaseRequestController extends Controller
 
         SendRfqMail::dispatch($purchaseRequest);
 
-        $purchaseRequest->activities()->create([
-            'action' => 'RFQ Resent.',
-            'description' => 'RFQ resent to ' . $purchaseRequest->vendor->name . '.',
-            'user_id' => Auth::id(),
-            'vendor_id' => $purchaseRequest->vendor_id,
-        ]);
+
+        // Activity Logging
+        $this->activity->log(
+            $purchaseRequest,
+            Auth::user(),
+            $purchaseRequest->vendor,
+            "Rfq sent again.",
+            'RFQ resent to ' . $purchaseRequest->vendor->name . '.',
+        );
 
         return response()->json([
             'success' => true,
@@ -223,12 +234,16 @@ class PurchaseRequestController extends Controller
                 'status' => 'active'
             ]);
 
-            $purchaseRequest->activities()->create([
-                'action' => 'Status updated.',
-                'description' => "Purchase Request status updated to active by " . Auth::user()->name . '',
-                'user_id' => Auth::user()->id,
-                'vendor_id' => $purchaseRequest->vendor_id
-            ]);
+            // Activity Logging
+            $this->activity->log(
+                $purchaseRequest,
+                Auth::user(),
+                $purchaseRequest->vendor,
+                "PR status updated.",
+                "Purchase Request status updated to active by " . Auth::user()->name . '',
+            );
+
+
 
             return response()->json([
                 'success' => true,
@@ -314,12 +329,16 @@ class PurchaseRequestController extends Controller
                 ]);
             }
 
-            $purchaseRequest->activities()->create([
-                'action' => $action,
-                'description' => $description,
-                'user_id' => Auth::id(),
-                'vendor_id' => $purchaseRequest->vendor_id,
-            ]);
+            // Activity Logging
+            $this->activity->log(
+                $purchaseRequest,
+                Auth::user(),
+                $purchaseRequest->vendor,
+                $action,
+                $description,
+                $purchaseRequest
+            );
+
 
             return $purchaseRequest;
         });
@@ -434,13 +453,16 @@ class PurchaseRequestController extends Controller
                 'status' => 'active',
                 'stage' => 'purchase_order',
             ]);
+            // Activity Logging
+            $this->activity->log(
+                $selectedRequest,
+                Auth::user(),
+                $selectedRequest->vendor,
+                "Purchase order created.",
+                "Purchase Order {$order->order_number} created after vendor request comparison.",
+                $order
+            );
 
-            $selectedRequest->activities()->create([
-                'action' => 'Purchase Order Created.',
-                'description' => "Purchase Order {$order->order_number} created after vendor request comparison.",
-                'user_id' => Auth::id(),
-                'vendor_id' => $selectedRequest->vendor_id,
-            ]);
 
             foreach ($purchaseRequests as $requestItem) {
                 if ($requestItem->id === $selectedRequest->id) {
@@ -456,12 +478,15 @@ class PurchaseRequestController extends Controller
                     'stage' => 'cancelled'
                 ]);
 
-                $requestItem->activities()->create([
-                    'action' => 'Purchase Request Cancelled.',
-                    'description' => "Purchase Request cancelled because another vendor request was selected.",
-                    'user_id' => Auth::id(),
-                    'vendor_id' => $requestItem->vendor_id,
-                ]);
+                // Activity Logging
+                $this->activity->log(
+                    $selectedRequest,
+                    Auth::user(),
+                    $selectedRequest->vendor,
+                   'Purchase Request Cancelled.',
+                   "Purchase Request cancelled because another vendor request was selected.",
+                   
+                );
             }
 
             return $order;
@@ -480,7 +505,6 @@ class PurchaseRequestController extends Controller
 
         $duplicate = DB::transaction(function () use ($pr) {
             $purchaseRequest = PurchaseRequest::create([
-               
                 'status' => 'draft',
                 'stage' => 'request',
                 'vendor_id' => $pr->vendor_id,
@@ -499,12 +523,16 @@ class PurchaseRequestController extends Controller
                 ]);
             }
 
-            $purchaseRequest->activities()->create([
-                'action' => 'Purchase Request Duplicated.',
-                'description' => "Purchase Request duplicated from {$pr->request_number} by " . Auth::user()->name . '.',
-                'user_id' => Auth::id(),
-                'vendor_id' => $purchaseRequest->vendor_id,
-            ]);
+            // Activity Logging
+            $this->activity->log(
+                $purchaseRequest,
+                Auth::user(),
+                $purchaseRequest->vendor_id,
+                "Purchase Request Duplicated.",
+                "Purchase Request duplicated from {$pr->request_number} by " . Auth::user()->name . '.',
+                $purchaseRequest
+            );
+
 
             return $purchaseRequest;
         });
@@ -568,24 +596,31 @@ class PurchaseRequestController extends Controller
                 'stage' => 'confirmation',
             ]);
 
-            $purchaseRequest->activities()->create([
-                'action' => 'Purchase Request Submitted.',
-                'description' => 'Purchase Request submitted by ' . Auth::user()->name . '.',
-                'user_id' => Auth::id(),
-                'vendor_id' => $purchaseRequest->vendor_id,
-            ]);
+            // Activity Logging
+            $this->activity->log(
+                $purchaseRequest,
+                Auth::user(),
+                $purchaseRequest->vendor,
+                "Purchase Request Created.",
+                "Purchased request created successfully.",
+                $purchaseRequest
+            );
+
 
             return $purchaseRequest;
         });
 
         SendRfqMail::dispatch($purchaseRequest);
 
-        $purchaseRequest->activities()->create([
-            'action' => 'RFQ Mail Sent.',
-            'description' => 'Purchase request RFQ mail sent to ' . $purchaseRequest->vendor->name . '.',
-            'user_id' => Auth::id(),
-            'vendor_id' => $purchaseRequest->vendor_id,
-        ]);
+        // Activity Logging
+        $this->activity->log(
+            $purchaseRequest,
+            Auth::user(),
+            $purchaseRequest->vendor,
+            "Purchase Request sent.",
+            "Purchase request mail sent to vendor: " . $purchaseRequest->vendor->name,
+            $purchaseRequest
+        );
 
         return response()->json([
             'success' => true,
@@ -609,6 +644,7 @@ class PurchaseRequestController extends Controller
             'items.unit',
             'vendor',
             'quotations.items',
+            'activities'
         ]);
 
         return match ($purchaseRequest->stage) {
@@ -699,12 +735,16 @@ class PurchaseRequestController extends Controller
                     ]);
                 }
 
-                $purchaseRequest->activities()->create([
-                    'action' => 'Purchase Request updated.',
-                    'description' => "Purchase Request updated by " . Auth::user()->name . '',
-                    'user_id' => Auth::user()->id,
-                    'vendor_id' => $purchaseRequest->vendor_id
-                ]);
+
+                // Activity Logging
+                $this->activity->log(
+                    $purchaseRequest,
+                    Auth::user(),
+                    $purchaseRequest->vendor,
+                    "Purchase Request updated.",
+                    "Purchase request updated.",
+                    $purchaseRequest
+                );
             }
         );
 

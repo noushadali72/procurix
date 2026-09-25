@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestActivity;
 use Illuminate\Http\Request;
 
@@ -10,9 +11,24 @@ class PurchaseRequestActivityController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(PurchaseRequest $pr)
     {
-        //
+        $activities = PurchaseRequestActivity::where(
+            'purchase_request_id',
+            $pr->id
+        )
+            ->with([
+                'user:id,name',
+                'vendor:id,name,company_name',
+            ])
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Activities fetched successfully.',
+            'activities' => $activities
+        ], 200);
     }
 
     /**

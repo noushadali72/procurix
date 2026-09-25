@@ -3,10 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\PurchaseOrder;
+use App\Services\PurchaseRequestActivityService as ServicesPurchaseRequestActivityService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PurchaseRequestActivityService;
 
 class PurchaseOrderController extends Controller
 {
+    public function __construct(private ServicesPurchaseRequestActivityService $activity)
+    {
+        
+    }
     /**
      * Display purchase orders.
      */
@@ -30,6 +37,9 @@ class PurchaseOrderController extends Controller
         $purchaseOrder->load([
             'vendor',
             'purchaseRequest',
+            'purchaseRequest.activities',
+            'purchaseRequest.activities.user',
+            'purchaseRequest.activities.vendor',
             'items.rawMaterial',
             'items.unit',
             'goodsReceipts.items',
@@ -50,16 +60,26 @@ class PurchaseOrderController extends Controller
                 if ($purchaseOrder->purchaseRequest) {
                     $purchaseOrder->purchaseRequest()->update([
                         'status' => 'sent',
-                        'stage'=>'confirmation'
-                        ]);
+                        'stage' => 'confirmation'
+                    ]);
                 }
+              
+                // Activity Logging
+                $this->activity->log(
+                    $purchaseOrder->purchaseRequest,
+                    Auth::user(),
+                    $purchaseOrder->vendor_id,
+                    "Purchase Order Deleted.",
+                    "Purchase Order was deleted from purchase request number: {$purchaseOrder->purchaseRequest->request_number}.",
+                );
 
                 // Delete the purchase order
                 $purchaseOrder->delete();
+
             });
 
             return response()->json([
-                'success'=>true,
+                'success' => true,
                 'message' => 'Purchase order deleted successfully.'
             ], 200);
         } catch (\Exception $e) {
