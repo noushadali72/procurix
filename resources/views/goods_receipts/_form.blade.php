@@ -24,9 +24,11 @@
                     Order Number
                 </p>
 
-                <p class="mt-1 text-sm font-semibold text-slate-900">
+                <a href="{{ route('purchase-orders.show',$purchaseOrder) }}" class="mt-1 text-sm font-semibold text-slate-900">
                     {{ $purchaseOrder->order_number }}
-                </p>
+                      <i class="bx bx-link text-xs text-slate-400"></i>
+
+                </a>
             </div>
 
 

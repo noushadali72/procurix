@@ -21,7 +21,7 @@
         <a href="{{ route('purchase-orders.show', $purchaseOrder) }}" class="transition hover:text-gray-900">
 
             {{ $purchaseOrder->order_number }}
-
+            
         </a>
 
         <i class="bx bx-chevron-right text-sm text-gray-400"></i>
@@ -85,6 +85,7 @@
 
             Purchase Order
 
+            
         </a>
 
     </div>

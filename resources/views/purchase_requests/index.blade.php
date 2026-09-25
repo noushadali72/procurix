@@ -249,6 +249,8 @@
                                     </button>
                                     @endif
 
+                                    @if (in_array($purchaseRequest->status, ['draft', 'sent', 'pending']))
+                            
                                     {{-- Edit --}}
                                     <a href="{{ route('purchase-requests.edit', $purchaseRequest) }}"
                                         class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white">
@@ -256,6 +258,8 @@
                                         Edit
                                     </a>
 
+                                                
+                                    @endif
 
                                     {{-- Delete --}}
                                     <button type="button"

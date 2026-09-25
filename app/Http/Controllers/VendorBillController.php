@@ -62,27 +62,6 @@ class VendorBillController extends Controller
     }
 
 
-    /**
-     * Display vendor bill.
-     */
-    // public function show(VendorBill $vendorBill)
-    // {
-    //     $vendorBill->load([
-    //         'vendor',
-    //         'items',
-    //         'items.rawMaterial',
-    //         'items.unit',
-    //         'purchaseOrder',
-    //         'vendorPayments',
-    //         'creditApplications',
-    //     ]);
-
-    //     return view(
-    //         'vendor_bills.show',
-    //         compact('vendorBill')
-    //     );
-    // }
-
     public function show(VendorBill $vendorBill)
     {
         $vendorBill->load([
@@ -128,10 +107,8 @@ class VendorBillController extends Controller
      * Therefore returns made BEFORE bill generation
      * automatically reduce the vendor bill.
      */
-    private function createVendorBill(
-        PurchaseOrder $purchaseOrder,
-        UnitConversionService $conversion
-    ) {
+    private function createVendorBill(PurchaseOrder $purchaseOrder, UnitConversionService $conversion)
+    {
         if ($purchaseOrder->status !== 'received') {
             return response()->json([
                 'message' =>
@@ -146,49 +123,36 @@ class VendorBillController extends Controller
             ], 422);
         }
 
-        /*
-         * Load everything required to calculate:
-         *
-         * received quantity
-         * returned quantity
-         * billable quantity
-         */
+
+
         $purchaseOrder->load([
             'items.unit',
-
             'items.goodsReceiptItems.unit',
-
             'items.goodsReceiptItems.purchaseReturnItems.unit',
-
             'items.goodsReceiptItems.purchaseReturnItems.purchaseReturn',
         ]);
 
         try {
 
-            $vendorBill = DB::transaction(function () use (
-                $purchaseOrder,
-                $conversion
-            ) {
-
+            $vendorBill = DB::transaction(function () use ($purchaseOrder, $conversion) {
                 /*
                  * Recheck inside transaction so two requests cannot
                  * intentionally generate the same bill through normal flow.
                  */
-                if (VendorBill::where('purchase_order_id',$purchaseOrder->id)->exists()
-                ) {
+                if (VendorBill::where('purchase_order_id', $purchaseOrder->id)->exists()) {
                     throw new \RuntimeException(
                         'Vendor bill already exists for this purchase order.'
                     );
                 }
 
                 $term = $purchaseOrder->vendor->paymentTerm;
-                $due_days = $term->due_days;
-                
+                $due_days = $term?->due_days;
+
                 $vendorBill = VendorBill::create([
                     'purchase_order_id' => $purchaseOrder->id,
                     'vendor_id' => $purchaseOrder->vendor_id,
                     'bill_date' => now()->toDateString(),
-                    'due_date' => now()->addDays($due_days??3)->toDateString(),
+                    'due_date' => now()->addDays($due_days ?? 3)->toDateString(),
                     'subtotal' => 0,
                     'tax' => 0,
                     'total' => 0,
@@ -209,9 +173,7 @@ class VendorBillController extends Controller
                      * units, therefore convert everything into
                      * the Purchase Order item's unit.
                      */
-                    $receivedQty = $orderItem
-                        ->goodsReceiptItems
-                        ->sum(function ($receiptItem) use (
+                    $receivedQty = $orderItem->goodsReceiptItems->sum(function ($receiptItem) use (
                             $conversion,
                             $orderItem
                         ) {
@@ -231,9 +193,7 @@ class VendorBillController extends Controller
                      * A return belongs to a Goods Receipt Item.
                      * Only completed returns affect the bill.
                      */
-                    $returnedQty = $orderItem
-                        ->goodsReceiptItems
-                        ->sum(function ($receiptItem) use (
+                    $returnedQty = $orderItem->goodsReceiptItems->sum(function ($receiptItem) use (
                             $conversion,
                             $orderItem
                         ) {
@@ -297,9 +257,7 @@ class VendorBillController extends Controller
                         $billableQty * $unitCost,
                         2
                     );
-
                     $subtotal += $lineTotal;
-
 
                     /*
                      * -------------------------------------------
@@ -307,20 +265,11 @@ class VendorBillController extends Controller
                      * -------------------------------------------
                      */
                     $vendorBill->items()->create([
-                        'raw_material_id' =>
-                        $orderItem->raw_material_id,
-
-                        'qty' =>
-                        $billableQty,
-
-                        'unit_id' =>
-                        $orderItem->unit_id,
-
-                        'unit_cost' =>
-                        $unitCost,
-
-                        'line_total' =>
-                        $lineTotal,
+                        'raw_material_id' => $orderItem->raw_material_id,
+                        'qty' => $billableQty,
+                        'unit_id' => $orderItem->unit_id,
+                        'unit_cost' =>$unitCost,
+                        'line_total' =>$lineTotal,
                     ]);
                 }
 
@@ -344,8 +293,6 @@ class VendorBillController extends Controller
                         'There is no billable quantity remaining for this purchase order.'
                     );
                 }
-
-
                 $vendorBill->update([
                     'subtotal' => round($subtotal, 2),
                     'total' => round($subtotal, 2),
@@ -353,29 +300,26 @@ class VendorBillController extends Controller
 
                 return $vendorBill;
             });
-
-
             return response()->json([
-                'message' =>
-                'Vendor bill generated successfully.',
-
-                'redirect' => route(
-                    'vendor-bills.show',
-                    $vendorBill
-                ),
+                'success'=>true,
+                'message' => 'Vendor bill generated successfully.',
+                'redirect' => route('vendor-bills.show',$vendorBill),
             ]);
+
         } catch (\RuntimeException $e) {
 
             return response()->json([
+                'success'=>false,
                 'message' => $e->getMessage(),
             ], 422);
+
         } catch (\Throwable $e) {
 
             report($e);
-
             return response()->json([
-                'message' =>
-                'Unable to generate vendor bill.',
+                'success' => false,
+                'message' => 'Unable to generate vendor bill.',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

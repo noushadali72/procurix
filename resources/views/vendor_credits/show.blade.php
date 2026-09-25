@@ -119,9 +119,11 @@
                     <p class="text-xs text-slate-400">Purchase Return</p>
 
                     <a href="{{ route('purchase-returns.show', $vendorCredit->purchaseReturn) }}"
-                        class="mt-1 inline-block text-sm font-medium text-slate-800 underline">
+                        class="mt-1 inline-block text-sm font-medium text-slate-800 hover:underline">
 
                         {{ $vendorCredit->purchaseReturn->return_number }}
+                          <i class="bx bx-link text-xs text-slate-400"></i>
+
 
                     </a>
                 </div>
@@ -547,38 +549,28 @@
                     e.preventDefault();
 
                     $.ajax({
-
                         url: "{{ route('vendor-credits.apply', $vendorCredit) }}",
-
                         type: 'POST',
-
                         data: $(this).serialize(),
-
                         headers: {
                             Accept: 'application/json'
                         },
-
                         success: function(response) {
-
                             showToast(
                                 'success',
                                 response.message
                             );
-
                             setTimeout(function() {
                                 window.location.reload();
                             }, 500);
 
                         },
-
                         error: function(xhr) {
-
                             showToast(
                                 'error',
                                 xhr.responseJSON?.message ||
                                 'Unable to apply vendor credit.'
                             );
-
                         }
 
                     });
@@ -587,58 +579,44 @@
 
 
                 $('#refundCreditForm').on('submit', function(e) {
-
                     e.preventDefault();
-
                     const form = $(this);
                     const button = $('#submitRefund');
-
                     $('[data-refund-error]')
                         .addClass('hidden')
                         .text('');
-
                     button
                         .prop('disabled', true)
                         .html(`
-            <i class="bx bx-loader-alt bx-spin"></i>
-            Recording...
-        `);
+                                <i class="bx bx-loader-alt bx-spin"></i>
+                                Recording...
+                            `);
 
                     $.ajax({
-
                         url: "{{ route('vendor-credits.refund', $vendorCredit) }}",
-
                         type: 'POST',
-
                         data: form.serialize(),
-
                         headers: {
                             Accept: 'application/json'
                         },
-
                         success: function(response) {
-
                             showToast(
                                 'success',
                                 response.message
                             );
-
+                            form[0].reset();
                             setTimeout(function() {
                                 window.location.reload();
                             }, 500);
                         },
 
                         error: function(xhr) {
-
                             if (xhr.status === 422) {
-
                                 const errors =
                                     xhr.responseJSON?.errors || {};
-
                                 $.each(
                                     errors,
                                     function(field, messages) {
-
                                         $('[data-refund-error="' + field + '"]')
                                             .removeClass('hidden')
                                             .text(messages[0]);
@@ -655,9 +633,9 @@
                             button
                                 .prop('disabled', false)
                                 .html(`
-                    <i class="bx bx-revision"></i>
-                    Record Refund
-                `);
+                                    <i class="bx bx-revision"></i>
+                                    Record Refund
+                                `);
                         }
                     });
                 });

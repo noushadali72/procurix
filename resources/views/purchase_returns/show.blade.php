@@ -75,9 +75,11 @@
                         GRN
                     </p>
 
-                    <p class="mt-1 text-sm font-semibold text-slate-900">
+                    <a href="{{ route('goods-receipts.show',$purchaseReturn->goodsReceipt) }}" class="mt-1 text-sm font-semibold text-slate-900 hover:underline">
                         {{ $purchaseReturn->goodsReceipt->grn_number }}
-                    </p>
+                          <i class="bx bx-link text-xs text-slate-400"></i>
+
+                    </a>
 
                 </div>
 

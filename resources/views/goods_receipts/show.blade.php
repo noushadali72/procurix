@@ -111,7 +111,7 @@
             </a>
 
 
-            <button type="button" id="delete-grn"
+            {{-- <button type="button" id="delete-grn"
                 class="inline-flex cursor-pointer items-center
                        justify-center gap-2 rounded-lg border
                        border-red-200 bg-red-50 px-3.5 py-2
@@ -122,7 +122,7 @@
 
                 Delete
 
-            </button>
+            </button> --}}
 
         </div>
 
@@ -213,7 +213,8 @@
 
                             {{ $purchaseOrder->order_number }}
 
-                            <i class="bx bx-link-external text-xs text-gray-400"></i>
+                             <i class="bx bx-link text-xs text-slate-400"></i>
+
 
                         </a>
 

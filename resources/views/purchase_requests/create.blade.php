@@ -230,6 +230,125 @@
     </div>
 
     @push('scripts')
+        {{-- Add Vendor Script  --}}
+        <script>
+            $(document).ready(function() {
+
+                // Open modal
+                $('#openVendorModal').on('click', function() {
+                    $('#vendorModal').removeClass('hidden');
+                });
+
+
+                // Close modal
+                function closeVendorModal() {
+                    $('#vendorModal').addClass('hidden');
+                    $('#vendorForm')[0].reset();
+                    $('.text-red-600').text('');
+                }
+
+
+                $('#closeVendorModal, #cancelVendorModal, #vendorModalOverlay')
+                    .on('click', function() {
+                        closeVendorModal();
+                    });
+
+
+                // Submit vendor
+                $('#vendorForm').on('submit', function(e) {
+                    e.preventDefault();
+                    const $form = $(this);
+                    const $button = $('#saveVendorBtn');
+                    const originalText = $('#saveVendorBtnText').text();
+
+                    // Clear previous errors
+                    $('#vendorForm span[id$="Err"]').text('');
+
+                    $button
+                        .prop('disabled', true);
+
+                    $('#saveVendorBtnText')
+                        .text('Saving...');
+
+
+                    $.ajax({
+                        url: $form.attr('action'),
+                        type: 'POST',
+                        data: $form.serialize(),
+
+                        headers: {
+                            Accept: 'application/json'
+                        },
+
+                        success: function(response) {
+
+                            showToast(
+                                'success',
+                                response.message || 'Vendor created successfully.'
+                            );
+
+                            closeVendorModal();
+
+                            // Refresh quotation page so the new vendor
+                            // appears in the dropdown.
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 500);
+                        },
+
+                        error: function(xhr) {
+
+                            if (xhr.status === 422) {
+
+                                const errors =
+                                    xhr.responseJSON?.errors || {};
+
+                                $.each(errors, function(field, messages) {
+
+                                    const errorMap = {
+                                        name: '#vendorNameErr',
+                                        company_name: '#vendorCompanyNameErr',
+                                        contact_person: '#vendorContactPersonErr',
+                                        email: '#vendorEmailErr',
+                                        phone: '#vendorPhoneErr',
+                                        ntn: '#vendorNtnErr',
+                                        is_active: '#vendorIsActiveErr',
+                                        address: '#vendorAddressErr'
+                                    };
+
+                                    if (errorMap[field]) {
+                                        $(errorMap[field])
+                                            .text(messages[0]);
+                                    }
+
+                                    return true;
+                                });
+
+                                return;
+                            }
+
+                            showToast(
+                                'error',
+                                xhr.responseJSON?.message ||
+                                'Unable to create vendor.'
+                            );
+                        },
+
+                        complete: function() {
+
+                            $button
+                                .prop('disabled', false);
+
+                            $('#saveVendorBtnText')
+                                .text(originalText);
+                        }
+                    });
+
+                });
+
+            });
+        </script>
+
         <script>
             $(document).ready(function() {
 
@@ -279,6 +398,7 @@
                         success: function(response) {
 
                             draftId = response.id;
+                            $("#purchase_request_id").val(draftId);
 
                             if (showToastMessage) {
                                 showToast(
@@ -404,20 +524,18 @@
                 */
 
                 form.on('submit', function(e) {
-
                     e.preventDefault();
-
                     clearErrors();
-
                     const button = $('#submitBtn');
-
                     button.prop('disabled', true);
 
+                    if(!confirm('Do you want to proceed to send RFQ?')){
+                        return;
+                    }
                     $.ajax({
                         url: form.attr('action'),
                         type: 'POST',
                         data: form.serialize(),
-
                         headers: {
                             'Accept': 'application/json'
                         },

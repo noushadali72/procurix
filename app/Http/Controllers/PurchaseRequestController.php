@@ -138,7 +138,7 @@ class PurchaseRequestController extends Controller
 
     public function confirmation(PurchaseRequest $purchaseRequest)
     {
-        $purchaseRequest->load(['items.rawMaterial', 'items.unit', 'vendor','activities']);
+        $purchaseRequest->load(['items.rawMaterial', 'items.unit', 'vendor', 'activities']);
 
         return view('purchase_requests.confirmation', compact('purchaseRequest'));
     }
@@ -291,9 +291,6 @@ class PurchaseRequestController extends Controller
                 ]);
 
                 $purchaseRequest->items()->delete();
-
-                $action = 'Purchase Request Draft Updated.';
-                $description = 'Purchase Request draft updated by ' . Auth::user()->name . '.';
             } else {
 
                 $purchaseRequest = PurchaseRequest::create([
@@ -307,6 +304,16 @@ class PurchaseRequestController extends Controller
 
                 $action = 'Purchase Request Draft Created.';
                 $description = 'Purchase Request draft created by ' . Auth::user()->name . '.';
+
+                // Activity Logging
+                $this->activity->log(
+                    $purchaseRequest,
+                    Auth::user(),
+                    $purchaseRequest->vendor,
+                    $action,
+                    $description,
+                    $purchaseRequest
+                );
             }
 
             foreach ($validated['items'] ?? [] as $item) {
@@ -329,15 +336,7 @@ class PurchaseRequestController extends Controller
                 ]);
             }
 
-            // Activity Logging
-            $this->activity->log(
-                $purchaseRequest,
-                Auth::user(),
-                $purchaseRequest->vendor,
-                $action,
-                $description,
-                $purchaseRequest
-            );
+
 
 
             return $purchaseRequest;
@@ -483,9 +482,9 @@ class PurchaseRequestController extends Controller
                     $selectedRequest,
                     Auth::user(),
                     $selectedRequest->vendor,
-                   'Purchase Request Cancelled.',
-                   "Purchase Request cancelled because another vendor request was selected.",
-                   
+                    'Purchase Request Cancelled.',
+                    "Purchase Request cancelled because another vendor request was selected.",
+
                 );
             }
 
@@ -672,6 +671,9 @@ class PurchaseRequestController extends Controller
      */
     public function edit(PurchaseRequest $purchaseRequest)
     {
+        if (!in_array($purchaseRequest->status, ['draft', 'sent', 'pending'])) {
+            return redirect()->back();
+        }
         $purchaseRequest->load([
             'items.rawMaterial',
             'items.unit',
@@ -712,6 +714,13 @@ class PurchaseRequestController extends Controller
     ): JsonResponse {
 
         $validated = $request->validated();
+
+        if (!in_array($purchaseRequest->status, ['draft', 'sent', 'pending'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Purchase request must be in draft, sent or pending mode to edit.',
+            ], 500);
+        }
 
 
         DB::transaction(

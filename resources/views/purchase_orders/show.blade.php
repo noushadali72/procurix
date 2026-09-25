@@ -281,7 +281,8 @@
 
                                     {{ $purchaseOrder->purchaseRequest->request_number }}
 
-                                    <i class="bx bx-link-external text-xs text-gray-400"></i>
+                                     <i class="bx bx-link text-xs text-slate-400"></i>
+
 
                                 </a>
 

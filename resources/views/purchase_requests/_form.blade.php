@@ -1,5 +1,5 @@
 
-    <input type="hidden" name="purchase_request_id" value="{{ $purchaseRequest?->id??'' }}"/>
+    <input type="hidden" id="purchase_request_id" name="purchase_request_id" value="{{ $purchaseRequest?->id??'' }}"/>
 
     {{-- Request Details --}}
     <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">

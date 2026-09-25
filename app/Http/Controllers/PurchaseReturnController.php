@@ -70,13 +70,8 @@ class PurchaseReturnController extends Controller
                  * Lock the Goods Receipt because we're calculating
                  * returnable quantities against it.
                  */
-                $lockedReceipt = GoodsReceipt::query()
-                    ->lockForUpdate()
-                    ->findOrFail($goodsReceipt->id);
-
-                $lockedReceipt->load([
-                    'purchaseOrder.vendor',
-                ]);
+                $lockedReceipt = GoodsReceipt::query()->lockForUpdate()->findOrFail($goodsReceipt->id);
+                $lockedReceipt->load(['purchaseOrder.vendor',]);
 
                 /*
                  * Ignore rows where return quantity is zero.
@@ -264,23 +259,14 @@ class PurchaseReturnController extends Controller
 
                     VendorCredit::create([
                         'purchase_return_id' => $purchaseReturn->id,
-                        'vendor_id' => $lockedReceipt
-                            ->purchaseOrder
-                            ->vendor_id,
-
+                        'vendor_id' => $lockedReceipt->purchaseOrder->vendor_id,
                         'vendor_bill_id' => $vendorBill->id,
-
                         'credit_number' => $this->generateCreditNumber(),
-
                         'credit_date' => $validated['return_date'],
-
                         'amount' => round($returnTotal, 2),
-
                         'applied_amount' => 0,
                         'refunded_amount' => 0,
-
                         'status' => 'open',
-
                         'notes' =>
                         "Generated from purchase return {$purchaseReturn->return_number}.",
                     ]);
@@ -292,10 +278,7 @@ class PurchaseReturnController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Materials returned successfully.',
-                'redirect' => route(
-                    'purchase-returns.show',
-                    $purchaseReturn
-                ),
+                'redirect' => route('purchase-returns.show',$purchaseReturn),
             ], 201);
         } catch (\RuntimeException $e) {
 
@@ -306,10 +289,10 @@ class PurchaseReturnController extends Controller
         } catch (\Throwable $e) {
 
             report($e);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Unable to process the purchase return.',
+                'error'=>$e->getMessage(),
             ], 500);
         }
     }
@@ -333,22 +316,12 @@ class PurchaseReturnController extends Controller
 
     private function generateReturnNumber(): string
     {
-        return 'RET-' . str_pad(
-            (PurchaseReturn::max('id') ?? 0) + 1,
-            5,
-            '0',
-            STR_PAD_LEFT
-        );
+        return 'RET-' . str_pad((PurchaseReturn::max('id') ?? 0) + 1,5,'0',STR_PAD_LEFT);
     }
 
 
     private function generateCreditNumber(): string
     {
-        return 'VC-' . str_pad(
-            (VendorCredit::max('id') ?? 0) + 1,
-            5,
-            '0',
-            STR_PAD_LEFT
-        );
+        return 'VC-' . str_pad((VendorCredit::max('id') ?? 0) + 1,5,'0',STR_PAD_LEFT);
     }
 }

@@ -324,6 +324,7 @@
                             </option>
 
                             @foreach ($purchaseOrders as $purchaseOrder)
+                                
                                 <option value="{{ $purchaseOrder->id }}">
 
                                     {{ $purchaseOrder->order_number }}
@@ -417,42 +418,27 @@
 
         // Create vendor bill
         $form.on('submit', function(e) {
-
             e.preventDefault();
-
             $('#purchaseOrderErr').text('');
-
             const originalText = $buttonText.text();
-
             $button.prop('disabled', true);
             $buttonText.text('Creating...');
 
-
             $.ajax({
-
                 url: $form.attr('action'),
-
                 type: 'POST',
-
                 data: $form.serialize(),
-
                 headers: {
                     Accept: 'application/json'
                 },
-
-
                 success: function(response) {
-
                     showToast(
                         'success',
                         response.message ||
                         'Vendor bill generated successfully.'
                     );
 
-
                     closeVendorBillModal();
-
-
                     setTimeout(function() {
 
                         window.location.href =
