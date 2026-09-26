@@ -10,6 +10,7 @@ use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestActivity;
 use App\Models\Quotation;
 use App\Models\RawMaterial;
+use App\Models\RfqComparison;
 use Illuminate\Http\Request;
 use App\Models\Unit;
 use App\Models\Vendor;
@@ -377,7 +378,9 @@ class PurchaseRequestController extends Controller
                 'required',
                 'integer',
                 'exists:purchase_requests,id',
+
             ],
+            'selection_reason'=>['nullable','string','max:255']
         ]);
 
         $selectedId = $validated['selected_purchase_request'];
@@ -411,19 +414,20 @@ class PurchaseRequestController extends Controller
 
         $order = DB::transaction(function () use (
             $selectedRequest,
-            $purchaseRequests
+            $purchaseRequests,
+            $validated
         ) {
             $selectedRequest->load('items');
 
             $total = 0;
 
             $order = PurchaseOrder::create([
-                'order_number' => 'PO-' . str_pad(
-                    (PurchaseOrder::max('id') ?? 0) + 1,
-                    5,
-                    '0',
-                    STR_PAD_LEFT
-                ),
+            // 'order_number' => 'PO-' . str_pad(
+            //         (PurchaseOrder::max('id') ?? 0) + 1,
+            //         5,
+            //         '0',
+            //         STR_PAD_LEFT
+            //     ),
                 'purchase_request_id' => $selectedRequest->id,
                 'vendor_id' => $selectedRequest->vendor_id,
                 'status' => 'placed',
@@ -432,9 +436,16 @@ class PurchaseRequestController extends Controller
                 'notes' => $selectedRequest->notes,
             ]);
 
+            // Creating Comparison Records
+            $comparison = RfqComparison::create([
+                'purchase_order_id'=>$order->id,
+                'purchase_request_id'=>$selectedRequest->id,
+                'selection_reason'=>$validated['selection_reason']
+            ]);
+
+
             foreach ($selectedRequest->items as $item) {
                 $total += $item->unit_cost * $item->qty;
-
                 $order->items()->create([
                     'raw_material_id' => $item->raw_material_id,
                     'qty' => $item->qty,
@@ -476,6 +487,20 @@ class PurchaseRequestController extends Controller
                     'status' => 'cancelled',
                     'stage' => 'cancelled'
                 ]);
+
+                $requestItem->load(['items']);
+                foreach($requestItem->items as $item){
+
+                    $comparison->items()->create([
+                    'purchase_request_id'=>$requestItem->id,
+                    'raw_material_id' => $item->raw_material_id,
+                    'qty' => $item->qty,
+                    'unit_id' => $item->unit_id,
+                    'unit_cost' => $item->unit_cost,
+                    'line_total' => $item->total,
+                ]);
+                }
+
 
                 // Activity Logging
                 $this->activity->log(

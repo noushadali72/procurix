@@ -10,10 +10,7 @@ use PurchaseRequestActivityService;
 
 class PurchaseOrderController extends Controller
 {
-    public function __construct(private ServicesPurchaseRequestActivityService $activity)
-    {
-        
-    }
+    public function __construct(private ServicesPurchaseRequestActivityService $activity) {}
     /**
      * Display purchase orders.
      */
@@ -43,6 +40,10 @@ class PurchaseOrderController extends Controller
             'items.rawMaterial',
             'items.unit',
             'goodsReceipts.items',
+            'comparison.purchaseRequest',
+            'comparison.items.purchaseRequest',
+            'comparison.items.rawMaterial',
+            'comparison.items.unit',
         ]);
 
         return view('purchase_orders.show', compact('purchaseOrder'));
@@ -63,7 +64,7 @@ class PurchaseOrderController extends Controller
                         'stage' => 'confirmation'
                     ]);
                 }
-              
+
                 // Activity Logging
                 $this->activity->log(
                     $purchaseOrder->purchaseRequest,
@@ -75,7 +76,6 @@ class PurchaseOrderController extends Controller
 
                 // Delete the purchase order
                 $purchaseOrder->delete();
-
             });
 
             return response()->json([

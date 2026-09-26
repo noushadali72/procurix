@@ -25,10 +25,7 @@ class PurchaseReturnController extends Controller
             ->latest()
             ->paginate(15);
 
-        return view(
-            'purchase_returns.index',
-            compact('purchaseReturns')
-        );
+        return view('purchase_returns.index', compact('purchaseReturns'));
     }
 
 
@@ -44,10 +41,7 @@ class PurchaseReturnController extends Controller
             'items.purchaseReturnItems.purchaseReturn',
         ]);
 
-        return view(
-            'purchase_returns.create',
-            compact('goodsReceipt')
-        );
+        return view('purchase_returns.create', compact('goodsReceipt'));
     }
 
 
@@ -66,12 +60,8 @@ class PurchaseReturnController extends Controller
                 $conversion
             ) {
 
-                /*
-                 * Lock the Goods Receipt because we're calculating
-                 * returnable quantities against it.
-                 */
                 $lockedReceipt = GoodsReceipt::query()->lockForUpdate()->findOrFail($goodsReceipt->id);
-                $lockedReceipt->load(['purchaseOrder.vendor',]);
+                $lockedReceipt->load(['purchaseOrder.vendor']);
 
                 /*
                  * Ignore rows where return quantity is zero.
@@ -79,8 +69,7 @@ class PurchaseReturnController extends Controller
                 $returnItems = collect($validated['items'])
                     ->filter(function ($item) {
                         return (float) ($item['qty'] ?? 0) > 0;
-                    })
-                    ->values();
+                    })->values();
 
                 if ($returnItems->isEmpty()) {
                     throw new \RuntimeException(

@@ -58,6 +58,20 @@
         .app-sidebar-scroll::-webkit-scrollbar-thumb:hover {
             background: #4b5563;
         }
+
+        :root {
+            /* Required to enable light-dark() functionality */
+            color-scheme: light dark;
+
+            /* Syntax: light-dark(light-value, dark-value) */
+            --bg-color: light-dark(#ffffff, #151414);
+            --text-color: light-dark(#333333, #ffffff);
+        }
+
+        body {
+            background-color: var(--bg-color)!important;
+            color: var(--text-color)!important;
+        }
     </style>
 
 </head>

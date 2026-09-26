@@ -403,7 +403,7 @@
                                 </td>
 
                                 <td class="px-5 py-4 text-gray-500">
-                                    {{ $record->manufactured_at->format('d M Y, h:i A') }}
+                                    {{ $record->manufactured_at?->format('d M Y, h:i A') }}
                                 </td>
 
                             </tr>

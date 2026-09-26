@@ -82,6 +82,20 @@
         {{-- Header Actions --}}
         <div class="flex flex-wrap items-center gap-2">
 
+            @if ($purchaseOrder->comparison)
+                <button type="button" id="openComparisonModal"
+                    class="inline-flex cursor-pointer items-center gap-2 rounded-lg
+               border border-gray-300 bg-white px-4 py-2.5
+               text-sm font-medium text-gray-700 transition
+               hover:bg-gray-50">
+
+                    <i class="bx bx-git-compare text-lg"></i>
+
+                    View RFQ Comparison
+
+                </button>
+            @endif
+
             @if (in_array($purchaseOrder->status, ['placed', 'partially_received']))
                 <a href="{{ route('goods-receipts.create', $purchaseOrder) }}"
                     class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
@@ -281,7 +295,7 @@
 
                                     {{ $purchaseOrder->purchaseRequest->request_number }}
 
-                                     <i class="bx bx-link text-xs text-slate-400"></i>
+                                    <i class="bx bx-link text-xs text-slate-400"></i>
 
 
                                 </a>
@@ -1069,6 +1083,1047 @@
     </div>
 
 
+    {{-- Comparison Modal --}}
+
+    {{-- ====================================================== --}}
+    {{-- RFQ COMPARISON MODAL --}}
+    {{-- ====================================================== --}}
+
+    @if ($purchaseOrder->comparison)
+
+        @php
+            $comparison = $purchaseOrder->comparison;
+
+            $selectedRequest = $comparison->purchaseRequest;
+
+            /*
+             * Alternative Purchase Requests
+             * Comparison items are grouped by purchase_request_id.
+             */
+            $alternativeRequests = $comparison->items->groupBy('purchase_request_id');
+        @endphp
+
+
+        <div id="comparisonModal" class="fixed inset-0 z-50 hidden">
+
+            {{-- Backdrop --}}
+            <div id="comparisonModalBackdrop" class="absolute inset-0 bg-gray-950/50 backdrop-blur-[1px]">
+            </div>
+
+
+            {{-- Modal Position --}}
+            <div class="relative flex min-h-full items-center
+                   justify-center p-4 sm:p-6">
+
+                {{-- Modal Container --}}
+                <div
+                    class="relative flex max-h-[90vh] w-full max-w-5xl
+                       flex-col overflow-hidden rounded-2xl
+                       border border-gray-200 bg-white shadow-2xl">
+
+
+                    {{-- ================================================== --}}
+                    {{-- MODAL HEADER --}}
+                    {{-- ================================================== --}}
+
+                    <div
+                        class="flex shrink-0 items-start justify-between
+                           gap-4 border-b border-gray-200
+                           bg-white px-6 py-4">
+
+                        <div class="flex items-start gap-3">
+
+                            <div
+                                class="flex h-10 w-10 shrink-0 items-center
+                                   justify-center rounded-xl
+                                   bg-gray-900 text-white">
+
+                                <i class="bx bx-git-compare text-xl"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <h2
+                                    class="text-base font-semibold
+                                       text-gray-900">
+
+                                    RFQ Comparison
+
+                                </h2>
+
+                                <p class="mt-0.5 text-xs
+                                       text-gray-500">
+
+                                    Review the selected purchase request
+                                    and alternatives considered for this order.
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <button type="button" id="closeComparisonModal"
+                            class="flex h-9 w-9 shrink-0 cursor-pointer
+                               items-center justify-center rounded-lg
+                               border border-gray-200 bg-white
+                               text-gray-400 transition
+                               hover:bg-gray-50 hover:text-gray-700">
+
+                            <i class="bx bx-x text-xl"></i>
+
+                        </button>
+
+                    </div>
+
+
+                    {{-- ================================================== --}}
+                    {{-- MODAL CONTENT --}}
+                    {{-- ================================================== --}}
+
+                    <div class="flex-1 overflow-y-auto">
+
+                        <div class="px-6 py-5">
+
+
+                            {{-- Section Heading --}}
+                            <div class="mb-4">
+
+                                <div
+                                    class="flex flex-col gap-2
+                                       sm:flex-row sm:items-center
+                                       sm:justify-between">
+
+                                    <div>
+
+                                        <h3
+                                            class="text-sm font-semibold
+                                               text-gray-900">
+
+                                            Compared Purchase Requests
+
+                                        </h3>
+
+                                        <p
+                                            class="mt-1 text-xs
+                                               text-gray-500">
+
+                                            Open a purchase request to review
+                                            its materials, quantities and costs.
+
+                                        </p>
+
+                                    </div>
+
+
+                                    <div
+                                        class="inline-flex w-fit items-center
+                                           gap-1.5 rounded-full
+                                           bg-gray-100 px-2.5 py-1
+                                           text-[11px] font-medium
+                                           text-gray-600">
+
+                                        <i class="bx bx-file"></i>
+
+                                        {{ 1 + $alternativeRequests->count() }}
+
+                                        {{ Str::plural('Request', 1 + $alternativeRequests->count()) }}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="space-y-3">
+
+
+                                {{-- ================================================== --}}
+                                {{-- SELECTED PURCHASE REQUEST --}}
+                                {{-- ================================================== --}}
+
+                                <div
+                                    class="overflow-hidden rounded-xl
+                                       border border-green-200">
+
+
+                                    {{-- Accordion Header --}}
+                                    <button type="button"
+                                        class="comparisonAccordion flex w-full
+                                           cursor-pointer items-center
+                                           justify-between gap-4
+                                           bg-green-50/60 px-4 py-4
+                                           text-left transition
+                                           hover:bg-green-50">
+
+
+                                        <div
+                                            class="flex min-w-0
+                                               items-center gap-3">
+
+                                            <div
+                                                class="flex h-9 w-9 shrink-0
+                                                   items-center justify-center
+                                                   rounded-lg bg-green-100
+                                                   text-green-700">
+
+                                                <i
+                                                    class="bx bx-check-circle
+                                                       text-lg">
+                                                </i>
+
+                                            </div>
+
+
+                                            <div class="min-w-0">
+
+                                                <div
+                                                    class="flex flex-wrap
+                                                       items-center gap-2">
+
+                                                    <p
+                                                        class="text-sm
+                                                           font-semibold
+                                                           text-gray-900">
+
+                                                        {{ $selectedRequest->request_number }}
+
+                                                    </p>
+
+
+                                                    <span
+                                                        class="inline-flex
+                                                           items-center gap-1
+                                                           rounded-full
+                                                           border border-green-200
+                                                           bg-green-100
+                                                           px-2 py-0.5
+                                                           text-[10px]
+                                                           font-semibold
+                                                           text-green-700">
+
+                                                        <i class="bx bx-check"></i>
+
+                                                        Selected
+
+                                                    </span>
+
+                                                </div>
+
+
+                                                <p
+                                                    class="mt-1 text-xs
+                                                       text-gray-500">
+
+                                                    Selected for
+
+                                                    <span
+                                                        class="font-medium
+                                                           text-gray-700">
+
+                                                        {{ $purchaseOrder->order_number }}
+
+                                                    </span>
+
+                                                </p>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div
+                                            class="flex shrink-0
+                                               items-center gap-3">
+
+                                            <a href="{{ route('purchase-requests.show', $selectedRequest) }}"
+                                                onclick="event.stopPropagation();"
+                                                class="hidden items-center
+                                                   gap-1 text-xs
+                                                   font-medium text-gray-500
+                                                   transition
+                                                   hover:text-gray-900
+                                                   sm:inline-flex">
+
+                                                View PR
+
+                                                <i
+                                                    class="bx
+                                                       bx-right-arrow-alt">
+                                                </i>
+
+                                            </a>
+
+
+                                            <i
+                                                class="comparisonAccordionIcon
+                                                   bx bx-chevron-down
+                                                   text-xl text-gray-400
+                                                   transition-transform
+                                                   duration-200">
+                                            </i>
+
+                                        </div>
+
+                                    </button>
+
+
+                                    {{-- Accordion Body --}}
+                                    <div
+                                        class="comparisonAccordionBody hidden
+                                           border-t border-green-200">
+
+
+                                        {{-- Selection Reason --}}
+                                        @if ($comparison->selection_reason)
+                                            <div
+                                                class="border-b border-gray-200
+                                                   bg-green-50/30
+                                                   px-4 py-3">
+
+                                                <div
+                                                    class="flex
+                                                       items-start gap-3">
+
+                                                    <div
+                                                        class="flex h-8 w-8
+                                                           shrink-0
+                                                           items-center
+                                                           justify-center
+                                                           rounded-lg
+                                                           bg-green-100
+                                                           text-green-700">
+
+                                                        <i
+                                                            class="bx
+                                                               bx-message-square-detail">
+                                                        </i>
+
+                                                    </div>
+
+
+                                                    <div>
+
+                                                        <p
+                                                            class="text-[10px]
+                                                               font-semibold
+                                                               uppercase
+                                                               tracking-wide
+                                                               text-gray-400">
+
+                                                            Selection Reason
+
+                                                        </p>
+
+                                                        <p
+                                                            class="mt-1 text-xs
+                                                               leading-5
+                                                               text-gray-700">
+
+                                                            {{ $comparison->selection_reason }}
+
+                                                        </p>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        @endif
+
+
+                                        {{-- Selected PR Items --}}
+                                        <div class="overflow-x-auto">
+
+                                            <table
+                                                class="w-full min-w-[700px]
+                                                   text-left text-sm">
+
+                                                <thead
+                                                    class="border-b
+                                                       border-gray-200
+                                                       bg-gray-50
+                                                       text-[11px]
+                                                       uppercase
+                                                       tracking-wide
+                                                       text-gray-500">
+
+                                                    <tr>
+
+                                                        <th
+                                                            class="px-4 py-3
+                                                               font-medium">
+
+                                                            Material
+
+                                                        </th>
+
+                                                        <th
+                                                            class="px-4 py-3
+                                                               text-right
+                                                               font-medium">
+
+                                                            Quantity
+
+                                                        </th>
+
+                                                        <th
+                                                            class="px-4 py-3
+                                                               font-medium">
+
+                                                            Unit
+
+                                                        </th>
+
+                                                        <th
+                                                            class="px-4 py-3
+                                                               text-right
+                                                               font-medium">
+
+                                                            Unit Cost
+
+                                                        </th>
+
+                                                        <th
+                                                            class="px-4 py-3
+                                                               text-right
+                                                               font-medium">
+
+                                                            Total
+
+                                                        </th>
+
+                                                    </tr>
+
+                                                </thead>
+
+
+                                                <tbody
+                                                    class="divide-y
+                                                       divide-gray-100">
+
+                                                    @foreach ($purchaseOrder->items as $item)
+                                                        <tr
+                                                            class="transition
+                                                               hover:bg-gray-50">
+
+                                                            {{-- Material --}}
+                                                            <td class="px-4 py-3">
+
+                                                                <div
+                                                                    class="flex
+                                                                       items-center
+                                                                       gap-2.5">
+
+                                                                    <div
+                                                                        class="flex
+                                                                           h-8 w-8
+                                                                           shrink-0
+                                                                           items-center
+                                                                           justify-center
+                                                                           rounded-lg
+                                                                           bg-gray-100
+                                                                           text-gray-500">
+
+                                                                        <i
+                                                                            class="bx
+                                                                               bx-package">
+                                                                        </i>
+
+                                                                    </div>
+
+
+                                                                    <div>
+
+                                                                        <p
+                                                                            class="font-medium
+                                                                               text-gray-800">
+
+                                                                            {{ $item->rawMaterial->name }}
+
+                                                                        </p>
+
+
+                                                                        @if ($item->rawMaterial->sku)
+                                                                            <p
+                                                                                class="mt-0.5
+                                                                                   text-[10px]
+                                                                                   text-gray-400">
+
+                                                                                {{ $item->rawMaterial->sku }}
+
+                                                                            </p>
+                                                                        @endif
+
+                                                                    </div>
+
+                                                                </div>
+
+                                                            </td>
+
+
+                                                            {{-- Quantity --}}
+                                                            <td
+                                                                class="px-4 py-3
+                                                                   text-right
+                                                                   text-gray-700">
+
+                                                                {{ $item->qty }}
+
+                                                            </td>
+
+
+                                                            {{-- Unit --}}
+                                                            <td
+                                                                class="px-4 py-3
+                                                                   text-gray-600">
+
+                                                                {{ $item->unit->short_name ?? $item->unit->name }}
+
+                                                            </td>
+
+
+                                                            {{-- Unit Cost --}}
+                                                            <td
+                                                                class="px-4 py-3
+                                                                   text-right
+                                                                   text-gray-700">
+
+                                                                {{ number_format($item->unit_cost, 2) }}
+
+                                                            </td>
+
+
+                                                            {{-- Total --}}
+                                                            <td
+                                                                class="px-4 py-3
+                                                                   text-right
+                                                                   font-semibold
+                                                                   text-gray-900">
+
+                                                                {{ number_format($item->total, 2) }}
+
+                                                            </td>
+
+                                                        </tr>
+                                                    @endforeach
+
+                                                </tbody>
+
+
+                                                <tfoot
+                                                    class="border-t
+                                                       border-gray-200
+                                                       bg-gray-50">
+
+                                                    <tr>
+
+                                                        <td colspan="4"
+                                                            class="px-4 py-3
+                                                               text-right
+                                                               text-xs
+                                                               font-medium
+                                                               text-gray-500">
+
+                                                            Selected Total
+
+                                                        </td>
+
+
+                                                        <td
+                                                            class="px-4 py-3
+                                                               text-right
+                                                               text-sm
+                                                               font-semibold
+                                                               text-gray-900">
+
+                                                            {{ number_format($purchaseOrder->total, 2) }}
+
+                                                        </td>
+
+                                                    </tr>
+
+                                                </tfoot>
+
+                                            </table>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                {{-- ================================================== --}}
+                                {{-- ALTERNATIVE PURCHASE REQUESTS --}}
+                                {{-- ================================================== --}}
+
+                                @foreach ($alternativeRequests as $purchaseRequestId => $comparisonItems)
+                                    @php
+                                        $request = $comparisonItems->first()->purchaseRequest;
+
+                                        $comparisonTotal = $comparisonItems->sum('line_total');
+                                    @endphp
+
+
+                                    <div
+                                        class="overflow-hidden rounded-xl
+                                           border border-gray-200">
+
+
+                                        {{-- Accordion Header --}}
+                                        <button type="button"
+                                            class="comparisonAccordion flex w-full
+                                               cursor-pointer items-center
+                                               justify-between gap-4
+                                               bg-white px-4 py-4
+                                               text-left transition
+                                               hover:bg-gray-50">
+
+
+                                            <div
+                                                class="flex min-w-0
+                                                   items-center gap-3">
+
+                                                <div
+                                                    class="flex h-9 w-9
+                                                       shrink-0 items-center
+                                                       justify-center
+                                                       rounded-lg bg-gray-100
+                                                       text-gray-500">
+
+                                                    <i
+                                                        class="bx bx-file
+                                                           text-lg">
+                                                    </i>
+
+                                                </div>
+
+
+                                                <div class="min-w-0">
+
+                                                    <div
+                                                        class="flex flex-wrap
+                                                           items-center gap-2">
+
+                                                        <p
+                                                            class="text-sm
+                                                               font-semibold
+                                                               text-gray-900">
+
+                                                            {{ $request?->request_number ?? 'Purchase Request' }}
+
+                                                        </p>
+
+
+                                                        <span
+                                                            class="rounded-full
+                                                               bg-gray-100
+                                                               px-2 py-0.5
+                                                               text-[10px]
+                                                               font-medium
+                                                               text-gray-500">
+
+                                                            Alternative
+
+                                                        </span>
+
+                                                    </div>
+
+
+                                                    <p
+                                                        class="mt-1 text-xs
+                                                           text-gray-500">
+
+                                                        {{ $comparisonItems->count() }}
+
+                                                        {{ Str::plural('item', $comparisonItems->count()) }}
+
+                                                        <span class="mx-1">
+                                                            •
+                                                        </span>
+
+                                                        Total:
+
+                                                        <span
+                                                            class="font-semibold
+                                                               text-gray-700">
+
+                                                            {{ number_format($comparisonTotal, 2) }}
+
+                                                        </span>
+
+                                                    </p>
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <div
+                                                class="flex shrink-0
+                                                   items-center gap-3">
+
+                                                @if ($request)
+                                                    <a href="{{ route('purchase-requests.show', $request) }}"
+                                                        onclick="event.stopPropagation();"
+                                                        class="hidden items-center
+                                                           gap-1 text-xs
+                                                           font-medium
+                                                           text-gray-500
+                                                           transition
+                                                           hover:text-gray-900
+                                                           sm:inline-flex">
+
+                                                        View PR
+
+                                                        <i
+                                                            class="bx
+                                                               bx-right-arrow-alt">
+                                                        </i>
+
+                                                    </a>
+                                                @endif
+
+
+                                                <i
+                                                    class="comparisonAccordionIcon
+                                                       bx bx-chevron-down
+                                                       text-xl text-gray-400
+                                                       transition-transform
+                                                       duration-200">
+                                                </i>
+
+                                            </div>
+
+                                        </button>
+
+
+                                        {{-- Accordion Body --}}
+                                        <div
+                                            class="comparisonAccordionBody hidden
+                                               border-t border-gray-200">
+
+                                            <div class="overflow-x-auto">
+
+                                                <table
+                                                    class="w-full min-w-[700px]
+                                                       text-left text-sm">
+
+                                                    <thead
+                                                        class="border-b
+                                                           border-gray-200
+                                                           bg-gray-50
+                                                           text-[11px]
+                                                           uppercase
+                                                           tracking-wide
+                                                           text-gray-500">
+
+                                                        <tr>
+
+                                                            <th
+                                                                class="px-4 py-3
+                                                                   font-medium">
+
+                                                                Material
+
+                                                            </th>
+
+                                                            <th
+                                                                class="px-4 py-3
+                                                                   text-right
+                                                                   font-medium">
+
+                                                                Quantity
+
+                                                            </th>
+
+                                                            <th
+                                                                class="px-4 py-3
+                                                                   font-medium">
+
+                                                                Unit
+
+                                                            </th>
+
+                                                            <th
+                                                                class="px-4 py-3
+                                                                   text-right
+                                                                   font-medium">
+
+                                                                Unit Cost
+
+                                                            </th>
+
+                                                            <th
+                                                                class="px-4 py-3
+                                                                   text-right
+                                                                   font-medium">
+
+                                                                Total
+
+                                                            </th>
+
+                                                        </tr>
+
+                                                    </thead>
+
+
+                                                    <tbody
+                                                        class="divide-y
+                                                           divide-gray-100">
+
+                                                        @foreach ($comparisonItems as $item)
+                                                            <tr
+                                                                class="transition
+                                                                   hover:bg-gray-50">
+
+                                                                {{-- Material --}}
+                                                                <td class="px-4 py-3">
+
+                                                                    <div
+                                                                        class="flex
+                                                                           items-center
+                                                                           gap-2.5">
+
+                                                                        <div
+                                                                            class="flex
+                                                                               h-8 w-8
+                                                                               shrink-0
+                                                                               items-center
+                                                                               justify-center
+                                                                               rounded-lg
+                                                                               bg-gray-100
+                                                                               text-gray-500">
+
+                                                                            <i
+                                                                                class="bx
+                                                                                   bx-package">
+                                                                            </i>
+
+                                                                        </div>
+
+
+                                                                        <div>
+
+                                                                            <p
+                                                                                class="font-medium
+                                                                                   text-gray-800">
+
+                                                                                {{ $item->rawMaterial?->name ?? '—' }}
+
+                                                                            </p>
+
+
+                                                                            @if ($item->rawMaterial?->sku)
+                                                                                <p
+                                                                                    class="mt-0.5
+                                                                                       text-[10px]
+                                                                                       text-gray-400">
+
+                                                                                    {{ $item->rawMaterial->sku }}
+
+                                                                                </p>
+                                                                            @endif
+
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                </td>
+
+
+                                                                {{-- Quantity --}}
+                                                                <td
+                                                                    class="px-4 py-3
+                                                                       text-right
+                                                                       text-gray-700">
+
+                                                                    {{ $item->qty }}
+
+                                                                </td>
+
+
+                                                                {{-- Unit --}}
+                                                                <td
+                                                                    class="px-4 py-3
+                                                                       text-gray-600">
+
+                                                                    {{ $item->unit?->short_name ?? ($item->unit?->name ?? '—') }}
+
+                                                                </td>
+
+
+                                                                {{-- Unit Cost --}}
+                                                                <td
+                                                                    class="px-4 py-3
+                                                                       text-right
+                                                                       text-gray-700">
+
+                                                                    {{ number_format($item->unit_cost ?? 0, 2) }}
+
+                                                                </td>
+
+
+                                                                {{-- Total --}}
+                                                                <td
+                                                                    class="px-4 py-3
+                                                                       text-right
+                                                                       font-semibold
+                                                                       text-gray-900">
+
+                                                                    {{ number_format($item->line_total ?? 0, 2) }}
+
+                                                                </td>
+
+                                                            </tr>
+                                                        @endforeach
+
+                                                    </tbody>
+
+
+                                                    <tfoot
+                                                        class="border-t
+                                                           border-gray-200
+                                                           bg-gray-50">
+
+                                                        <tr>
+
+                                                            <td colspan="4"
+                                                                class="px-4 py-3
+                                                                   text-right
+                                                                   text-xs
+                                                                   font-medium
+                                                                   text-gray-500">
+
+                                                                Total
+
+                                                            </td>
+
+
+                                                            <td
+                                                                class="px-4 py-3
+                                                                   text-right
+                                                                   text-sm
+                                                                   font-semibold
+                                                                   text-gray-900">
+
+                                                                {{ number_format($comparisonTotal, 2) }}
+
+                                                            </td>
+
+                                                        </tr>
+
+                                                    </tfoot>
+
+                                                </table>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                @endforeach
+
+
+                                {{-- No Alternatives --}}
+                                @if ($alternativeRequests->isEmpty())
+                                    <div
+                                        class="rounded-xl border
+                                           border-dashed border-gray-300
+                                           bg-gray-50 px-6 py-8
+                                           text-center">
+
+                                        <div
+                                            class="mx-auto flex h-10 w-10
+                                               items-center justify-center
+                                               rounded-full bg-white
+                                               text-gray-400">
+
+                                            <i
+                                                class="bx bx-git-compare
+                                                   text-xl">
+                                            </i>
+
+                                        </div>
+
+
+                                        <p
+                                            class="mt-3 text-sm
+                                               font-medium text-gray-700">
+
+                                            No alternative requests
+
+                                        </p>
+
+
+                                        <p
+                                            class="mt-1 text-xs
+                                               text-gray-500">
+
+                                            Only the selected purchase request
+                                            is available in this comparison.
+
+                                        </p>
+
+                                    </div>
+                                @endif
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- ================================================== --}}
+                    {{-- MODAL FOOTER --}}
+                    {{-- ================================================== --}}
+
+                    <div
+                        class="flex shrink-0 items-center justify-between
+                           gap-4 border-t border-gray-200
+                           bg-gray-50 px-6 py-3.5">
+
+                        <div class="flex items-center gap-2
+                               text-[11px] text-gray-500">
+
+                            <i class="bx bx-info-circle"></i>
+
+                            <span>
+                                RFQ comparison retained with this purchase order.
+                            </span>
+
+                        </div>
+
+
+                        <button type="button" id="closeComparisonModalFooter"
+                            class="inline-flex cursor-pointer
+                               items-center justify-center gap-2
+                               rounded-lg bg-gray-900
+                               px-4 py-2 text-sm font-medium
+                               text-white transition
+                               hover:bg-gray-800">
+
+                            Close
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    @endif
+
+
     {{-- ====================================================== --}}
     {{-- SCRIPTS --}}
     {{-- ====================================================== --}}
@@ -1077,6 +2132,79 @@
         <script>
             $(document).ready(function() {
 
+                /*
+                 * RFQ Comparison Modal
+                 */
+                $('#openComparisonModal').on('click', function() {
+
+                    $('#comparisonModal')
+                        .removeClass('hidden');
+
+                    $('body')
+                        .addClass('overflow-hidden');
+
+                });
+
+
+                function closeComparisonModal() {
+
+                    $('#comparisonModal')
+                        .addClass('hidden');
+
+                    $('body')
+                        .removeClass('overflow-hidden');
+
+                }
+
+
+                $('#closeComparisonModal, #closeComparisonModalFooter')
+                    .on('click', function() {
+
+                        closeComparisonModal();
+
+                    });
+
+
+                $('#comparisonModalBackdrop')
+                    .on('click', function() {
+
+                        closeComparisonModal();
+
+                    });
+
+
+                $(document).on('keydown', function(e) {
+
+                    if (
+                        e.key === 'Escape' &&
+                        !$('#comparisonModal').hasClass('hidden')
+                    ) {
+                        closeComparisonModal();
+                    }
+
+                });
+
+
+                /*
+                 * Comparison Accordions
+                 */
+                $('.comparisonAccordion')
+                    .on('click', function() {
+
+                        const button = $(this);
+
+                        const body = button
+                            .next('.comparisonAccordionBody');
+
+                        const icon = button
+                            .find('.comparisonAccordionIcon');
+
+
+                        body.toggleClass('hidden');
+
+                        icon.toggleClass('rotate-180');
+
+                    });
 
                 /*
                  * Generate Vendor Bill

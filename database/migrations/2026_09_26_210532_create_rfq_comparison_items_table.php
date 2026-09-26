@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('purchase_request_items', function (Blueprint $table) {
+        Schema::create('rfq_comparison_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_order_id')->constrained('purchase_orders')->cascadeOnDelete();
+            $table->foreignId('purchase_request_id')->nullable()->constrained('purchase_requests')->nullOnDelete();
+            $table->foreignId('rfq_comparison_id')->constrained('rfq_comparisons')->cascadeOnDelete();
             $table->foreignId('raw_material_id')->nullable()->constrained('raw_materials')->nullOnDelete();
-            $table->decimal('qty',15,3)->default(1);
+            $table->decimal('qty',12,2)->default(1);
             $table->decimal('unit_cost',15,2)->nullable();
-            $table->decimal('total',20,2)->nullable();
+            $table->decimal('line_total',20,2)->nullable();
             $table->foreignId('unit_id')->constrained('units')->restrictOnDelete();
+
             $table->timestamps();
         });
     }
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('purchase_request_items');
+        Schema::dropIfExists('rfq_comparison_items');
     }
 };
