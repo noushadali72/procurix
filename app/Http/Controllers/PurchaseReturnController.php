@@ -9,12 +9,15 @@ use App\Models\PurchaseReturn;
 use App\Models\RawMaterial;
 use App\Models\VendorBill;
 use App\Models\VendorCredit;
+use App\Services\PurchaseRequestActivityService;
 use App\Services\UnitConversionService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PurchaseReturnController extends Controller
 {
+    public function __construct(private PurchaseRequestActivityService $activity) {}
     public function index()
     {
         $purchaseReturns = PurchaseReturn::with([
@@ -229,6 +232,16 @@ class PurchaseReturnController extends Controller
                     'status' => 'completed',
                 ]);
 
+
+                $this->activity->log(
+                    $lockedReceipt->purchaseOrder->purchaseRequest,
+                    Auth::user(),
+                    $lockedReceipt->purchaseOrder->purchaseRequest->vendor,
+                    'Material Return record Created.',
+                    "Material return {$purchaseReturn->return_number} was created against Purchase Order {$lockedReceipt->purchaseOrder->order_number}.",
+                    $purchaseReturn
+                );
+
                 /*
                  * Finance handling:
                  *
@@ -237,16 +250,11 @@ class PurchaseReturnController extends Controller
                  * If there is NO bill yet, don't create credit.
                  * Vendor Bill generation will later use net received qty.
                  */
-                $vendorBill = VendorBill::query()
-                    ->where(
-                        'purchase_order_id',
-                        $lockedReceipt->purchase_order_id
-                    )
-                    ->first();
+                $vendorBill = VendorBill::query()->where('purchase_order_id', $lockedReceipt->purchase_order_id)->first();
 
                 if ($vendorBill) {
 
-                    VendorCredit::create([
+                    $vendorCredit = VendorCredit::create([
                         'purchase_return_id' => $purchaseReturn->id,
                         'vendor_id' => $lockedReceipt->purchaseOrder->vendor_id,
                         'vendor_bill_id' => $vendorBill->id,
@@ -259,7 +267,18 @@ class PurchaseReturnController extends Controller
                         'notes' =>
                         "Generated from purchase return {$purchaseReturn->return_number}.",
                     ]);
+
+                    $this->activity->log(
+                        $lockedReceipt->purchaseOrder->purchaseRequest,
+                        Auth::user(),
+                        $vendorCredit->vendor,
+                        'Vendor Credit Created.',
+                        "Vendor Credit {$vendorCredit->credit_number} was created for material return {$purchaseReturn->return_number}.",
+                        $vendorCredit
+                    );
                 }
+
+
 
                 return $purchaseReturn;
             });
@@ -267,7 +286,7 @@ class PurchaseReturnController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Materials returned successfully.',
-                'redirect' => route('purchase-returns.show',$purchaseReturn),
+                'redirect' => route('purchase-returns.show', $purchaseReturn),
             ], 201);
         } catch (\RuntimeException $e) {
 
@@ -281,7 +300,7 @@ class PurchaseReturnController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Unable to process the purchase return.',
-                'error'=>$e->getMessage(),
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -305,12 +324,12 @@ class PurchaseReturnController extends Controller
 
     private function generateReturnNumber(): string
     {
-        return 'RET-' . str_pad((PurchaseReturn::max('id') ?? 0) + 1,5,'0',STR_PAD_LEFT);
+        return 'RET-' . str_pad((PurchaseReturn::max('id') ?? 0) + 1, 5, '0', STR_PAD_LEFT);
     }
 
 
     private function generateCreditNumber(): string
     {
-        return 'VC-' . str_pad((VendorCredit::max('id') ?? 0) + 1,5,'0',STR_PAD_LEFT);
+        return 'VC-' . str_pad((VendorCredit::max('id') ?? 0) + 1, 5, '0', STR_PAD_LEFT);
     }
 }

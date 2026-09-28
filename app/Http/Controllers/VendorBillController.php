@@ -4,13 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\PurchaseOrder;
 use App\Models\VendorBill;
+use App\Services\PurchaseRequestActivityService;
 use App\Services\UnitConversionService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class VendorBillController extends Controller
 {
+    public function __construct(private PurchaseRequestActivityService $activity)
+    {}
+    
     /**
      * Display vendor bills and purchase orders
      * available for bill generation.
@@ -303,6 +308,15 @@ class VendorBillController extends Controller
                     'subtotal' => round($subtotal, 2),
                     'total' => round($subtotal, 2),
                 ]);
+
+                $this->activity->log(
+                    $purchaseOrder->purchaseRequest,
+                    Auth::user(),
+                    $vendorBill->vendor,
+                    'Vendor Bill Created.',
+                    "Vendor Bill {$vendorBill->bill_number} was created for Purchase Order {$purchaseOrder->order_number}.",
+                    $vendorBill
+                );
 
                 return $vendorBill;
             });

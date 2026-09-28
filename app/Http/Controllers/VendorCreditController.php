@@ -4,11 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\VendorBill;
 use App\Models\VendorCredit;
+use App\Services\PurchaseRequestActivityService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class VendorCreditController extends Controller
 {
+    public function __construct(
+        private PurchaseRequestActivityService $activity
+    ) {}
     /**
      * Display vendor credits.
      */
@@ -29,30 +34,6 @@ class VendorCreditController extends Controller
         );
     }
 
-
-    /**
-     * Display a vendor credit.
-     */
-    // public function show(VendorCredit $vendorCredit)
-    // {
-    //     $vendorCredit->load([
-    //         'vendor.vendorBills.vendorPayments',
-    //         'vendor.vendorBills.creditApplications',
-
-    //         'purchaseReturn.goodsReceipt.purchaseOrder',
-
-    //         'vendorBill',
-
-    //         'applications.vendorBill',
-
-    //         'refunds',
-    //     ]);
-
-    //     return view(
-    //         'vendor_credits.show',
-    //         compact('vendorCredit')
-    //     );
-    // }
 
     public function show(VendorCredit $vendorCredit)
     {
@@ -208,7 +189,7 @@ class VendorCreditController extends Controller
                  *
                  * This record itself is the source of truth.
                  */
-                $credit->applications()->create([
+                $application =  $credit->applications()->create([
                     'vendor_bill_id' => $bill->id,
 
                     'amount' => $amount,
@@ -242,6 +223,18 @@ class VendorCreditController extends Controller
                  * vendor credit
                  */
                 $this->updateBillStatus($bill);
+
+                /*
+             * Vendor credit applied.
+             */
+                $this->activity->log(
+                    $bill->purchaseOrder->purchaseRequest,
+                    Auth::user(),
+                    $credit->vendor,
+                    'Vendor credit applied',
+                    "Vendor Credit was applied for Rs. {$amount} against Vendor Bill {$bill->bill_number}.",
+                    $application
+                );
             });
 
 
@@ -363,7 +356,7 @@ class VendorCreditController extends Controller
                  *
                  * Do NOT increment refunded_amount manually.
                  */
-                $credit->refunds()->create([
+                $refund = $credit->refunds()->create([
                     'amount' =>
                     $amount,
 
@@ -397,6 +390,32 @@ class VendorCreditController extends Controller
                 $this->updateCreditStatus(
                     $credit
                 );
+
+                /*
+             * Vendor refund activity.
+             */
+                $this->activity->log(
+                    $credit->purchaseReturn->goodsReceipt->purchaseOrder->purchaseRequest,
+                    Auth::user(),
+                    $credit->vendor,
+                    'Vendor refund recorded',
+                    "Vendor refund of Rs. {$amount} was recorded against Vendor Credit.",
+                    $refund
+                );
+
+                /*
+             * Credit fully refunded.
+             */
+                if ($credit->status === 'refunded') {
+                    $this->activity->log(
+                        $credit->purchaseReturn->goodsReceipt->purchaseOrder->purchaseRequest,
+                        Auth::user(),
+                        $credit->vendor,
+                        'Vendor credit refunded',
+                        "Vendor Credit was fully refunded.",
+                        $credit
+                    );
+                }
             });
 
 

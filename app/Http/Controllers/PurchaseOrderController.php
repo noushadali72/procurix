@@ -69,7 +69,7 @@ class PurchaseOrderController extends Controller
                 $this->activity->log(
                     $purchaseOrder->purchaseRequest,
                     Auth::user(),
-                    $purchaseOrder->vendor_id,
+                    $purchaseOrder->vendor,
                     "Purchase Order Deleted.",
                     "Purchase Order was deleted from purchase request number: {$purchaseOrder->purchaseRequest->request_number}.",
                 );

@@ -504,9 +504,9 @@ class PurchaseRequestController extends Controller
 
                 // Activity Logging
                 $this->activity->log(
-                    $selectedRequest,
+                    $requestItem,
                     Auth::user(),
-                    $selectedRequest->vendor,
+                    $requestItem->vendor,
                     'Purchase Request Cancelled.',
                     "Purchase Request cancelled because another vendor request was selected.",
 
@@ -551,7 +551,7 @@ class PurchaseRequestController extends Controller
             $this->activity->log(
                 $purchaseRequest,
                 Auth::user(),
-                $purchaseRequest->vendor_id,
+                $purchaseRequest->vendor,
                 "Purchase Request Duplicated.",
                 "Purchase Request duplicated from {$pr->request_number} by " . Auth::user()->name . '.',
                 $purchaseRequest
