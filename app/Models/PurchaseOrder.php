@@ -67,8 +67,28 @@ class PurchaseOrder extends Model
         return $this->hasOne(RfqComparison::class);
     }
 
-    private static function generateOrderNumber(): string
+    public function getOrderedQtyAttribute()
     {
-        return "PO-" . str_pad(((PurchaseOrder::max('id') ?? 0) + 1), 5, '0', STR_PAD_LEFT);
+        return $this->items()->sum('qty');
+    }
+
+
+    public function getReceivedQtyAttribute()
+    {
+        return GoodsReceiptItem::whereHas('goodsReceipt', function ($query) {
+            $query->where('purchase_order_id', $this->id);
+        })->sum('qty');
+    }
+
+    public function getReturnedQtyAttribute()
+    {
+        return PurchaseReturnItem::whereHas('goodsReceiptItem.goodsReceipt', function ($query) {
+            $query->where('purchase_order_id', $this->id);
+        })->sum('qty');
+    }
+
+    public function getReturnableQtyAttribute()
+    {
+        return max($this->received_qty - $this->returned_qty, 0);
     }
 }

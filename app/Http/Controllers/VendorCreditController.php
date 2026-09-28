@@ -55,34 +55,34 @@ class VendorCreditController extends Controller
     // }
 
     public function show(VendorCredit $vendorCredit)
-{
-    $vendorCredit->load([
-        'vendor',
-        'purchaseReturn.goodsReceipt.purchaseOrder',
-        'vendorBill',
-        'applications.vendorBill',
-        'refunds',
-    ]);
+    {
+        $vendorCredit->load([
+            'vendor',
+            'purchaseReturn.goodsReceipt.purchaseOrder',
+            'vendorBill',
+            'applications.vendorBill',
+            'refunds',
+        ]);
 
-    $vendorBills = VendorBill::where(
+        $vendorBills = VendorBill::where(
             'vendor_id',
             $vendorCredit->vendor_id
         )
-        ->with([
-            'vendorPayments',
-            'creditApplications',
-        ])
-        ->latest()
-        ->get()
-        ->filter(function ($bill) {
-            return $bill->due_amount > 0;
-        });
+            ->with([
+                'vendorPayments',
+                'creditApplications',
+            ])
+            ->latest()
+            ->get()
+            ->filter(function ($bill) {
+                return $bill->due_amount > 0;
+            });
 
-    return view(
-        'vendor_credits.show',
-        compact('vendorCredit', 'vendorBills')
-    );
-}
+        return view(
+            'vendor_credits.show',
+            compact('vendorCredit', 'vendorBills')
+        );
+    }
 
 
     /**
@@ -501,33 +501,18 @@ class VendorCreditController extends Controller
     /**
      * Recalculate Vendor Bill status.
      */
-    private function updateBillStatus(
-        VendorBill $bill
-    ): void {
-
-        /*
-         * due_amount already considers both
-         * payments and credit applications.
-         */
-        $dueAmount =
-            (float) $bill->due_amount;
-
+    private function updateBillStatus(VendorBill $bill): void
+    {
+        $dueAmount = (float) $bill->due_amount;
+        $paidAmount = (float) $bill->paid_amount;
 
         if ($dueAmount <= 0) {
-
             $status = 'paid';
+        } elseif ($paidAmount > 0) {
+            $status = 'partially_paid';
         } else {
-
-            $settledAmount =
-                (float) $bill->paid_amount
-                + (float) $bill->credited_amount;
-
-
-            $status = $settledAmount > 0
-                ? 'partially_paid'
-                : 'unpaid';
+            $status = 'unpaid';
         }
-
 
         $bill->update([
             'status' => $status,

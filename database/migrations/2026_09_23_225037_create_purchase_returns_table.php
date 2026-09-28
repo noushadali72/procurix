@@ -10,21 +10,10 @@ return new class extends Migration
     {
         Schema::create('purchase_returns', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('goods_receipt_id')
-                ->constrained('goods_receipts')
-                ->restrictOnDelete();
-
+            $table->foreignId('goods_receipt_id')->constrained('goods_receipts')->restrictOnDelete();
             $table->string('return_number')->unique();
-
             $table->date('return_date');
-
-            $table->enum('status', [
-                'draft',
-                'completed',
-                'cancelled'
-            ])->default('draft');
-
+            $table->enum('status', ['draft', 'completed', 'cancelled'])->default('draft');
             $table->string('reason')->nullable();
             $table->text('notes')->nullable();
 

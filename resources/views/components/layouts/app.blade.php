@@ -96,10 +96,10 @@
         <div class="flex h-16 shrink-0 items-center
                    border-b border-gray-800 px-5">
 
-            <a href="{{ route('admin.dashboard') }}" class="flex min-w-0 items-center">
+            <a href="{{ route('admin.dashboard') }}" class="flex min-w-0 items-center justify-start">
 
                 <img src="{{ asset('storage/logo.png') }}" alt="{{ config('app.name') }}"
-                    class="max-h-9 max-w-[175px] object-contain">
+                    class="max-h-30 max-w-[200px] object-cover">
 
             </a>
 

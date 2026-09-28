@@ -24,11 +24,17 @@ class VendorBillController extends Controller
             ->latest()
             ->paginate(10);
 
-        $purchaseOrders = PurchaseOrder::with('vendor')
+
+        $purchaseOrders = PurchaseOrder::with([
+            'vendor',
+            'goodsReceipts.items.purchaseReturnItems',
+        ])
             ->where('status', 'received')
             ->whereDoesntHave('vendorBill')
             ->latest()
-            ->get();
+            ->get()
+            ->filter(fn($purchaseOrder) => $purchaseOrder->returnable_qty > 0)
+            ->values();
 
         return view(
             'vendor_bills.index',
@@ -174,15 +180,15 @@ class VendorBillController extends Controller
                      * the Purchase Order item's unit.
                      */
                     $receivedQty = $orderItem->goodsReceiptItems->sum(function ($receiptItem) use (
-                            $conversion,
-                            $orderItem
-                        ) {
-                            return $conversion->convert(
-                                (float) $receiptItem->qty,
-                                $receiptItem->unit,
-                                $orderItem->unit
-                            );
-                        });
+                        $conversion,
+                        $orderItem
+                    ) {
+                        return $conversion->convert(
+                            (float) $receiptItem->qty,
+                            $receiptItem->unit,
+                            $orderItem->unit
+                        );
+                    });
 
 
                     /*
@@ -194,32 +200,32 @@ class VendorBillController extends Controller
                      * Only completed returns affect the bill.
                      */
                     $returnedQty = $orderItem->goodsReceiptItems->sum(function ($receiptItem) use (
-                            $conversion,
-                            $orderItem
-                        ) {
+                        $conversion,
+                        $orderItem
+                    ) {
 
-                            return $receiptItem
-                                ->purchaseReturnItems
-                                ->sum(function ($returnItem) use (
-                                    $conversion,
-                                    $orderItem
+                        return $receiptItem
+                            ->purchaseReturnItems
+                            ->sum(function ($returnItem) use (
+                                $conversion,
+                                $orderItem
+                            ) {
+
+                                if (
+                                    $returnItem
+                                    ->purchaseReturn
+                                    ?->status !== 'completed'
                                 ) {
+                                    return 0;
+                                }
 
-                                    if (
-                                        $returnItem
-                                        ->purchaseReturn
-                                        ?->status !== 'completed'
-                                    ) {
-                                        return 0;
-                                    }
-
-                                    return $conversion->convert(
-                                        (float) $returnItem->qty,
-                                        $returnItem->unit,
-                                        $orderItem->unit
-                                    );
-                                });
-                        });
+                                return $conversion->convert(
+                                    (float) $returnItem->qty,
+                                    $returnItem->unit,
+                                    $orderItem->unit
+                                );
+                            });
+                    });
 
 
                     /*
@@ -268,8 +274,8 @@ class VendorBillController extends Controller
                         'raw_material_id' => $orderItem->raw_material_id,
                         'qty' => $billableQty,
                         'unit_id' => $orderItem->unit_id,
-                        'unit_cost' =>$unitCost,
-                        'line_total' =>$lineTotal,
+                        'unit_cost' => $unitCost,
+                        'line_total' => $lineTotal,
                     ]);
                 }
 
@@ -301,18 +307,16 @@ class VendorBillController extends Controller
                 return $vendorBill;
             });
             return response()->json([
-                'success'=>true,
+                'success' => true,
                 'message' => 'Vendor bill generated successfully.',
-                'redirect' => route('vendor-bills.show',$vendorBill),
+                'redirect' => route('vendor-bills.show', $vendorBill),
             ]);
-
         } catch (\RuntimeException $e) {
 
             return response()->json([
-                'success'=>false,
+                'success' => false,
                 'message' => $e->getMessage(),
             ], 422);
-
         } catch (\Throwable $e) {
 
             report($e);
