@@ -124,7 +124,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('vendor-payments', VendorPaymentController::class)->except('store');
     Route::post('vendor-payments/{vendorBill}', [VendorPaymentController::class, 'store'])->name('vendor-payments.store');
     Route::resource('payment-terms', PaymentTermController::class)->only(['index', 'store', 'update', 'destroy']);
-    Route::view('test', 'test.index');
 
 
     // Vendor Credits

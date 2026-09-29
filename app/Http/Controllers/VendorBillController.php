@@ -13,9 +13,8 @@ use Illuminate\Support\Facades\DB;
 
 class VendorBillController extends Controller
 {
-    public function __construct(private PurchaseRequestActivityService $activity)
-    {}
-    
+    public function __construct(private PurchaseRequestActivityService $activity) {}
+
     /**
      * Display vendor bills and purchase orders
      * available for bill generation.
@@ -73,6 +72,24 @@ class VendorBillController extends Controller
     }
 
 
+    // public function show(VendorBill $vendorBill)
+    // {
+    //     $vendorBill->load([
+    //         'vendor',
+    //         'items',
+    //         'items.rawMaterial',
+    //         'items.unit',
+    //         'purchaseOrder',
+    //         'vendorPayments',
+    //         'creditApplications',
+    //     ]);
+
+    //     return view(
+    //         'vendor_bills.show',
+    //         compact('vendorBill')
+    //     );
+    // }
+
     public function show(VendorBill $vendorBill)
     {
         $vendorBill->load([
@@ -81,6 +98,8 @@ class VendorBillController extends Controller
             'items.rawMaterial',
             'items.unit',
             'purchaseOrder',
+            'purchaseOrder.purchaseRequest.activities.user',
+            'purchaseOrder.purchaseRequest.activities.vendor',
             'vendorPayments',
             'creditApplications',
         ]);

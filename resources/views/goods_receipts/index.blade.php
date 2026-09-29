@@ -1,54 +1,50 @@
 <x-layouts.app title="Goods Receipts">
 
-    <div class="max-w-7xl">
+    {{-- Breadcrumb --}}
+    <nav class="mb-6 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
 
-        {{-- Breadcrumb --}}
-        <nav class="mb-6 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+        <a href="{{ route('admin.dashboard') }}" class="transition hover:text-slate-900 dark:hover:text-white">
+            Dashboard
+        </a>
 
-            <a href="{{ route('admin.dashboard') }}" class="transition hover:text-slate-900 dark:hover:text-white">
-                Dashboard
-            </a>
+        <i class="bx bx-chevron-right text-slate-400"></i>
 
-            <i class="bx bx-chevron-right text-slate-400"></i>
+        <span class="text-slate-500 dark:text-slate-400">
+            Receiving
+        </span>
 
-            <span class="text-slate-500 dark:text-slate-400">
-                Receiving
-            </span>
+        <i class="bx bx-chevron-right text-slate-400"></i>
 
-            <i class="bx bx-chevron-right text-slate-400"></i>
+        <span class="font-medium text-slate-700 dark:text-slate-200">
+            Goods Receipts
+        </span>
 
-            <span class="font-medium text-slate-700 dark:text-slate-200">
-                Goods Receipts
-            </span>
-
-        </nav>
+    </nav>
 
 
-        {{-- Page Header --}}
-        <div class="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    {{-- Page Header --}}
+    <div class="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 
-            <div>
+        <div>
 
-                <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3">
 
-                    <div
-                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                <div
+                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
 
-                        <i class="bx bx-package text-xl"></i>
+                    <i class="bx bx-package text-xl"></i>
 
-                    </div>
+                </div>
 
-                    <div>
+                <div>
 
-                        <h1 class="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
-                            Goods Receipts
-                        </h1>
+                    <h1 class="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
+                        Goods Receipts
+                    </h1>
 
-                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                            View materials received against purchase orders.
-                        </p>
-
-                    </div>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        View materials received against purchase orders.
+                    </p>
 
                 </div>
 
@@ -56,35 +52,39 @@
 
         </div>
 
-
-        {{-- Success Message --}}
-        @if (session('success'))
-            <div
-                class="mb-5 flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400">
-
-                <i class="bx bx-check-circle mt-0.5 text-base"></i>
-
-                <span>
-                    {{ session('success') }}
-                </span>
-
-            </div>
-        @endif
+    </div>
 
 
-        {{-- Error Message --}}
-        @if (session('error'))
-            <div
-                class="mb-5 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+    {{-- Success Message --}}
+    @if (session('success'))
+        <div
+            class="mb-5 flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400">
 
-                <i class="bx bx-error-circle mt-0.5 text-base"></i>
+            <i class="bx bx-check-circle mt-0.5 text-base"></i>
 
-                <span>
-                    {{ session('error') }}
-                </span>
+            <span>
+                {{ session('success') }}
+            </span>
 
-            </div>
-        @endif
+        </div>
+    @endif
+
+
+    {{-- Error Message --}}
+    @if (session('error'))
+        <div
+            class="mb-5 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+
+            <i class="bx bx-error-circle mt-0.5 text-base"></i>
+
+            <span>
+                {{ session('error') }}
+            </span>
+
+        </div>
+    @endif
+    <div class="">
+
 
 
         {{-- Main Card --}}

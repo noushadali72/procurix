@@ -35,11 +35,42 @@ class VendorCreditController extends Controller
     }
 
 
+    // public function show(VendorCredit $vendorCredit)
+    // {
+    //     $vendorCredit->load([
+    //         'vendor',
+    //         'purchaseReturn.goodsReceipt.purchaseOrder',
+    //         'vendorBill',
+    //         'applications.vendorBill',
+    //         'refunds',
+    //     ]);
+
+    //     $vendorBills = VendorBill::where(
+    //         'vendor_id',
+    //         $vendorCredit->vendor_id
+    //     )
+    //         ->with([
+    //             'vendorPayments',
+    //             'creditApplications',
+    //         ])
+    //         ->latest()
+    //         ->get()
+    //         ->filter(function ($bill) {
+    //             return $bill->due_amount > 0;
+    //         });
+
+    //     return view(
+    //         'vendor_credits.show',
+    //         compact('vendorCredit', 'vendorBills')
+    //     );
+    // }
+
     public function show(VendorCredit $vendorCredit)
     {
         $vendorCredit->load([
             'vendor',
-            'purchaseReturn.goodsReceipt.purchaseOrder',
+            'purchaseReturn.goodsReceipt.purchaseOrder.purchaseRequest.activities.user',
+            'purchaseReturn.goodsReceipt.purchaseOrder.purchaseRequest.activities.vendor',
             'vendorBill',
             'applications.vendorBill',
             'refunds',

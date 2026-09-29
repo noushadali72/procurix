@@ -1,680 +1,428 @@
 <x-layouts.app title="Vendor Bill">
 
-    {{-- Header --}}
-    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    @php
+        $purchaseRequest = $vendorBill->purchaseOrder->purchaseRequest;
+        $activities = $purchaseRequest?->activities ?? collect();
+    @endphp
 
-        <div>
-            <a href="{{ route('vendor-bills.index') }}"
-                class="inline-flex items-center text-sm font-medium text-gray-500 transition hover:text-gray-900">
-                <i class="bx bx-arrow-back mr-1.5"></i>
-                Back to Vendor Bills
-            </a>
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
-            <div class="mt-3">
-
-                <div class="flex flex-wrap items-center gap-2">
-
-                    <h1 class="text-xl font-semibold text-gray-900">
-                        Vendor Bill #{{ $vendorBill->bill_number }}
-                    </h1>
-
-                    @php
-                        $statusClass = match ($vendorBill->status) {
-                            'paid' => 'bg-green-50 text-green-700',
-                            'partially_paid' => 'bg-amber-50 text-amber-700',
-                            'overdue' => 'bg-red-50 text-red-700',
-                            'unpaid' => 'bg-yellow-50 text-yellow-700',
-                            default => 'bg-gray-100 text-gray-700',
-                        };
-
-                        $statusDot = match ($vendorBill->status) {
-                            'paid' => 'bg-green-500',
-                            'partially_paid' => 'bg-amber-500',
-                            'overdue' => 'bg-red-500',
-                            'unpaid' => 'bg-yellow-500',
-                            default => 'bg-gray-400',
-                        };
-
-                        $statusLabel = match ($vendorBill->status) {
-                            'partially_paid' => 'Partially Paid',
-                            default => ucfirst(str_replace('_', ' ', $vendorBill->status)),
-                        };
-                    @endphp
-
-                    <span
-                        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
-                        <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
-                        {{ $statusLabel }}
-                    </span>
-
-                </div>
-
-                <p class="mt-1 text-sm text-gray-500">
-                    View vendor bill details, items, and payment information.
-                </p>
-
-            </div>
-        </div>
-
-        {{-- Header Actions --}}
-        <div class="flex items-center gap-2">
-
-            <a href="{{ route('vendor-bills.generatepdf', $vendorBill) }}" target="_blank"
-                class="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
-                <i class="bx bx-file"></i>
-                Generate PDF
-            </a>
-
-            @if ($vendorBill->due_amount > 0)
-                <button type="button" id="openPaymentModal"
-                    class="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
-                    <i class="bx bx-money"></i>
-                    Record Payment
-                </button>
-            @endif
-
-        </div>
-
-    </div>
-
-
-    {{-- Bill Information --}}
-    <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-sm">
-
-        <div class="border-b border-gray-200 px-6 py-4">
-
-            <h3 class="font-semibold text-gray-900">
-                Bill Information
-            </h3>
-
-            <p class="mt-1 text-sm text-gray-500">
-                Vendor bill and purchase order information.
-            </p>
-
-        </div>
-
-        <div class="grid grid-cols-1 gap-x-8 gap-y-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
-
-            {{-- Bill Number --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Bill Number
-                </p>
-
-                <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $vendorBill->bill_number }}
-                </p>
-            </div>
-
-            {{-- Vendor --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Vendor
-                </p>
-
-                <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $vendorBill->vendor->company_name ?? ($vendorBill->vendor->name ?? '-') }}
-                </p>
-            </div>
-
-            {{-- Purchase Order --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Purchase Order
-                </p>
-
-                <a href="{{ route('purchase-orders.show', $vendorBill->purchaseOrder) }}"
-                    class="mt-1.5 font-semibold text-blue-900 underline">
-                    {{ $vendorBill->purchaseOrder->order_number ?? '-' }}
-                </a>
-            </div>
-
-            {{-- Bill Date --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Bill Date
-                </p>
-
-                <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $vendorBill->bill_date ? \Carbon\Carbon::parse($vendorBill->bill_date)->format('d M Y') : '-' }}
-                </p>
-            </div>
-
-            {{-- Due Date --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Due Date
-                </p>
-
-                <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $vendorBill->due_date ? \Carbon\Carbon::parse($vendorBill->due_date)->format('d M Y') : '-' }}
-                </p>
-            </div>
-
-            {{-- Status --}}
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Status
-                </p>
-
-                <div class="mt-1.5">
-                    <span
-                        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
-                        <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
-                        {{ $statusLabel }}
-                    </span>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    {{-- Vendor Information --}}
-    <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-sm">
-
-        <div class="border-b border-gray-200 px-6 py-4">
-
-            <h3 class="font-semibold text-gray-900">
-                Vendor Information
-            </h3>
-
-            <p class="mt-1 text-sm text-gray-500">
-                Vendor details associated with this bill.
-            </p>
-
-        </div>
-
-        <div class="grid grid-cols-1 gap-x-8 gap-y-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
-
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Vendor
-                </p>
-
-                <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $vendorBill->vendor->company_name ?? ($vendorBill->vendor->name ?? '-') }}
-                </p>
-            </div>
-
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Contact
-                </p>
-
-                <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $vendorBill->vendor->phone ?? ($vendorBill->vendor->contact_no ?? '-') }}
-                </p>
-            </div>
-
-            <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Email
-                </p>
-
-                <p class="mt-1.5 font-semibold text-gray-900">
-                    {{ $vendorBill->vendor->email ?? '-' }}
-                </p>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    {{-- Bill Items --}}
-    <div class="mb-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-
-        <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-
-            <div>
-                <h3 class="font-semibold text-gray-900">
-                    Bill Items
-                </h3>
-
-                <p class="mt-1 text-sm text-gray-500">
-                    Items included in this vendor bill.
-                </p>
-            </div>
-
-            <span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
-                {{ $vendorBill->items->count() }} Items
-            </span>
-
-        </div>
-
-        <div class="overflow-x-auto">
-
-            <table class="w-full min-w-[750px] text-left text-sm">
-
-                <thead class="border-b border-gray-200 bg-gray-50">
-
-                    <tr class="text-xs font-medium uppercase tracking-wide text-gray-500">
-
-                        <th class="px-6 py-3.5">
-                            Item
-                        </th>
-
-                        <th class="px-6 py-3.5">
-                            Unit
-                        </th>
-
-                        <th class="px-6 py-3.5 text-right">
-                            Quantity
-                        </th>
-
-                        <th class="px-6 py-3.5 text-right">
-                            Unit Cost
-                        </th>
-
-                        <th class="px-6 py-3.5 text-right">
-                            Total
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody class="divide-y divide-gray-100">
-
-                    @forelse ($vendorBill->items as $item)
-                        <tr class="transition hover:bg-gray-50">
-
-                            <td class="px-6 py-4">
-
-                                <p class="font-medium text-gray-900">
-                                    {{ $item->product->name ?? ($item->rawMaterial->name ?? '-') }}
-                                </p>
-
-                                @if ($item->rawMaterial?->sku)
-                                    <p class="mt-0.5 text-xs text-gray-500">
-                                        {{ $item->rawMaterial->sku }}
-                                    </p>
-                                @endif
-
-                            </td>
-
-                            <td class="px-6 py-4 text-gray-600">
-                                {{ $item->unit->short_name ?? ($item->unit->name ?? '-') }}
-                            </td>
-
-                            <td class="px-6 py-4 text-right font-medium text-gray-900">
-                                {{ $item->qty }}
-                            </td>
-
-                            <td class="px-6 py-4 text-right text-gray-700">
-                                {{ number_format($item->unit_cost, 2) }}
-                            </td>
-
-                            <td class="px-6 py-4 text-right font-semibold text-gray-900">
-                                {{ number_format($item->line_total, 2) }}
-                            </td>
-
-                        </tr>
-
-                    @empty
-
-                        <tr>
-                            <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">
-                                No bill items found.
-                            </td>
-                        </tr>
-                    @endforelse
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-
-    {{-- Financial Summary --}}
-    <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-sm">
-
-        <div class="border-b border-gray-200 px-6 py-4">
-            <h3 class="font-semibold text-gray-900">
-                Financial Summary
-            </h3>
-        </div>
-
-        <div class="p-6">
-
-            <div class="ml-auto max-w-sm space-y-3">
-
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">
-                        Subtotal
-                    </span>
-
-                    <span class="font-medium text-gray-900">
-                        {{ number_format($vendorBill->subtotal, 2) }}
-                    </span>
-                </div>
-
-
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">
-                        Tax
-                    </span>
-
-                    <span class="font-medium text-gray-900">
-                        {{ number_format($vendorBill->tax, 2) }}
-                    </span>
-                </div>
-
-
-                <div class="flex justify-between border-t border-gray-200 pt-3">
-                    <span class="font-semibold text-gray-700">
-                        Total
-                    </span>
-
-                    <span class="font-semibold text-gray-900">
-                        {{ number_format($vendorBill->total, 2) }}
-                    </span>
-                </div>
-
-
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">
-                        Paid
-                    </span>
-
-                    <span class="font-medium text-green-700">
-                        {{ number_format($vendorBill->paid_amount, 2) }}
-                    </span>
-                </div>
-
-
-                @if ($vendorBill->credited_amount > 0)
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-500">
-                            Vendor Credit
-                        </span>
-
-                        <span class="font-medium text-amber-700">
-                            {{ number_format($vendorBill->credited_amount, 2) }}
-                        </span>
-                    </div>
-                @endif
-
-
-                <div class="flex justify-between border-t border-gray-200 pt-3">
-
-                    <span class="font-semibold text-gray-900">
-                        Outstanding
-                    </span>
-
-                    <span
-                        class="text-lg font-bold
-                    {{ $vendorBill->due_amount > 0 ? 'text-red-600' : 'text-green-700' }}">
-
-                        {{ number_format($vendorBill->due_amount, 2) }}
-
-                    </span>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    {{-- Notes --}}
-    @if ($vendorBill->notes)
-        <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-sm">
-
-            <div class="border-b border-gray-200 px-6 py-4">
-
-                <h3 class="font-semibold text-gray-900">
-                    Notes
-                </h3>
-
-            </div>
-
-            <div class="p-6">
-
-                <p class="whitespace-pre-line text-sm leading-6 text-gray-700">
-                    {{ $vendorBill->notes }}
-                </p>
-
-            </div>
-
-        </div>
-    @endif
-
-    {{-- Payment Modal --}}
-    <div id="paymentModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4">
-
-        {{-- Modal Container --}}
-        <div
-            class="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden
-               rounded-xl border border-gray-200 bg-white
-               shadow-[0_20px_60px_-15px_rgba(0,0,0,0.30)]">
+        <div class="lg:col-span-2">
 
             {{-- Header --}}
-            <div
-                class="flex shrink-0 items-center justify-between
-                   border-b border-gray-200 bg-white px-5 py-4">
+            <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
                 <div>
+                    <a href="{{ route('vendor-bills.index') }}"
+                        class="inline-flex items-center text-sm font-medium text-gray-500 transition hover:text-gray-900">
+                        <i class="bx bx-arrow-back mr-1.5"></i>
+                        Back to Vendor Bills
+                    </a>
+
+                    <div class="mt-3">
+
+                        <div class="flex flex-wrap items-center gap-2">
+
+                            <h1 class="text-xl font-semibold text-gray-900">
+                                Vendor Bill #{{ $vendorBill->bill_number }}
+                            </h1>
+
+                            @php
+                                $statusClass = match ($vendorBill->status) {
+                                    'paid' => 'bg-green-50 text-green-700',
+                                    'partially_paid' => 'bg-amber-50 text-amber-700',
+                                    'overdue' => 'bg-red-50 text-red-700',
+                                    'unpaid' => 'bg-yellow-50 text-yellow-700',
+                                    default => 'bg-gray-100 text-gray-700',
+                                };
+
+                                $statusDot = match ($vendorBill->status) {
+                                    'paid' => 'bg-green-500',
+                                    'partially_paid' => 'bg-amber-500',
+                                    'overdue' => 'bg-red-500',
+                                    'unpaid' => 'bg-yellow-500',
+                                    default => 'bg-gray-400',
+                                };
+
+                                $statusLabel = match ($vendorBill->status) {
+                                    'partially_paid' => 'Partially Paid',
+                                    default => ucfirst(str_replace('_', ' ', $vendorBill->status)),
+                                };
+                            @endphp
+
+                            <span
+                                class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
+                                <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
+                                {{ $statusLabel }}
+                            </span>
+
+                        </div>
+
+                        <p class="mt-1 text-sm text-gray-500">
+                            View vendor bill details, items, and payment information.
+                        </p>
+
+                    </div>
+                </div>
+
+                {{-- Header Actions --}}
+                <div class="flex items-center gap-2">
+
+                    <a href="{{ route('vendor-bills.generatepdf', $vendorBill) }}" target="_blank"
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
+                        <i class="bx bx-file"></i>
+                        Generate PDF
+                    </a>
+
+                    @if ($vendorBill->due_amount > 0)
+                        <button type="button" id="openPaymentModal"
+                            class="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
+                            <i class="bx bx-money"></i>
+                            Record Payment
+                        </button>
+                    @endif
+
+                </div>
+
+            </div>
+
+
+            {{-- Bill Information --}}
+            <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-sm">
+
+                <div class="border-b border-gray-200 px-6 py-4">
 
                     <h3 class="font-semibold text-gray-900">
-                        Make Payment
+                        Bill Information
                     </h3>
 
                     <p class="mt-1 text-sm text-gray-500">
-                        Record a payment for this vendor bill.
+                        Vendor bill and purchase order information.
                     </p>
 
                 </div>
 
-                <button type="button" id="closePaymentModal"
-                    class="flex h-9 w-9 items-center justify-center
-                       rounded-lg border border-gray-200
-                       text-gray-400 shadow-sm transition
-                       hover:bg-gray-50 hover:text-gray-700">
+                <div class="grid grid-cols-1 gap-x-8 gap-y-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
 
-                    <i class="bx bx-x text-2xl"></i>
+                    {{-- Bill Number --}}
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
+                            Bill Number
+                        </p>
 
-                </button>
+                        <p class="mt-1.5 font-semibold text-gray-900">
+                            {{ $vendorBill->bill_number }}
+                        </p>
+                    </div>
+
+                    {{-- Vendor --}}
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
+                            Vendor
+                        </p>
+
+                        <p class="mt-1.5 font-semibold text-gray-900">
+                            {{ $vendorBill->vendor->company_name ?? ($vendorBill->vendor->name ?? '-') }}
+                        </p>
+                    </div>
+
+                    {{-- Purchase Order --}}
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
+                            Purchase Order
+                        </p>
+
+                        <a href="{{ route('purchase-orders.show', $vendorBill->purchaseOrder) }}"
+                            class="mt-1.5 font-semibold text-blue-900 underline">
+                            {{ $vendorBill->purchaseOrder->order_number ?? '-' }}
+                        </a>
+                    </div>
+
+                    {{-- Bill Date --}}
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
+                            Bill Date
+                        </p>
+
+                        <p class="mt-1.5 font-semibold text-gray-900">
+                            {{ $vendorBill->bill_date ? \Carbon\Carbon::parse($vendorBill->bill_date)->format('d M Y') : '-' }}
+                        </p>
+                    </div>
+
+                    {{-- Due Date --}}
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
+                            Due Date
+                        </p>
+
+                        <p class="mt-1.5 font-semibold text-gray-900">
+                            {{ $vendorBill->due_date ? \Carbon\Carbon::parse($vendorBill->due_date)->format('d M Y') : '-' }}
+                        </p>
+                    </div>
+
+                    {{-- Status --}}
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
+                            Status
+                        </p>
+
+                        <div class="mt-1.5">
+                            <span
+                                class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $statusClass }}">
+                                <span class="h-1.5 w-1.5 rounded-full {{ $statusDot }}"></span>
+                                {{ $statusLabel }}
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
 
             </div>
 
 
-            {{-- Form --}}
-            <form id="paymentForm" action="{{ route('vendor-payments.store', $vendorBill) }}" method="POST"
-                enctype="multipart/form-data" class="flex min-h-0 flex-1 flex-col">
+            {{-- Vendor Information --}}
+            <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-sm">
 
-                @csrf
+                <div class="border-b border-gray-200 px-6 py-4">
+
+                    <h3 class="font-semibold text-gray-900">
+                        Vendor Information
+                    </h3>
+
+                    <p class="mt-1 text-sm text-gray-500">
+                        Vendor details associated with this bill.
+                    </p>
+
+                </div>
+
+                <div class="grid grid-cols-1 gap-x-8 gap-y-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
+
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
+                            Vendor
+                        </p>
+
+                        <p class="mt-1.5 font-semibold text-gray-900">
+                            {{ $vendorBill->vendor->company_name ?? ($vendorBill->vendor->name ?? '-') }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
+                            Contact
+                        </p>
+
+                        <p class="mt-1.5 font-semibold text-gray-900">
+                            {{ $vendorBill->vendor->phone ?? ($vendorBill->vendor->contact_no ?? '-') }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
+                            Email
+                        </p>
+
+                        <p class="mt-1.5 font-semibold text-gray-900">
+                            {{ $vendorBill->vendor->email ?? '-' }}
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
 
 
-                {{-- Scrollable Form Body --}}
-                <div class="flex-1 overflow-y-auto px-5 py-4">
+            {{-- Bill Items --}}
+            <div class="mb-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
 
-                    <div class="space-y-4">
+                <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
 
-                        {{-- Outstanding --}}
-                        <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                    <div>
+                        <h3 class="font-semibold text-gray-900">
+                            Bill Items
+                        </h3>
 
-                            <div class="flex items-center justify-between">
+                        <p class="mt-1 text-sm text-gray-500">
+                            Items included in this vendor bill.
+                        </p>
+                    </div>
 
-                                <span class="text-sm text-gray-500">
-                                    Outstanding Amount
-                                </span>
+                    <span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+                        {{ $vendorBill->items->count() }} Items
+                    </span>
 
-                                <span class="font-semibold text-gray-900">
-                                    {{ number_format($vendorBill->due_amount, 2) }}
-                                </span>
+                </div>
 
-                            </div>
+                <div class="overflow-x-auto">
 
+                    <table class="w-full min-w-[750px] text-left text-sm">
+
+                        <thead class="border-b border-gray-200 bg-gray-50">
+
+                            <tr class="text-xs font-medium uppercase tracking-wide text-gray-500">
+
+                                <th class="px-6 py-3.5">
+                                    Item
+                                </th>
+
+                                <th class="px-6 py-3.5">
+                                    Unit
+                                </th>
+
+                                <th class="px-6 py-3.5 text-right">
+                                    Quantity
+                                </th>
+
+                                <th class="px-6 py-3.5 text-right">
+                                    Unit Cost
+                                </th>
+
+                                <th class="px-6 py-3.5 text-right">
+                                    Total
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody class="divide-y divide-gray-100">
+
+                            @forelse ($vendorBill->items as $item)
+                                <tr class="transition hover:bg-gray-50">
+
+                                    <td class="px-6 py-4">
+
+                                        <p class="font-medium text-gray-900">
+                                            {{ $item->product->name ?? ($item->rawMaterial->name ?? '-') }}
+                                        </p>
+
+                                        @if ($item->rawMaterial?->sku)
+                                            <p class="mt-0.5 text-xs text-gray-500">
+                                                {{ $item->rawMaterial->sku }}
+                                            </p>
+                                        @endif
+
+                                    </td>
+
+                                    <td class="px-6 py-4 text-gray-600">
+                                        {{ $item->unit->short_name ?? ($item->unit->name ?? '-') }}
+                                    </td>
+
+                                    <td class="px-6 py-4 text-right font-medium text-gray-900">
+                                        {{ $item->qty }}
+                                    </td>
+
+                                    <td class="px-6 py-4 text-right text-gray-700">
+                                        {{ number_format($item->unit_cost, 2) }}
+                                    </td>
+
+                                    <td class="px-6 py-4 text-right font-semibold text-gray-900">
+                                        {{ number_format($item->line_total, 2) }}
+                                    </td>
+
+                                </tr>
+
+                            @empty
+
+                                <tr>
+                                    <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">
+                                        No bill items found.
+                                    </td>
+                                </tr>
+                            @endforelse
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            {{-- Financial Summary --}}
+            <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-sm">
+
+                <div class="border-b border-gray-200 px-6 py-4">
+                    <h3 class="font-semibold text-gray-900">
+                        Financial Summary
+                    </h3>
+                </div>
+
+                <div class="p-6">
+
+                    <div class="ml-auto max-w-sm space-y-3">
+
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">
+                                Subtotal
+                            </span>
+
+                            <span class="font-medium text-gray-900">
+                                {{ number_format($vendorBill->subtotal, 2) }}
+                            </span>
                         </div>
 
 
-                        {{-- Amount + Payment Method --}}
-                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">
+                                Tax
+                            </span>
 
-                            {{-- Amount --}}
-                            <div>
-
-                                <label for="payment_amount" class="mb-1.5 block text-sm font-medium text-gray-700">
-                                    Payment Amount
-                                </label>
-
-                                <input type="number" step="0.01" min="0.01"
-                                    max="{{ $vendorBill->due_amount }}" value="{{ $vendorBill->due_amount }}"
-                                    id="payment_amount" name="amount" placeholder="Enter amount"
-                                    class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
-
-                                <p data-error="amount" class="mt-1 hidden text-xs text-red-600">
-                                </p>
-
-                            </div>
-
-
-                            {{-- Payment Method --}}
-                            <div>
-
-                                <label for="payment_method" class="mb-1.5 block text-sm font-medium text-gray-700">
-
-                                    Payment Method
-                                    <span class="text-red-500">*</span>
-
-                                </label>
-
-                                <select id="payment_method" name="payment_method"
-                                    class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
-
-                                    <option value="">
-                                        Select Method
-                                    </option>
-
-                                    <option value="cash">
-                                        Cash
-                                    </option>
-
-                                    <option value="bank_transfer">
-                                        Bank Transfer
-                                    </option>
-
-                                    <option value="cheque">
-                                        Cheque
-                                    </option>
-
-                                    <option value="card">
-                                        Card
-                                    </option>
-
-                                    <option value="other">
-                                        Other
-                                    </option>
-
-                                </select>
-
-                                <p data-error="payment_method" class="mt-1 hidden text-xs text-red-600">
-                                </p>
-
-                            </div>
-
+                            <span class="font-medium text-gray-900">
+                                {{ number_format($vendorBill->tax, 2) }}
+                            </span>
                         </div>
 
 
-                        {{-- Payment Date + Transaction ID --}}
-                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="flex justify-between border-t border-gray-200 pt-3">
+                            <span class="font-semibold text-gray-700">
+                                Total
+                            </span>
 
-                            {{-- Payment Date --}}
-                            <div>
-
-                                <label for="payment_date" class="mb-1.5 block text-sm font-medium text-gray-700">
-                                    Payment Date
-                                </label>
-
-                                <input type="date" id="payment_date" name="payment_date"
-                                    value="{{ now()->toDateString() }}"
-                                    class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
-
-                                <p data-error="payment_date" class="mt-1 hidden text-xs text-red-600">
-                                </p>
-
-                            </div>
-
-
-                            {{-- Transaction ID --}}
-                            <div>
-
-                                <label for="transaction_id" class="mb-1.5 block text-sm font-medium text-gray-700">
-
-                                    Transaction ID
-
-                                    <span class="font-normal text-gray-400">
-                                        (Optional)
-                                    </span>
-
-                                </label>
-
-                                <input type="text" id="transaction_id" name="transaction_id"
-                                    placeholder="Transaction ID"
-                                    class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
-
-                                <p data-error="transaction_id" class="mt-1 hidden text-xs text-red-600">
-                                </p>
-
-                            </div>
-
+                            <span class="font-semibold text-gray-900">
+                                {{ number_format($vendorBill->total, 2) }}
+                            </span>
                         </div>
 
 
-                        {{-- Payment Proof --}}
-                        <div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">
+                                Paid
+                            </span>
 
-                            <label for="payment_proof" class="mb-1.5 block text-sm font-medium text-gray-700">
+                            <span class="font-medium text-green-700">
+                                {{ number_format($vendorBill->paid_amount, 2) }}
+                            </span>
+                        </div>
 
-                                Payment Proof
 
-                                <span class="font-normal text-gray-400">
-                                    (Optional)
+                        @if ($vendorBill->credited_amount > 0)
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">
+                                    Vendor Credit
                                 </span>
 
-                            </label>
-
-                            <input type="file" accept="image/png,image/jpg,image/jpeg" id="payment_proof"
-                                name="payment_proof"
-                                class="block w-full rounded-lg border border-gray-300
-                                   bg-white px-3 py-2 text-sm text-gray-600
-                                   file:mr-3 file:rounded-md file:border-0
-                                   file:bg-gray-100 file:px-3 file:py-1.5
-                                   file:text-xs file:font-medium
-                                   file:text-gray-700
-                                   hover:file:bg-gray-200">
-
-                            <p data-error="payment_proof" class="mt-1 hidden text-xs text-red-600">
-                            </p>
-
-                        </div>
-
-
-                        {{-- Notes --}}
-                        <div>
-
-                            <label for="payment_notes" class="mb-1.5 block text-sm font-medium text-gray-700">
-
-                                Notes
-
-                                <span class="font-normal text-gray-400">
-                                    (Optional)
+                                <span class="font-medium text-amber-700">
+                                    {{ number_format($vendorBill->credited_amount, 2) }}
                                 </span>
+                            </div>
+                        @endif
 
-                            </label>
 
-                            <textarea id="payment_notes" name="notes" rows="2" placeholder="Enter payment notes"
-                                class="w-full resize-none rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"></textarea>
+                        <div class="flex justify-between border-t border-gray-200 pt-3">
 
-                            <p data-error="notes" class="mt-1 hidden text-xs text-red-600">
-                            </p>
+                            <span class="font-semibold text-gray-900">
+                                Outstanding
+                            </span>
+
+                            <span
+                                class="text-lg font-bold
+                        {{ $vendorBill->due_amount > 0 ? 'text-red-600' : 'text-green-700' }}">
+
+                                {{ number_format($vendorBill->due_amount, 2) }}
+
+                            </span>
 
                         </div>
 
@@ -682,42 +430,522 @@
 
                 </div>
 
+            </div>
 
-                {{-- Fixed Footer --}}
+            {{-- Notes --}}
+            @if ($vendorBill->notes)
+                <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-sm">
+
+                    <div class="border-b border-gray-200 px-6 py-4">
+
+                        <h3 class="font-semibold text-gray-900">
+                            Notes
+                        </h3>
+
+                    </div>
+
+                    <div class="p-6">
+
+                        <p class="whitespace-pre-line text-sm leading-6 text-gray-700">
+                            {{ $vendorBill->notes }}
+                        </p>
+
+                    </div>
+
+                </div>
+            @endif
+
+            {{-- Payment Modal --}}
+            <div id="paymentModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4">
+
+                {{-- Modal Container --}}
                 <div
-                    class="flex shrink-0 justify-end gap-3
-                       border-t border-gray-200 bg-white px-5 py-4">
+                    class="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden
+                rounded-xl border border-gray-200 bg-white
+                shadow-[0_20px_60px_-15px_rgba(0,0,0,0.30)]">
 
-                    <button type="button" id="cancelPayment"
-                        class="rounded-lg border border-gray-300
-                           bg-white px-4 py-2 text-sm font-medium
-                           text-gray-700 shadow-sm transition
-                           hover:bg-gray-50">
+                    {{-- Header --}}
+                    <div
+                        class="flex shrink-0 items-center justify-between
+                    border-b border-gray-200 bg-white px-5 py-4">
 
-                        Cancel
+                        <div>
 
-                    </button>
+                            <h3 class="font-semibold text-gray-900">
+                                Make Payment
+                            </h3>
 
-                    <button type="submit" id="submitPayment"
-                        class="inline-flex items-center gap-1.5
-                           rounded-lg bg-gray-900 px-4 py-2
-                           text-sm font-medium text-white
-                           shadow-sm transition hover:bg-gray-800">
+                            <p class="mt-1 text-sm text-gray-500">
+                                Record a payment for this vendor bill.
+                            </p>
 
-                        <i class="bx bx-check"></i>
+                        </div>
 
-                        Record Payment
+                        <button type="button" id="closePaymentModal"
+                            class="flex h-9 w-9 items-center justify-center
+                        rounded-lg border border-gray-200
+                        text-gray-400 shadow-sm transition
+                        hover:bg-gray-50 hover:text-gray-700">
 
-                    </button>
+                            <i class="bx bx-x text-2xl"></i>
+
+                        </button>
+
+                    </div>
+
+
+                    {{-- Form --}}
+                    <form id="paymentForm" action="{{ route('vendor-payments.store', $vendorBill) }}" method="POST"
+                        enctype="multipart/form-data" class="flex min-h-0 flex-1 flex-col">
+
+                        @csrf
+
+
+                        {{-- Scrollable Form Body --}}
+                        <div class="flex-1 overflow-y-auto px-5 py-4">
+
+                            <div class="space-y-4">
+
+                                {{-- Outstanding --}}
+                                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+
+                                    <div class="flex items-center justify-between">
+
+                                        <span class="text-sm text-gray-500">
+                                            Outstanding Amount
+                                        </span>
+
+                                        <span class="font-semibold text-gray-900">
+                                            {{ number_format($vendorBill->due_amount, 2) }}
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                                {{-- Amount + Payment Method --}}
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                                    {{-- Amount --}}
+                                    <div>
+
+                                        <label for="payment_amount"
+                                            class="mb-1.5 block text-sm font-medium text-gray-700">
+                                            Payment Amount
+                                        </label>
+
+                                        <input type="number" step="0.01" min="0.01"
+                                            max="{{ $vendorBill->due_amount }}"
+                                            value="{{ $vendorBill->due_amount }}" id="payment_amount" name="amount"
+                                            placeholder="Enter amount"
+                                            class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+
+                                        <p data-error="amount" class="mt-1 hidden text-xs text-red-600">
+                                        </p>
+
+                                    </div>
+
+
+                                    {{-- Payment Method --}}
+                                    <div>
+
+                                        <label for="payment_method"
+                                            class="mb-1.5 block text-sm font-medium text-gray-700">
+
+                                            Payment Method
+                                            <span class="text-red-500">*</span>
+
+                                        </label>
+
+                                        <select id="payment_method" name="payment_method"
+                                            class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+
+                                            <option value="">
+                                                Select Method
+                                            </option>
+
+                                            <option value="cash">
+                                                Cash
+                                            </option>
+
+                                            <option value="bank_transfer">
+                                                Bank Transfer
+                                            </option>
+
+                                            <option value="cheque">
+                                                Cheque
+                                            </option>
+
+                                            <option value="card">
+                                                Card
+                                            </option>
+
+                                            <option value="other">
+                                                Other
+                                            </option>
+
+                                        </select>
+
+                                        <p data-error="payment_method" class="mt-1 hidden text-xs text-red-600">
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+
+                                {{-- Payment Date + Transaction ID --}}
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                                    {{-- Payment Date --}}
+                                    <div>
+
+                                        <label for="payment_date"
+                                            class="mb-1.5 block text-sm font-medium text-gray-700">
+                                            Payment Date
+                                        </label>
+
+                                        <input type="date" id="payment_date" name="payment_date"
+                                            value="{{ now()->toDateString() }}"
+                                            class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+
+                                        <p data-error="payment_date" class="mt-1 hidden text-xs text-red-600">
+                                        </p>
+
+                                    </div>
+
+
+                                    {{-- Transaction ID --}}
+                                    <div>
+
+                                        <label for="transaction_id"
+                                            class="mb-1.5 block text-sm font-medium text-gray-700">
+
+                                            Transaction ID
+
+                                            <span class="font-normal text-gray-400">
+                                                (Optional)
+                                            </span>
+
+                                        </label>
+
+                                        <input type="text" id="transaction_id" name="transaction_id"
+                                            placeholder="Transaction ID"
+                                            class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+
+                                        <p data-error="transaction_id" class="mt-1 hidden text-xs text-red-600">
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+
+                                {{-- Payment Proof --}}
+                                <div>
+
+                                    <label for="payment_proof" class="mb-1.5 block text-sm font-medium text-gray-700">
+
+                                        Payment Proof
+
+                                        <span class="font-normal text-gray-400">
+                                            (Optional)
+                                        </span>
+
+                                    </label>
+
+                                    <input type="file" accept="image/png,image/jpg,image/jpeg" id="payment_proof"
+                                        name="payment_proof"
+                                        class="block w-full rounded-lg border border-gray-300
+                                    bg-white px-3 py-2 text-sm text-gray-600
+                                    file:mr-3 file:rounded-md file:border-0
+                                    file:bg-gray-100 file:px-3 file:py-1.5
+                                    file:text-xs file:font-medium
+                                    file:text-gray-700
+                                    hover:file:bg-gray-200">
+
+                                    <p data-error="payment_proof" class="mt-1 hidden text-xs text-red-600">
+                                    </p>
+
+                                </div>
+
+
+                                {{-- Notes --}}
+                                <div>
+
+                                    <label for="payment_notes" class="mb-1.5 block text-sm font-medium text-gray-700">
+
+                                        Notes
+
+                                        <span class="font-normal text-gray-400">
+                                            (Optional)
+                                        </span>
+
+                                    </label>
+
+                                    <textarea id="payment_notes" name="notes" rows="2" placeholder="Enter payment notes"
+                                        class="w-full resize-none rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900"></textarea>
+
+                                    <p data-error="notes" class="mt-1 hidden text-xs text-red-600">
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- Fixed Footer --}}
+                        <div
+                            class="flex shrink-0 justify-end gap-3
+                        border-t border-gray-200 bg-white px-5 py-4">
+
+                            <button type="button" id="cancelPayment"
+                                class="rounded-lg border border-gray-300
+                            bg-white px-4 py-2 text-sm font-medium
+                            text-gray-700 shadow-sm transition
+                            hover:bg-gray-50">
+
+                                Cancel
+
+                            </button>
+
+                            <button type="submit" id="submitPayment"
+                                class="inline-flex items-center gap-1.5
+                            rounded-lg bg-gray-900 px-4 py-2
+                            text-sm font-medium text-white
+                            shadow-sm transition hover:bg-gray-800">
+
+                                <i class="bx bx-check"></i>
+
+                                Record Payment
+
+                            </button>
+
+                        </div>
+
+                    </form>
 
                 </div>
 
-            </form>
-
+            </div>
         </div>
 
-    </div>
+        {{-- Activity Timeline --}}
+        <aside class="lg:col-span-1">
 
+            <div class="sticky top-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+
+                <div class="border-b border-gray-200 px-5 py-4">
+
+                    <div class="flex items-center justify-between">
+
+                        <div class="flex items-center gap-3">
+
+                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-600">
+                                <i class="bx bx-history"></i>
+                            </div>
+
+                            <div>
+
+                                <h2 class="text-sm font-semibold text-gray-900">
+                                    Activity
+                                </h2>
+
+                                <p class="mt-0.5 text-xs text-gray-500">
+                                    Purchase request history
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <span
+                            class="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-gray-100 px-2 text-[11px] font-semibold text-gray-600">
+                            {{ $activities->count() }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="max-h-[calc(100vh-150px)] overflow-y-auto">
+
+                    @forelse ($activities as $activity)
+
+                        @php
+                            $activityIcon = match ($activity->action) {
+                                'Purchase Request Created' => 'bx-plus',
+                                'Purchase Request Updated' => 'bx-edit',
+                                'RFQ Sent' => 'bx-envelope',
+                                'RFQ Resent' => 'bx-refresh',
+                                'Quotation Received' => 'bx-file',
+                                'Quotation Selected' => 'bx-check-square',
+                                'Purchase Order Created' => 'bx-cart',
+                                'Purchase Order Approved' => 'bx-check',
+                                'Goods Receipt Created', 'Goods Received', 'Materials Received' => 'bx-package',
+                                'Material Return Created' => 'bx-undo',
+                                'Material Return Completed' => 'bx-check-double',
+                                'Vendor Bill Created' => 'bx-receipt',
+                                'Payment Recorded' => 'bx-money',
+                                'Vendor Bill Partially Paid' => 'bx-time-five',
+                                'Vendor Bill Paid' => 'bx-check-circle',
+                                'Vendor Credit Created' => 'bx-credit-card',
+                                'Vendor Credit Applied' => 'bx-transfer',
+                                'Vendor Refund Recorded' => 'bx-undo',
+                                default => 'bx-history',
+                            };
+
+                            $activityClass = match ($activity->action) {
+                                'Purchase Request Created',
+                                'Purchase Request Updated'
+                                    => 'border-gray-200 bg-gray-50 text-gray-600',
+
+                                'RFQ Sent', 'RFQ Resent' => 'border-blue-200 bg-blue-50 text-blue-600',
+
+                                'Quotation Received',
+                                'Quotation Selected'
+                                    => 'border-violet-200 bg-violet-50 text-violet-600',
+
+                                'Purchase Order Created',
+                                'Purchase Order Approved'
+                                    => 'border-amber-200 bg-amber-50 text-amber-600',
+
+                                'Goods Receipt Created',
+                                'Goods Received',
+                                'Materials Received'
+                                    => 'border-teal-200 bg-teal-50 text-teal-600',
+
+                                'Material Return Created' => 'border-orange-200 bg-orange-50 text-orange-600',
+
+                                'Material Return Completed',
+                                'Vendor Bill Paid'
+                                    => 'border-green-200 bg-green-50 text-green-600',
+
+                                'Vendor Bill Created' => 'border-indigo-200 bg-indigo-50 text-indigo-600',
+
+                                'Payment Recorded',
+                                'Vendor Bill Partially Paid'
+                                    => 'border-blue-200 bg-blue-50 text-blue-600',
+
+                                'Vendor Credit Created',
+                                'Vendor Credit Applied'
+                                    => 'border-violet-200 bg-violet-50 text-violet-600',
+
+                                'Vendor Refund Recorded' => 'border-orange-200 bg-orange-50 text-orange-600',
+
+                                default => 'border-gray-200 bg-white text-gray-500',
+                            };
+                        @endphp
+
+
+                        <div class="relative flex gap-3 px-5 py-4">
+
+                            @if (!$loop->last)
+                                <span class="absolute bottom-0 left-[31px] top-12 w-px bg-gray-200">
+                                </span>
+                            @endif
+
+
+                            {{-- Icon --}}
+                            <div
+                                class="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border {{ $activityClass }}">
+
+                                <i class="bx {{ $activityIcon }} text-sm"></i>
+
+                            </div>
+
+
+                            {{-- Content --}}
+                            <div class="min-w-0 flex-1">
+
+                                <div class="flex items-start justify-between gap-3">
+
+                                    <p class="text-xs font-semibold text-gray-800">
+                                        {{ $activity->action }}
+                                    </p>
+
+                                    <span class="shrink-0 text-[10px] text-gray-400">
+                                        {{ $activity->created_at->diffForHumans() }}
+                                    </span>
+
+                                </div>
+
+
+                                @if ($activity->description)
+                                    <p class="mt-1 text-xs leading-5 text-gray-500">
+                                        {{ $activity->description }}
+                                    </p>
+                                @endif
+
+
+                                @if ($activity->vendor || $activity->user)
+                                    <div class="mt-2 flex flex-wrap gap-2">
+
+                                        @if ($activity->vendor)
+                                            <span
+                                                class="inline-flex items-center gap-1 rounded-md bg-gray-50 px-2 py-1 text-[10px] font-medium text-gray-500">
+
+                                                <i class="bx bx-store text-xs"></i>
+
+                                                {{ $activity->vendor->company_name ?: $activity->vendor->name }}
+
+                                            </span>
+                                        @endif
+
+
+                                        @if ($activity->user)
+                                            <span
+                                                class="inline-flex items-center gap-1 rounded-md bg-gray-50 px-2 py-1 text-[10px] font-medium text-gray-500">
+
+                                                <i class="bx bx-user text-xs"></i>
+
+                                                {{ $activity->user->name }}
+
+                                            </span>
+                                        @endif
+
+                                    </div>
+                                @endif
+
+                            </div>
+
+                        </div>
+
+                    @empty
+
+                        <div class="px-5 py-10 text-center">
+
+                            <div
+                                class="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+
+                                <i class="bx bx-history text-lg"></i>
+
+                            </div>
+
+                            <p class="mt-3 text-xs font-medium text-gray-600">
+                                No activity yet
+                            </p>
+
+                            <p class="mt-1 text-[11px] text-gray-400">
+                                Activity will appear here as this request progresses.
+                            </p>
+
+                        </div>
+
+                    @endforelse
+
+                </div>
+
+            </div>
+
+        </aside>
+
+    </div>
 
     @push('scripts')
         <script>

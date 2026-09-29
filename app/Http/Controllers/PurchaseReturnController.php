@@ -34,9 +34,10 @@ class PurchaseReturnController extends Controller
 
     public function create(GoodsReceipt $goodsReceipt)
     {
-
         $goodsReceipt->load([
             'purchaseOrder.vendor',
+            'purchaseOrder.purchaseRequest.activities.user',
+            'purchaseOrder.purchaseRequest.activities.vendor',
             'items.unit',
             'items.purchaseOrderItem.rawMaterial.unit',
             'items.purchaseOrderItem.unit',
@@ -306,10 +307,27 @@ class PurchaseReturnController extends Controller
     }
 
 
+    // public function show(PurchaseReturn $purchaseReturn)
+    // {
+    //     $purchaseReturn->load([
+    //         'goodsReceipt.purchaseOrder.vendor',
+    //         'items.goodsReceiptItem.purchaseOrderItem.rawMaterial',
+    //         'items.unit',
+    //         'vendorCredit.applications.vendorBill',
+    //     ]);
+
+    //     return view(
+    //         'purchase_returns.show',
+    //         compact('purchaseReturn')
+    //     );
+    // }
+
     public function show(PurchaseReturn $purchaseReturn)
     {
         $purchaseReturn->load([
             'goodsReceipt.purchaseOrder.vendor',
+            'goodsReceipt.purchaseOrder.purchaseRequest.activities.user',
+            'goodsReceipt.purchaseOrder.purchaseRequest.activities.vendor',
             'items.goodsReceiptItem.purchaseOrderItem.rawMaterial',
             'items.unit',
             'vendorCredit.applications.vendorBill',
@@ -320,7 +338,6 @@ class PurchaseReturnController extends Controller
             compact('purchaseReturn')
         );
     }
-
 
     private function generateReturnNumber(): string
     {
