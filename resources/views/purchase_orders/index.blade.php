@@ -125,16 +125,6 @@
                                         <p class="font-semibold text-gray-900">
                                             {{ $order->order_number }}
                                         </p>
-
-                                        @if ($order->quotation)
-                                            <p class="mt-0.5 text-xs text-gray-500">
-                                                Quotation
-                                               
-                                               <a href="{{ route('quotations.show',$order->quotation) }}" class="underline">
-                                                   #{{ $order->quotation->quotation_number ?? $order->quotation->id }}
-                                                </a>
-                                            </p>
-                                        @endif
                                     </div>
 
                                 </div>

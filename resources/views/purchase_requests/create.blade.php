@@ -1,14 +1,14 @@
-<x-layouts.app title="Create Purchase Request">
+<x-layouts.app title="Create Request for Quotation">
 
     <div class="mb-6 flex items-center justify-between">
 
         <div>
             <h1 class="text-2xl font-bold text-slate-900">
-                Create Purchase Request
+                Create Request for quotation
             </h1>
 
             <p class="mt-1 text-sm text-slate-500">
-                Create a new raw material purchase request.
+                Create a new raw material request for quotation.
             </p>
         </div>
 

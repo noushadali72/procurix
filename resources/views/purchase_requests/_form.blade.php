@@ -10,7 +10,7 @@
             </h2>
 
             <p class="mt-1 text-xs text-slate-500">
-                Enter the basic information for this purchase request.
+                Enter the basic information for this Quotation.
             </p>
         </div>
 
@@ -66,7 +66,7 @@
                 <label for="due_date"
                     class="mb-1.5 block text-sm font-medium text-slate-700">
 
-                    Due Date
+                    Expected Delivery
 
                 </label>
 

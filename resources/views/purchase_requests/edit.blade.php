@@ -1,15 +1,15 @@
-<x-layouts.app title="Edit Purchase Request">
+<x-layouts.app title="Edit Request for quotation">
 
     <div class="mb-6 flex items-center justify-between">
 
         <div>
 
             <h1 class="text-2xl font-bold text-slate-900">
-                Edit Purchase Request
+                Edit Request for quotation
             </h1>
 
             <p class="mt-1 text-sm text-slate-500">
-                Update purchase request information and materials.
+                Update Quotation information and materials.
             </p>
 
         </div>
@@ -38,7 +38,7 @@
             <button type="submit" id="submitBtn"
                 class="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60">
                 <i class="bx bx-save"></i>
-                Update Purchase Request
+                Update RFQ
             </button>
 
         </div>

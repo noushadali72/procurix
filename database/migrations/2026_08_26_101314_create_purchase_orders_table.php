@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('order_number')->nullable();
             $table->foreignId('purchase_request_id')->nullable()->constrained('purchase_requests')->restrictOnDelete();
-            $table->foreignId('quotation_id')->nullable()->constrained('quotations')->restrictOnDelete();
+            // $table->foreignId('quotation_id')->nullable()->constrained('quotations')->restrictOnDelete();
             $table->foreignId('vendor_id')->constrained('vendors')->restrictOnDelete();
             $table->enum('status',['received','placed','partially_received','cancelled'])->default('placed');
             $table->date('order_date');

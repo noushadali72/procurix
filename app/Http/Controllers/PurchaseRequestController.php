@@ -144,37 +144,37 @@ class PurchaseRequestController extends Controller
         return view('purchase_requests.confirmation', compact('purchaseRequest'));
     }
 
-    public function quotations(PurchaseRequest $pr)
-    {
-        $pr->load([
-            'quotations.vendor',
-            'quotations.items',
-        ]);
+    // public function quotations(PurchaseRequest $pr)
+    // {
+    //     $pr->load([
+    //         'quotations.vendor',
+    //         'quotations.items',
+    //     ]);
 
-        return view('purchase_requests.quotations', compact('pr'));
-    }
+    //     return view('purchase_requests.quotations', compact('pr'));
+    // }
 
 
-    public function compareQuotations(PurchaseRequest $pr)
-    {
-        $quotationIds = request()->input('quotations', []);
-        abort_if(count($quotationIds) < 2, 422);
-        $pr->load([
-            'items.rawMaterial',
-            'items.unit',
-        ]);
-        $quotations = $pr->quotations()
-            ->whereIn('id', $quotationIds)
-            ->with([
-                'vendor',
-                'items.rawMaterial',
-                'items.unit',
-            ])->get();
-        return view(
-            'purchase_requests.quotation-comparison',
-            compact('pr', 'quotations')
-        );
-    }
+    // public function compareQuotations(PurchaseRequest $pr)
+    // {
+    //     $quotationIds = request()->input('quotations', []);
+    //     abort_if(count($quotationIds) < 2, 422);
+    //     $pr->load([
+    //         'items.rawMaterial',
+    //         'items.unit',
+    //     ]);
+    //     $quotations = $pr->quotations()
+    //         ->whereIn('id', $quotationIds)
+    //         ->with([
+    //             'vendor',
+    //             'items.rawMaterial',
+    //             'items.unit',
+    //         ])->get();
+    //     return view(
+    //         'purchase_requests.quotation-comparison',
+    //         compact('pr', 'quotations')
+    //     );
+    // }
 
     public function resendRfq(PurchaseRequest $purchaseRequest): JsonResponse
     {

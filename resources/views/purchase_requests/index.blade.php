@@ -1,11 +1,11 @@
-<x-layouts.app title="Purchase Requests">
+<x-layouts.app title="Quotations">
 
     {{-- Page Header --}}
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
         <div>
             <h2 class="text-xl font-semibold text-gray-900">
-                Purchase Requests
+                Request for Quotations
             </h2>
 
             <p class="mt-1 text-sm text-gray-500">
@@ -16,7 +16,7 @@
         <a href="{{ route('purchase-requests.create') }}"
             class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
             <i class="bx bx-plus text-lg"></i>
-            Add Purchase Request
+            Add Request for Quotation
         </a>
 
     </div>
@@ -31,7 +31,7 @@
 
             <div>
                 <h3 class="text-sm font-semibold text-gray-900">
-                    Purchase Request List
+                    Quotations List
                 </h3>
 
                 <p class="mt-0.5 text-xs text-gray-500">
@@ -111,7 +111,7 @@
                                             </div>
 
                                             <div class="mt-0.5 text-xs text-gray-500">
-                                                Purchase request
+                                                Quotation
                                             </div>
                                         </a>
                                     </div>
@@ -290,17 +290,17 @@
                                     </div>
 
                                     <p class="mt-3 text-sm font-semibold text-gray-700">
-                                        No purchase requests found
+                                        No Quotations found
                                     </p>
 
                                     <p class="mt-1 text-sm text-gray-500">
-                                        Create your first purchase request to get started.
+                                        Create your first Request for quotation to get started.
                                     </p>
 
                                     <a href="{{ route('purchase-requests.create') }}"
                                         class="mt-4 inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800">
                                         <i class="bx bx-plus"></i>
-                                        Add Purchase Request
+                                        Create Request for quotation
                                     </a>
 
                                 </div>
@@ -350,7 +350,7 @@
                     success: function(response) {
                         showToast(
                             'success',
-                            response.message || 'Purchase request deleted successfully.'
+                            response.message || 'RFQ deleted successfully.'
                         );
                         setTimeout(function() {
                             window.location.reload();
@@ -363,7 +363,7 @@
                         showToast(
                             'error',
                             xhr.responseJSON?.message ||
-                            'Unable to delete purchase request.'
+                            'Unable to delete RFQ.'
                         );
 
                     }
@@ -374,7 +374,7 @@
             function approve() {
 
                 const button = $(this);
-                if (!confirm('Do you want to approve the Purchase Request?')) {
+                if (!confirm('Do you want to approve the RFQ?')) {
                     return;
                 }
 
@@ -430,7 +430,7 @@
                     error: function(xhr) {
                         showToast(
                             'error',
-                            xhr.responseJSON?.message || 'Unable to duplicate purchase request.'
+                            xhr.responseJSON?.message || 'Unable to duplicate RFQ.'
                         );
                     }
                 });

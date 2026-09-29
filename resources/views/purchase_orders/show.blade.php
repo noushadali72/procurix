@@ -287,7 +287,7 @@
                             <div>
 
                                 <p class="text-xs font-medium text-gray-500">
-                                    Purchase Request
+                                    Quotation
                                 </p>
 
                                 <a href="{{ route('purchase-requests.show', $purchaseOrder->purchaseRequest) }}"
@@ -924,7 +924,7 @@
                                 </h3>
 
                                 <p class="text-[11px] text-gray-500">
-                                    Purchase request history
+                                    RFQ history
                                 </p>
 
                             </div>
@@ -1156,7 +1156,7 @@
                                 <p class="mt-0.5 text-xs
                                        text-gray-500">
 
-                                    Review the selected purchase request
+                                    Review the selected RFQ
                                     and alternatives considered for this order.
 
                                 </p>
@@ -1203,7 +1203,7 @@
                                             class="text-sm font-semibold
                                                text-gray-900">
 
-                                            Compared Purchase Requests
+                                            Compared Quotations
 
                                         </h3>
 
@@ -1211,7 +1211,7 @@
                                             class="mt-1 text-xs
                                                text-gray-500">
 
-                                            Open a purchase request to review
+                                            Open a Quotation to review
                                             its materials, quantities and costs.
 
                                         </p>
@@ -2065,7 +2065,7 @@
                                             class="mt-1 text-xs
                                                text-gray-500">
 
-                                            Only the selected purchase request
+                                            Only the selected quotation
                                             is available in this comparison.
 
                                         </p>

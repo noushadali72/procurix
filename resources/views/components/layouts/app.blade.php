@@ -276,7 +276,7 @@
 
 
                     {{-- Warehouses --}}
-                    <a href="{{ route('warehouses.index') }}"
+                    {{-- <a href="{{ route('warehouses.index') }}"
                         class="flex items-center gap-3 rounded-lg
                                px-3 py-2.5 text-sm font-medium transition
 
@@ -292,7 +292,7 @@
                             Warehouses
                         </span>
 
-                    </a>
+                    </a> --}}
 
                 </div>
 
@@ -351,7 +351,7 @@
                         </i>
 
                         <span>
-                            Purchase Requests
+                            Request for Quotation
                         </span>
 
                     </a>

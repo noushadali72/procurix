@@ -1,4 +1,4 @@
-<x-layouts.app title="Confirm Purchase Request">
+<x-layouts.app title="Confirm Quotation">
 
 
     @php
@@ -37,7 +37,7 @@
         <a
             href="{{ route('purchase-requests.index') }}"
             class="hover:text-gray-900">
-            Purchase Requests
+            Quotations
         </a>
 
         <i class="bx bx-chevron-right text-sm text-gray-400"></i>
@@ -62,7 +62,7 @@
             <div class="flex flex-wrap items-center gap-3">
 
                 <h1 class="text-xl font-semibold tracking-tight text-gray-900">
-                    Confirm Purchase Request
+                    Confirm RFQ
                 </h1>
 
                 <span
@@ -370,7 +370,7 @@
                         </h2>
 
                         <p class="mt-0.5 text-xs text-gray-500">
-                            Materials included in this purchase request
+                            Materials included in this Quotation
                         </p>
 
                     </div>
@@ -1009,7 +1009,7 @@
                             showToast(
                                 'success',
                                 response.message ||
-                                'Purchase request confirmed successfully.'
+                                'Quotation confirmed successfully.'
                             );
 
 
@@ -1038,7 +1038,7 @@
                             showToast(
                                 'error',
                                 xhr.responseJSON?.message ||
-                                'Unable to confirm purchase request.'
+                                'Unable to confirm Quotation.'
                             );
 
                         }

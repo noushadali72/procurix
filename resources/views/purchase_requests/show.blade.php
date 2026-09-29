@@ -1,4 +1,4 @@
-<x-layouts.app title="Purchase Request Details">
+<x-layouts.app title="Quotation Details">
 
     {{-- Flash Messages --}}
     @if (session('success'))
@@ -25,7 +25,7 @@
             <div class="flex items-center gap-2">
 
                 <h2 class="text-xl font-semibold text-gray-900">
-                    Purchase Request
+                    Quotation
                 </h2>
 
                 @php
@@ -54,7 +54,7 @@
 
                 <span class="mx-1 text-gray-300">•</span>
 
-                Raw material purchase request details.
+                Raw material RFQ details.
 
             </p>
 
@@ -110,7 +110,7 @@
                     </h3>
 
                     <p class="mt-0.5 text-xs text-gray-500">
-                        Overview of this purchase request.
+                        Overview of this RFQ.
                     </p>
 
                 </div>
@@ -463,7 +463,7 @@
                                         </h4>
 
                                         <p class="mt-1 text-sm text-gray-500">
-                                            This purchase request does not contain any items.
+                                            This RFQ does not contain any items.
                                         </p>
 
                                     </td>
@@ -511,7 +511,7 @@
                                 </h3>
 
                                 <p class="mt-0.5 text-xs text-gray-500">
-                                    Purchase request history
+                                    Quotation history
                                 </p>
 
                             </div>
@@ -697,7 +697,7 @@
                             </h4>
 
                             <p class="mx-auto mt-1 max-w-[220px] text-xs leading-5 text-gray-500">
-                                Purchase request activity will appear here as the request progresses.
+                                Quotation activity will appear here as the request progresses.
                             </p>
 
                         </div>
