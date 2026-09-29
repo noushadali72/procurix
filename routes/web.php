@@ -65,9 +65,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('purchase-requests/{purchaseRequest}/compare/confirm', [PurchaseRequestController::class, 'confirmComparison'])->name('purchase-requests.compare.confirm');
     Route::post('purchase-requests/{purchaseRequest}/resend-rfq', [PurchaseRequestController::class, 'resendRfq'])->name('purchase-requests.resend-rfq');
     Route::resource('vendors', VendorController::class);
-    Route::resource('quotations', QuotationController::class)->except('create');
-    Route::get('quotations/create/{purchaseRequest}', [QuotationController::class, 'create'])->name('quotations.create');
-    Route::post('quotations/{quotation}/accept', [QuotationController::class, 'accept'])->name('quotations.accept');
     Route::resource('purchase-orders', PurchaseOrderController::class)->only(['index', 'show', 'destroy']);
     Route::post('purchase-orders/{purchaseOrder}/receive', [PurchaseOrderController::class, 'receive'])->name('purchase-orders.receive');
     Route::get('purchase-requests/{pr}/quotations', [PurchaseRequestController::class, 'quotations'])->name('purchase-requests.quotations');
@@ -92,28 +89,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 
     // Purchase Returns
-
-    Route::get(
-        'purchase-returns',
-        [PurchaseReturnController::class, 'index']
-    )->name('purchase-returns.index');
-
-    Route::get(
-        'purchase-returns/{purchaseReturn}',
-        [PurchaseReturnController::class, 'show']
-    )->name('purchase-returns.show');
-
-    Route::get(
-        'goods-receipts/{goodsReceipt}/returns/create',
-        [PurchaseReturnController::class, 'create']
-    )->name('purchase-returns.create');
-
-    Route::post(
-        'goods-receipts/{goodsReceipt}/returns',
-        [PurchaseReturnController::class, 'store']
-    )->name('purchase-returns.store');
-
-
+    Route::get('purchase-returns', [PurchaseReturnController::class, 'index'])->name('purchase-returns.index');
+    Route::get('purchase-returns/{purchaseReturn}', [PurchaseReturnController::class, 'show'])->name('purchase-returns.show');
+    Route::get('goods-receipts/{goodsReceipt}/returns/create', [PurchaseReturnController::class, 'create'])->name('purchase-returns.create');
+    Route::post('goods-receipts/{goodsReceipt}/returns', [PurchaseReturnController::class, 'store'])->name('purchase-returns.store');
 
     // Finance
     Route::resource('vendor-bills', VendorBillController::class)->except('create', 'show');
@@ -127,27 +106,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 
     // Vendor Credits
-
-    Route::get(
-        'vendor-credits',
-        [VendorCreditController::class, 'index']
-    )->name('vendor-credits.index');
-
-    Route::get(
-        'vendor-credits/{vendorCredit}',
-        [VendorCreditController::class, 'show']
-    )->name('vendor-credits.show');
-
-    Route::post(
-        'vendor-credits/{vendorCredit}/apply',
-        [VendorCreditController::class, 'apply']
-    )->name('vendor-credits.apply');
-
-    Route::post(
-        'vendor-credits/{vendorCredit}/refund',
-        [VendorCreditController::class, 'refund']
-    )->name('vendor-credits.refund');
-
+    Route::get('vendor-credits', [VendorCreditController::class, 'index'])->name('vendor-credits.index');
+    Route::get('vendor-credits/{vendorCredit}', [VendorCreditController::class, 'show'])->name('vendor-credits.show');
+    Route::post('vendor-credits/{vendorCredit}/apply', [VendorCreditController::class, 'apply'])->name('vendor-credits.apply');
+    Route::post('vendor-credits/{vendorCredit}/refund', [VendorCreditController::class, 'refund'])->name('vendor-credits.refund');
 
     // Activiteis
     Route::get('purchase-request-activities/{purchaseRequest}',[PurchaseRequestActivityController::class,'index'])->name('purchase-requests.activities.index');

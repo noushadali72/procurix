@@ -129,6 +129,19 @@
                     </div>
 
                     <div>
+                        <p class="text-xs text-slate-400">Vendor Bill</p>
+
+                        <a href="{{ route('vendor-bills.show', $vendorCredit->vendorBill) }}"
+                            class="mt-1 inline-block text-sm font-medium text-slate-800 hover:underline">
+
+                            {{ $vendorCredit->vendorBill->bill_number }}
+                            <i class="bx bx-link text-xs text-slate-400"></i>
+
+
+                        </a>
+                    </div>
+
+                    <div>
                         <p class="text-xs text-slate-400">Credit Date</p>
 
                         <p class="mt-1 text-sm font-medium text-slate-900">
@@ -247,7 +260,8 @@
                                     <span class="text-red-500">*</span>
                                 </label>
 
-                                <input type="number" id="refund_amount" name="amount" step="0.01" min="0.01"
+                                <input type="number" id="refund_amount" value="{{ $vendorCredit->remaining_amount }}"
+                                    name="amount" step="0.01" min="0.01"
                                     max="{{ $vendorCredit->remaining_amount }}"
                                     class="w-full rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
 

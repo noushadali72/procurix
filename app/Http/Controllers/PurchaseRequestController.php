@@ -667,7 +667,7 @@ class PurchaseRequestController extends Controller
             'items.rawMaterial',
             'items.unit',
             'vendor',
-            'quotations.items',
+            // 'quotations.items',
             'activities'
         ]);
 

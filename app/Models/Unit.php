@@ -33,10 +33,6 @@ class Unit extends Model
         return $this->hasMany(ManufacturingFormulaItem::class);
     }
 
-    public function invoiceItems()
-    {
-        return $this->hasMany(InvoiceItem::class);
-    }
 
     public function purchaseRequestItems()
     {

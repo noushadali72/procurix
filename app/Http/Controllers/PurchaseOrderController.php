@@ -3,26 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\PurchaseOrder;
-use App\Services\PurchaseRequestActivityService as ServicesPurchaseRequestActivityService;
+use App\Services\PurchaseRequestActivityService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use PurchaseRequestActivityService;
 
 class PurchaseOrderController extends Controller
 {
-    public function __construct(private ServicesPurchaseRequestActivityService $activity) {}
+    public function __construct(private PurchaseRequestActivityService $activity) {}
     /**
      * Display purchase orders.
      */
     public function index()
     {
-        $orders = PurchaseOrder::with([
-            'vendor',
-            'quotation',
-        ])
-            ->latest()
-            ->paginate(15);
-
+        $orders = PurchaseOrder::with(['vendor'])->latest()->paginate(15);
         return view('purchase_orders.index', compact('orders'));
     }
 

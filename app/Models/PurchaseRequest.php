@@ -29,12 +29,6 @@ class PurchaseRequest extends Model
     {
         return $this->hasMany(PurchaseRequestItem::class);
     }
-
-    public function quotations()
-    {
-        return $this->hasMany(Quotation::class);
-    }
-
     public function vendor(){
         return $this->belongsTo(Vendor::class);
     }

@@ -58,7 +58,7 @@ class VendorBill extends Model
     private static function generateBillNumber()
     {
         do {
-            $bill_number = 'PR-' . strtoupper(Str::random(7));
+            $bill_number = 'VB-' . strtoupper(Str::random(7));
         } while (
             VendorBill::where(
                 'bill_number',

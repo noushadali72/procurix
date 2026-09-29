@@ -8,7 +8,6 @@ class PurchaseOrder extends Model
 {
     protected $fillable = [
         'order_number',
-        'quotation_id',
         'purchase_request_id',
         'vendor_id',
         'status',
@@ -37,10 +36,6 @@ class PurchaseOrder extends Model
         return $this->belongsTo(PurchaseRequest::class, 'purchase_request_id');
     }
 
-    public function quotation()
-    {
-        return $this->belongsTo(Quotation::class, 'quotation_id');
-    }
 
     public function vendor()
     {

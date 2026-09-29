@@ -22,9 +22,6 @@ class Vendor extends Model
     public function purchaseRequests(){
         return $this->hasMany(PurchaseRequest::class);
     }
-    public function quotations(){
-        return $this->hasMany(Quotation::class);
-    }
     public function vendorBills(){
         return $this->hasMany(VendorBill::class);
     } 
