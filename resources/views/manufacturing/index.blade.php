@@ -1,5 +1,10 @@
 <x-layouts.app title="Manufacture Product">
-
+@php
+    $product_id = request('product_id')??$draft?->product_id??null;
+    if(request('product_id') && request('product_id') !=$draft?->product_id){
+        $draft = null;
+    }
+@endphp
 
     <div class="space-y-6">
 
@@ -67,7 +72,7 @@
                                 <option value="">Select product</option>
                                 @foreach ($products as $product)
                                     <option value="{{ $product->id }}"
-                                        {{ $draft?->product_id == $product->id ? 'selected' : '' }}>
+                                       @selected($product_id==$product->id)>
                                         {{ $product->name }}
                                     </option>
                                 @endforeach
@@ -83,7 +88,7 @@
                                 Quantity<sup>*</sup>
                             </label>
 
-                            <input type="text" id="quantity" name="quantity" value="{{ $draft?->quantity ?? '' }}"
+                            <input type="text" id="quantity" name="quantity" value="{{ $draft?->quantity ?? 1 }}"
                                 inputmode="decimal" placeholder="Enter quantity" disabled
                                 class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-500 focus:ring-1 focus:ring-gray-500 disabled:cursor-not-allowed disabled:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-gray-400 dark:focus:ring-gray-400 dark:disabled:bg-gray-800">
 
@@ -530,7 +535,7 @@
                             resetManufacturing();
 
                             setTimeout(function() {
-                                window.location.reload();
+                                window.location.href = "{{route('manufacturing.index')}}";
                             }, 800);
                         },
                         error: function(xhr) {
@@ -596,7 +601,7 @@
                     }, 500);
                 }
 
-                $(document).on('input change', '#manufacturingForm', autoSave);
+                $(document).on('input', '#quantity', autoSave);
 
                 if (productSelect.val()) {
                     productSelect.trigger('change');

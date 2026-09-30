@@ -80,8 +80,7 @@ class ManufacturingController extends Controller
                     if (!$rawMaterial) {
                         continue;
                     }
-                    $requiredQuantity =
-                        (float) $item->quantity * $productQuantity;
+                    $requiredQuantity = (float) $item->quantity * $productQuantity;
 
                     $requiredInStockUnit = $conversionService->convert(
                         $requiredQuantity,
@@ -119,7 +118,7 @@ class ManufacturingController extends Controller
                     'manufactured_at' => now(),
                 ]);
 
-                ManufacturingRecord::where('status','draft')->first()->delete();
+                ManufacturingRecord::where('status','draft')->first()?->delete();
             });
 
             return response()->json([
@@ -173,7 +172,7 @@ class ManufacturingController extends Controller
                 'success'=>false,
                 'message'=>'Unable to Auto Save!',
                 'error'=>$e->getMessage()
-            ]);
+            ],500);
         }
         
     }

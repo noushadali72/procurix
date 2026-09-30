@@ -82,7 +82,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Manufacturing
     Route::resource('manufacturing-formulas', ManufacturingFormulaController::class)->except(['show']);
     Route::post('/manufacturing/manufacture', [ManufacturingController::class, 'manufacture'])->name('manufacturing.manufacture');
-    Route::get('/manufacturing', [ManufacturingController::class, 'index'])->name('manufacturing.index');
+    Route::get('/manufacturing/', [ManufacturingController::class, 'index'])->name('manufacturing.index');
     Route::get('/manufacturing/records', [ManufacturingController::class, 'records'])->name('manufacturing.records');
     Route::post('/manufacturing/manufacture', [ManufacturingController::class, 'manufacture'])->name('manufacturing.manufacture');
     Route::post('manufacturing/autosave', [ManufacturingController::class, 'autoSave'])->name('manufacturing.autosave');
