@@ -8,6 +8,9 @@
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
     @endpush
 
+
+    
+
     <div class="mb-6 flex items-center justify-between">
 
         <div>

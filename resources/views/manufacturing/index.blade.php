@@ -1,10 +1,25 @@
 <x-layouts.app title="Manufacture Product">
-@php
-    $product_id = request('product_id')??$draft?->product_id??null;
-    if(request('product_id') && request('product_id') !=$draft?->product_id){
-        $draft = null;
-    }
-@endphp
+
+
+
+    @php
+        $product_id = request('product_id') ?? ($draft?->product_id ?? null);
+        if (request('product_id') && request('product_id') != $draft?->product_id) {
+            $draft = null;
+        }
+    @endphp
+
+
+
+
+    @push('head')
+        {{-- select2 cdn --}}
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+    @endpush
+
+
+
 
     <div class="space-y-6">
 
@@ -71,8 +86,7 @@
                                 class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-500 focus:ring-1 focus:ring-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-gray-400 dark:focus:ring-gray-400">
                                 <option value="">Select product</option>
                                 @foreach ($products as $product)
-                                    <option value="{{ $product->id }}"
-                                       @selected($product_id==$product->id)>
+                                    <option value="{{ $product->id }}" @selected($product_id == $product->id)>
                                         {{ $product->name }}
                                     </option>
                                 @endforeach
@@ -206,6 +220,7 @@
     @push('scripts')
         <script>
             $(document).ready(function() {
+                $("#product_id").select2();
                 const products = @json($products);
                 const units = @json($units);
 
@@ -377,6 +392,7 @@
 
                     let allAvailable = true;
                     const productUnit = getProductUnit();
+                    const insufficientMaterialIds = []; // Track insufficient IDs
 
                     formula.items.forEach(function(item) {
                         const rawMaterial = item.raw_material;
@@ -384,6 +400,9 @@
 
                         if (!rawMaterial?.unit || !formulaUnit) {
                             allAvailable = false;
+                            if (rawMaterial?.id) {
+                                insufficientMaterialIds.push(rawMaterial.id);
+                            }
                             return;
                         }
 
@@ -401,6 +420,7 @@
 
                             if (productQuantity === null) {
                                 allAvailable = false;
+                                insufficientMaterialIds.push(rawMaterial.id);
                                 return;
                             }
                         }
@@ -418,6 +438,7 @@
 
                         if (requiredStockQuantity === null) {
                             allAvailable = false;
+                            insufficientMaterialIds.push(rawMaterial.id);
                             return;
                         }
 
@@ -427,58 +448,61 @@
 
                         if (!isAvailable) {
                             allAvailable = false;
+                            insufficientMaterialIds.push(rawMaterial.id);
                         }
 
                         materialsBody.append(`
-                            <tr class="transition hover:bg-gray-50 dark:hover:bg-gray-800/50">
-
-                                <td class="px-5 py-4">
-                                    <div class="font-medium text-gray-900 dark:text-white">
-                                        ${rawMaterial.name}
-                                    </div>
-                                    <div class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                                        Stock unit: ${stockUnit.short_name}
-                                    </div>
-                                </td>
-
-                                <td class="px-5 py-4 font-medium text-gray-900 dark:text-white">
-                                    ${formatNumber(requiredStockQuantity)}
-                                    <span class="ml-0.5 text-xs font-normal text-gray-500 dark:text-gray-400">
-                                        ${stockUnit.short_name}
-                                    </span>
-                                </td>
-
-                                <td class="px-5 py-4 font-medium text-gray-900 dark:text-white">
-                                    ${formatNumber(availableStock)}
-                                    <span class="ml-0.5 text-xs font-normal text-gray-500 dark:text-gray-400">
-                                        ${stockUnit.short_name}
-                                    </span>
-                                </td>
-
-                                <td class="px-5 py-4">
-                                    <span class="inline-flex items-center gap-1.5 text-xs font-medium ${
-                                        isAvailable
-                                            ? 'text-emerald-600 dark:text-emerald-400'
-                                            : 'text-red-600 dark:text-red-400'
-                                    }">
-                                        <span class="h-1.5 w-1.5 rounded-full ${
-                                            isAvailable
-                                                ? 'bg-emerald-500'
-                                                : 'bg-red-500'
-                                        }"></span>
-
-                                        ${isAvailable ? 'Available' : 'Insufficient'}
-                                    </span>
-                                </td>
-
-                            </tr>
-                        `);
+            <tr class="transition hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                <td class="px-5 py-4">
+                    <div class="font-medium text-gray-900 dark:text-white">
+                        ${rawMaterial.name}
+                    </div>
+                    <div class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                        Stock unit: ${stockUnit.short_name}
+                    </div>
+                </td>
+                <td class="px-5 py-4 font-medium text-gray-900 dark:text-white">
+                    ${formatNumber(requiredStockQuantity)}
+                    <span class="ml-0.5 text-xs font-normal text-gray-500 dark:text-gray-400">
+                        ${stockUnit.short_name}
+                    </span>
+                </td>
+                <td class="px-5 py-4 font-medium text-gray-900 dark:text-white">
+                    ${formatNumber(availableStock)}
+                    <span class="ml-0.5 text-xs font-normal text-gray-500 dark:text-gray-400">
+                        ${stockUnit.short_name}
+                    </span>
+                </td>
+                <td class="px-5 py-4">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-medium ${
+                        isAvailable
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : 'text-red-600 dark:text-red-400'
+                    }">
+                        <span class="h-1.5 w-1.5 rounded-full ${
+                            isAvailable
+                                ? 'bg-emerald-500'
+                                : 'bg-red-500'
+                        }"></span>
+                        ${isAvailable ? 'Available' : 'Insufficient'}
+                    </span>
+                </td>
+            </tr>
+        `);
                     });
 
                     materialsSection.removeClass('hidden');
                     manufactureBtn.prop('disabled', !allAvailable);
-                    
+
                     if (!allAvailable) {
+                        // Build URL parameters for insufficient material IDs
+                        const params = new URLSearchParams();
+                        insufficientMaterialIds.forEach(id => {
+                            params.append('raw_material_ids[]', id);
+                        });
+
+                        const baseUrl = "{{ route('purchase-requests.create') }}";
+                        replenishBtn.attr('href', baseUrl + '?' + params.toString());
                         replenishBtn.removeClass('hidden').addClass('inline-flex');
                     }
                 }
@@ -535,7 +559,8 @@
                             resetManufacturing();
 
                             setTimeout(function() {
-                                window.location.href = "{{route('manufacturing.index')}}";
+                                window.location.href =
+                                    "{{ route('manufacturing.index') }}";
                             }, 800);
                         },
                         error: function(xhr) {

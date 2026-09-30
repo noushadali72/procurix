@@ -1,5 +1,6 @@
 <x-layouts.app title="Create Manufacturing Formula">
 
+    
     <div class="mb-6">
         <h2 class="text-xl font-semibold text-gray-900">
             Create Manufacturing Formula

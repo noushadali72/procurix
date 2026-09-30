@@ -1,7 +1,19 @@
 {{-- Formula Information --}}
 @php
-    $product_id = old('product_id',request('product_id')??$manufacturingFormula->product_id??null);
+    $product_id = old('product_id', request('product_id') ?? ($manufacturingFormula->product_id ?? null));
 @endphp
+
+
+
+@push('head')
+    {{-- select2 cdn --}}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+@endpush
+
+
+
+
 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 
     {{-- Product --}}
@@ -11,18 +23,12 @@
             Product
         </label>
 
-        <select
-            id="product_id"
-            name="product_id"
-            class="w-full rounded-lg border-gray-300 px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500"
-        >
+        <select id="product_id" name="product_id"
+            class="w-full rounded-lg border-gray-300 px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
             <option value="">Select Product</option>
 
             @foreach ($products as $product)
-                <option
-                    value="{{ $product->id }}"
-                    @selected($product_id == $product->id)
-                >
+                <option value="{{ $product->id }}" @selected($product_id == $product->id)>
                     {{ $product->name }}
                 </option>
             @endforeach
@@ -41,14 +47,9 @@
             Formula Name
         </label>
 
-        <input
-            type="text"
-            id="name"
-            name="name"
-            value="{{ old('name', $manufacturingFormula->name ?? '') }}"
+        <input type="text" id="name" name="name" value="{{ old('name', $manufacturingFormula->name ?? '') }}"
             placeholder="Enter formula name"
-            class="w-full rounded-lg border-gray-300 px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500"
-        >
+            class="w-full rounded-lg border-gray-300 px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
 
         <span id="nameErr" class="mt-1 block text-sm text-red-600"></span>
 
@@ -62,13 +63,8 @@
             Description
         </label>
 
-        <textarea
-            id="description"
-            name="description"
-            rows="3"
-            placeholder="Enter formula description (optional)"
-            class="w-full rounded-lg border-gray-300 px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500"
-        >{{ old('description', $manufacturingFormula->description ?? '') }}</textarea>
+        <textarea id="description" name="description" rows="3" placeholder="Enter formula description (optional)"
+            class="w-full rounded-lg border-gray-300 px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">{{ old('description', $manufacturingFormula->description ?? '') }}</textarea>
 
         <span id="descriptionErr" class="mt-1 block text-sm text-red-600"></span>
 
@@ -93,11 +89,8 @@
             </p>
         </div>
 
-        <button
-            type="button"
-            id="add-item"
-            class="rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
-        >
+        <button type="button" id="add-item"
+            class="rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800">
             + Add Material
         </button>
 
@@ -109,11 +102,8 @@
         $oldItems = old('items');
 
         if ($oldItems) {
-
             $formItems = $oldItems;
-
         } elseif (isset($manufacturingFormula)) {
-
             $formItems = $manufacturingFormula->items
                 ->map(function ($item) {
                     return [
@@ -123,9 +113,7 @@
                     ];
                 })
                 ->toArray();
-
         } else {
-
             $formItems = [
                 [
                     'raw_material_id' => '',
@@ -133,7 +121,6 @@
                     'unit_id' => '',
                 ],
             ];
-
         }
 
     @endphp
@@ -142,12 +129,8 @@
     <div id="items-container" class="space-y-3">
 
         @foreach ($formItems as $index => $item)
-
             @php
-                $selectedRawMaterial = $rawMaterials->firstWhere(
-                    'id',
-                    $item['raw_material_id'] ?? null
-                );
+                $selectedRawMaterial = $rawMaterials->firstWhere('id', $item['raw_material_id'] ?? null);
             @endphp
 
             <div class="formula-item rounded-lg border border-gray-200 bg-gray-50 p-4">
@@ -161,28 +144,21 @@
                             Raw Material
                         </label>
 
-                        <select
-                            name="items[{{ $index }}][raw_material_id]"
-                            class="raw-material w-full rounded-lg border-gray-300 bg-white px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500"
-                        >
+                        <select name="items[{{ $index }}][raw_material_id]"
+                            class="raw-material w-full rounded-lg border-gray-300 bg-white px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
 
                             <option value="">
                                 Select Raw Material
                             </option>
 
                             @foreach ($rawMaterials as $rawMaterial)
-
-                                <option
-                                    value="{{ $rawMaterial->id }}"
-                                    data-unit-id="{{ $rawMaterial->unit_id }}"
+                                <option value="{{ $rawMaterial->id }}" data-unit-id="{{ $rawMaterial->unit_id }}"
                                     data-unit-name="{{ $rawMaterial->unit->name }}"
                                     data-category-id="{{ $rawMaterial->unit->unit_category_id }}"
-                                    @selected(($item['raw_material_id'] ?? '') == $rawMaterial->id)
-                                >
+                                    @selected(($item['raw_material_id'] ?? '') == $rawMaterial->id)>
                                     {{ $rawMaterial->name }}
                                     ({{ $rawMaterial->unit->short_name }})
                                 </option>
-
                             @endforeach
 
                         </select>
@@ -197,14 +173,9 @@
                             Quantity
                         </label>
 
-                        <input
-                            type="number"
-                            name="items[{{ $index }}][quantity]"
-                            value="{{ $item['quantity'] ?? 1 }}"
-                            min="0"
-                            step="any"
-                            class="w-full rounded-lg border-gray-300 bg-white px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500"
-                        >
+                        <input type="number" name="items[{{ $index }}][quantity]"
+                            value="{{ $item['quantity'] ?? 1 }}" min="0" step="any"
+                            class="w-full rounded-lg border-gray-300 bg-white px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
 
                     </div>
 
@@ -216,25 +187,18 @@
                             Unit
                         </label>
 
-                        <select
-                            name="items[{{ $index }}][unit_id]"
-                            class="unit-select w-full rounded-lg border-gray-300 bg-white px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500"
-                        >
+                        <select name="items[{{ $index }}][unit_id]"
+                            class="unit-select w-full rounded-lg border-gray-300 bg-white px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
 
                             <option value="">
                                 Select Unit
                             </option>
 
                             @foreach ($units as $unit)
-
-                                <option
-                                    value="{{ $unit->id }}"
-                                    data-category-id="{{ $unit->unit_category_id }}"
-                                    @selected(($item['unit_id'] ?? '') == $unit->id)
-                                >
+                                <option value="{{ $unit->id }}" data-category-id="{{ $unit->unit_category_id }}"
+                                    @selected(($item['unit_id'] ?? '') == $unit->id)>
                                     {{ $unit->name }} ({{ $unit->short_name }})
                                 </option>
-
                             @endforeach
 
                         </select>
@@ -245,10 +209,8 @@
                     {{-- Remove --}}
                     <div class="flex items-end justify-end md:col-span-1">
 
-                        <button
-                            type="button"
-                            class="remove-item rounded-lg border border-red-200 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50"
-                        >
+                        <button type="button"
+                            class="remove-item rounded-lg border border-red-200 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50">
                             Remove
                         </button>
 
@@ -257,7 +219,6 @@
                 </div>
 
             </div>
-
         @endforeach
 
     </div>
@@ -280,27 +241,20 @@
                     Raw Material
                 </label>
 
-                <select
-                    name="items[INDEX][raw_material_id]"
-                    class="raw-material w-full rounded-lg border-gray-300 bg-white px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500"
-                >
+                <select name="items[INDEX][raw_material_id]"
+                    class="raw-material w-full rounded-lg border-gray-300 bg-white px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
 
                     <option value="">
                         Select Raw Material
                     </option>
 
                     @foreach ($rawMaterials as $rawMaterial)
-
-                        <option
-                            value="{{ $rawMaterial->id }}"
-                            data-unit-id="{{ $rawMaterial->unit_id }}"
+                        <option value="{{ $rawMaterial->id }}" data-unit-id="{{ $rawMaterial->unit_id }}"
                             data-unit-name="{{ $rawMaterial->unit->name }}"
-                            data-category-id="{{ $rawMaterial->unit->unit_category_id }}"
-                        >
+                            data-category-id="{{ $rawMaterial->unit->unit_category_id }}">
                             {{ $rawMaterial->name }}
                             ({{ $rawMaterial->unit->short_name }})
                         </option>
-
                     @endforeach
 
                 </select>
@@ -315,14 +269,8 @@
                     Quantity
                 </label>
 
-                <input
-                    type="number"
-                    name="items[INDEX][quantity]"
-                    value="1"
-                    min="0"
-                    step="any"
-                    class="w-full rounded-lg border-gray-300 bg-white px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500"
-                >
+                <input type="number" name="items[INDEX][quantity]" value="1" min="0" step="any"
+                    class="w-full rounded-lg border-gray-300 bg-white px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
 
             </div>
 
@@ -334,24 +282,17 @@
                     Unit
                 </label>
 
-                <select
-                    name="items[INDEX][unit_id]"
-                    class="unit-select w-full rounded-lg border-gray-300 bg-white px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500"
-                >
+                <select name="items[INDEX][unit_id]"
+                    class="unit-select w-full rounded-lg border-gray-300 bg-white px-4 py-2.5 shadow-sm focus:border-gray-500 focus:ring-gray-500">
 
                     <option value="">
                         Select Unit
                     </option>
 
                     @foreach ($units as $unit)
-
-                        <option
-                            value="{{ $unit->id }}"
-                            data-category-id="{{ $unit->unit_category_id }}"
-                        >
+                        <option value="{{ $unit->id }}" data-category-id="{{ $unit->unit_category_id }}">
                             {{ $unit->name }} ({{ $unit->short_name }})
                         </option>
-
                     @endforeach
 
                 </select>
@@ -362,10 +303,8 @@
             {{-- Remove --}}
             <div class="flex items-end justify-end md:col-span-1">
 
-                <button
-                    type="button"
-                    class="remove-item rounded-lg border border-red-200 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50"
-                >
+                <button type="button"
+                    class="remove-item rounded-lg border border-red-200 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50">
                     Remove
                 </button>
 
@@ -379,171 +318,171 @@
 
 
 @push('scripts')
+    <script>
+        $(document).ready(function() {
 
-<script>
-$(document).ready(function () {
+            $("#product_id").select2();
 
-    const container = $("#items-container");
-    const template = $("#item-template");
-    const addButton = $("#add-item");
+            const container = $("#items-container");
+            const template = $("#item-template");
+            const addButton = $("#add-item");
 
-    let index = {{ count($formItems) }};
+            let index = {{ count($formItems) }};
 
 
-    // Filter units according to raw material category
-    function filterUnits(item) {
+            // Filter units according to raw material category
+            function filterUnits(item) {
 
-        const rawMaterial = item.find(".raw-material");
-        const unitSelect = item.find(".unit-select");
+                const rawMaterial = item.find(".raw-material");
+                const unitSelect = item.find(".unit-select");
 
-        const categoryId = rawMaterial
-            .find("option:selected")
-            .data("category-id");
+                const categoryId = rawMaterial
+                    .find("option:selected")
+                    .data("category-id");
 
-        unitSelect.find("option").each(function () {
+                unitSelect.find("option").each(function() {
 
-            const option = $(this);
+                    const option = $(this);
 
-            if (!option.val()) {
-                option.show();
-                return;
+                    if (!option.val()) {
+                        option.show();
+                        return;
+                    }
+
+                    const optionCategoryId = option.data("category-id");
+
+                    option.toggle(
+                        categoryId &&
+                        Number(optionCategoryId) === Number(categoryId)
+                    );
+                });
+
+                const selectedOption = unitSelect.find("option:selected");
+
+                if (
+                    selectedOption.val() &&
+                    Number(selectedOption.data("category-id")) !== Number(categoryId)
+                ) {
+                    unitSelect.val("");
+                }
             }
 
-            const optionCategoryId = option.data("category-id");
 
-            option.toggle(
-                categoryId &&
-                Number(optionCategoryId) === Number(categoryId)
-            );
-        });
+            // Hide already selected raw materials
+            function updateRawMaterials() {
 
-        const selectedOption = unitSelect.find("option:selected");
+                const selected = [];
 
-        if (
-            selectedOption.val() &&
-            Number(selectedOption.data("category-id")) !== Number(categoryId)
-        ) {
-            unitSelect.val("");
-        }
-    }
+                $(".raw-material").each(function() {
 
+                    const value = $(this).val();
 
-    // Hide already selected raw materials
-    function updateRawMaterials() {
+                    if (value) {
+                        selected.push(value);
+                    }
+                });
 
-        const selected = [];
+                $(".raw-material").each(function() {
 
-        $(".raw-material").each(function () {
+                    const currentValue = $(this).val();
 
-            const value = $(this).val();
+                    $(this).find("option").each(function() {
 
-            if (value) {
-                selected.push(value);
+                        const option = $(this);
+
+                        if (!option.val()) {
+                            return;
+                        }
+
+                        option.toggle(
+                            option.val() === currentValue ||
+                            !selected.includes(option.val())
+                        );
+                    });
+                });
             }
-        });
 
-        $(".raw-material").each(function () {
 
-            const currentValue = $(this).val();
+            // Raw material changed
+            container.on("change", ".raw-material", function() {
 
-            $(this).find("option").each(function () {
+                const item = $(this).closest(".formula-item");
 
-                const option = $(this);
+                filterUnits(item);
 
-                if (!option.val()) {
+                // Select raw material's own unit by default
+                if (!item.find(".unit-select").val()) {
+
+                    const unitId = $(this)
+                        .find("option:selected")
+                        .data("unit-id");
+
+                    item.find(".unit-select").val(unitId);
+                }
+
+                updateRawMaterials();
+            });
+
+
+            // Filter existing items
+            container.find(".formula-item").each(function() {
+                filterUnits($(this));
+            });
+
+
+            // Add material
+            addButton.on("click", function() {
+
+                const html = template
+                    .html()
+                    .replaceAll("INDEX", index);
+
+                container.append(html);
+
+                index++;
+
+                updateRawMaterials();
+            });
+
+
+            // Remove material
+            container.on("click", ".remove-item", function() {
+
+                if (container.find(".formula-item").length <= 1) {
+
+                    showToast(
+                        "warning",
+                        "At least one raw material is required."
+                    );
+
                     return;
                 }
 
-                option.toggle(
-                    option.val() === currentValue ||
-                    !selected.includes(option.val())
-                );
+                $(this)
+                    .closest(".formula-item")
+                    .remove();
+
+                updateRawMaterials();
             });
+
+
+            // Quantity: decimal numbers only
+            $(document).on("input", 'input[name*="[quantity]"]', function() {
+
+                this.value = this.value.replace(/[^0-9.]/g, "");
+
+                const parts = this.value.split(".");
+
+                if (parts.length > 2) {
+                    this.value =
+                        parts[0] + "." + parts.slice(1).join("");
+                }
+            });
+
+
+            // Initial filtering
+            updateRawMaterials();
+
         });
-    }
-
-
-    // Raw material changed
-    container.on("change", ".raw-material", function () {
-
-        const item = $(this).closest(".formula-item");
-
-        filterUnits(item);
-
-        // Select raw material's own unit by default
-        if (!item.find(".unit-select").val()) {
-
-            const unitId = $(this)
-                .find("option:selected")
-                .data("unit-id");
-
-            item.find(".unit-select").val(unitId);
-        }
-
-        updateRawMaterials();
-    });
-
-
-    // Filter existing items
-    container.find(".formula-item").each(function () {
-        filterUnits($(this));
-    });
-
-
-    // Add material
-    addButton.on("click", function () {
-
-        const html = template
-            .html()
-            .replaceAll("INDEX", index);
-
-        container.append(html);
-
-        index++;
-
-        updateRawMaterials();
-    });
-
-
-    // Remove material
-    container.on("click", ".remove-item", function () {
-
-        if (container.find(".formula-item").length <= 1) {
-
-            showToast(
-                "warning",
-                "At least one raw material is required."
-            );
-
-            return;
-        }
-
-        $(this)
-            .closest(".formula-item")
-            .remove();
-
-        updateRawMaterials();
-    });
-
-
-    // Quantity: decimal numbers only
-    $(document).on("input", 'input[name*="[quantity]"]', function () {
-
-        this.value = this.value.replace(/[^0-9.]/g, "");
-
-        const parts = this.value.split(".");
-
-        if (parts.length > 2) {
-            this.value =
-                parts[0] + "." + parts.slice(1).join("");
-        }
-    });
-
-
-    // Initial filtering
-    updateRawMaterials();
-
-});
-</script>
-
+    </script>
 @endpush

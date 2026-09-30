@@ -174,8 +174,109 @@
 
             <tbody id="itemsContainer">
 
-                @if (isset($purchaseRequest) && $purchaseRequest->items->count())
+                {{-- Selected materials which came from replenishment --}}
+                @if (isset($selectedMaterials) && $selectedMaterials)
+                    @foreach ($selectedMaterials as $index => $material)
+                        <tr class="item-row border-b border-slate-100 last:border-0 hover:bg-slate-50">
 
+                            {{-- Raw Material --}}
+                            <td class="px-6 py-3">
+
+                                <select name="items[{{ $index }}][raw_material_id]"
+                                    class="raw-material-select h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                                    required>
+
+                                    <option value="">
+                                        Select Raw Material
+                                    </option>
+
+                                    @foreach ($rawMaterials as $rawMaterial)
+                                        <option value="{{ $rawMaterial->id }}"
+                                            data-unit-id="{{ $rawMaterial->unit_id }}"
+                                            data-unit-name="{{ $rawMaterial->unit->name }}"
+                                            data-category-id="{{ $rawMaterial->unit->unit_category_id }}"
+                                            data-cost-price="{{ $rawMaterial->cost_price }}"
+                                            {{ $material->id == $rawMaterial->id ? 'selected' : '' }}>
+
+                                            {{ $rawMaterial->name }}
+
+                                            @if ($rawMaterial->sku)
+                                                - {{ $rawMaterial->sku }}
+                                            @endif
+
+                                        </option>
+                                    @endforeach
+
+                                </select>
+
+                            </td>
+
+
+                            {{-- Quantity --}}
+                            <td class="px-4 py-3">
+
+                                <input type="text" inputmode="decimal" name="items[{{ $index }}][qty]"
+                                    value="{{ $material->qty ?? 1 }}" placeholder="0"
+                                    class="qty-input h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                                    required>
+
+                            </td>
+
+                            {{-- Unit Cost --}}
+                            <td class="px-4 py-3">
+
+                                <input type="text" inputmode="decimal" name="items[{{ $index }}][unit_cost]"
+                                    value="{{ $material->cost_price ?? 0 }}" placeholder="0.00"
+                                    class="cost-input h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                                    required>
+
+                            </td>
+
+
+                            {{-- Unit --}}
+                            <td class="px-4 py-3">
+
+                                <select name="items[{{ $index }}][unit_id]"
+                                    class="unit-select h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                                    required>
+
+                                    <option value="">
+                                        Select Unit
+                                    </option>
+
+                                    @foreach ($units as $unit)
+                                        <option value="{{ $unit->id }}"
+                                            data-category-id="{{ $unit->unit_category_id }}"
+                                            {{ $material->unit_id == $unit->id ? 'selected' : '' }}>
+
+                                            {{ $unit->name }}
+                                            ({{ $unit->short_name }})
+                                        </option>
+                                    @endforeach
+
+                                </select>
+
+                            </td>
+
+
+                            {{-- Action --}}
+                            <td class="px-4 py-3 text-center">
+
+                                <button type="button"
+                                    class="remove-item inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                                    title="Remove item">
+
+                                    <i class="bx bx-trash text-lg"></i>
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+                    @endforeach
+
+                {{-- Loads when we edit purchase request --}}
+                @elseif (isset($purchaseRequest) && $purchaseRequest->items->count())
                     @foreach ($purchaseRequest->items as $index => $item)
                         <tr class="item-row border-b border-slate-100 last:border-0 hover:bg-slate-50">
 
@@ -226,8 +327,9 @@
                             {{-- Unit Cost --}}
                             <td class="px-4 py-3">
 
-                                <input type="text" inputmode="decimal" name="items[{{ $index }}][unit_cost]"
-                                    value="{{ $item->unit_cost }}" placeholder="0.00"
+                                <input type="text" inputmode="decimal"
+                                    name="items[{{ $index }}][unit_cost]" value="{{ $item->unit_cost }}"
+                                    placeholder="0.00"
                                     class="cost-input h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                                     required>
 

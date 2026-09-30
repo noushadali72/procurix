@@ -214,15 +214,21 @@ class PurchaseRequestController extends Controller
     /**
      * Show create form.
      */
-    public function create()
+    public function create(Request $request)
+    
     {
+
+        // Came from replenishment
+        $selectedMaterialIds = $request->input('raw_material_ids');
+        $selectedMaterials = RawMaterial::find($selectedMaterialIds)??null; 
+        
         $rawMaterials = RawMaterial::with('unit.unitCategory')->orderBy('name')->get();
         $units = Unit::with('unitCategory')->orderBy('name')->get();
         $vendors = Vendor::orderBy('name')->get();
         $purchaseRequest = PurchaseRequest::where('status', 'draft')->latest()->first();
         return view(
             'purchase_requests.create',
-            compact('rawMaterials', 'units', 'vendors', 'purchaseRequest')
+            compact('rawMaterials', 'units', 'vendors', 'purchaseRequest','selectedMaterials')
         );
     }
 
@@ -696,6 +702,7 @@ class PurchaseRequestController extends Controller
      */
     public function edit(PurchaseRequest $purchaseRequest)
     {
+        $selectedMaterials = null;
         if (!in_array($purchaseRequest->status, ['draft', 'sent', 'pending'])) {
             return redirect()->back();
         }
@@ -724,7 +731,8 @@ class PurchaseRequestController extends Controller
                 'purchaseRequest',
                 'rawMaterials',
                 'units',
-                'vendors'
+                'vendors',
+                'selectedMaterials'
             )
         );
     }
