@@ -1,29 +1,28 @@
 <!DOCTYPE html>
-
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-
     <meta charset="utf-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <link rel="icon" href="{{ asset('storage/favicon.png') }}" type="image/x-icon">
-
     <title>
         {{ $title ?? config('app.name') }}
     </title>
-
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-
+    {{-- Boxicons cdn --}}
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
+    {{-- JQuery --}}
 
+    <script src="https://cdn.jsdelivr.net/npm/jquery@4.0.0/dist/jquery.min.js"
+        integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
+
+    @stack('head')
     @stack('styles')
+
+
 
 
     <style>
@@ -69,8 +68,62 @@
         }
 
         body {
-            background-color: var(--bg-color)!important;
-            color: var(--text-color)!important;
+            background-color: var(--bg-color) !important;
+            color: var(--text-color) !important;
+        }
+
+
+        /* select2 styles */
+
+        /* Select2 - match Tailwind select */
+        .select2-container {
+            width: 100% !important;
+        }
+
+        .select2-container .select2-selection--single {
+            height: 42px !important;
+            border: 1px solid #d1d5db !important;
+            border-radius: 0.5rem !important;
+            background-color: #fff !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        .select2-container .select2-selection--single .select2-selection__rendered {
+            padding-left: 12px !important;
+            padding-right: 36px !important;
+            font-size: 0.875rem !important;
+            color: #374151 !important;
+            line-height: normal !important;
+        }
+
+        .select2-container .select2-selection--single .select2-selection__arrow {
+            height: 100% !important;
+            right: 10px !important;
+            top: 0 !important;
+        }
+
+        /* Focus */
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #111827 !important;
+            box-shadow: 0 0 0 1px #111827 !important;
+        }
+
+        /* Dropdown */
+        .select2-container--default .select2-results__option {
+            padding: 8px 12px;
+            font-size: 0.875rem;
+        }
+
+        .select2-container--default .select2-results__option--highlighted {
+            background-color: #f3f4f6 !important;
+            color: #111827 !important;
+        }
+
+        .select2-dropdown {
+            border: 1px solid #d1d5db !important;
+            border-radius: 0.5rem !important;
+            overflow: hidden;
         }
     </style>
 
@@ -786,13 +839,6 @@
 
     </div>
 
-
-    {{-- ====================================================== --}}
-    {{-- JQUERY --}}
-    {{-- ====================================================== --}}
-
-    <script src="https://cdn.jsdelivr.net/npm/jquery@4.0.0/dist/jquery.min.js"
-        integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
 
 
     {{-- ====================================================== --}}

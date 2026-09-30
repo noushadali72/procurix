@@ -1,5 +1,12 @@
 <x-layouts.app title="Products">
 
+
+    @push('head')
+        {{-- select2 cdn --}}
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+    @endpush
+
     {{-- Page Header --}}
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
@@ -76,7 +83,7 @@
                     <i class="bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-400">
                     </i>
 
-                    <input type="text" name="searchQuery" id="search" value="{{ request('searchQuery') }}" 
+                    <input type="text" name="searchQuery" id="search" value="{{ request('searchQuery') }}"
                         placeholder="Search product name, SKU..."
                         class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-3
                         text-sm text-gray-900 placeholder-gray-400 outline-none transition
@@ -96,7 +103,7 @@
                 <select name="category_id" id="category_id"
                     class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5
                     text-sm text-gray-900 outline-none transition
-                    focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
+                    focus:border-gray-500 focus:ring-2 focus:ring-gray-200 ">
 
                     <option value="">
                         All Categories
@@ -489,6 +496,11 @@
     @push('scripts')
         <script>
             $(document).ready(function() {
+
+                $('#category_id').select2({
+                    width: '100%',
+
+                });
 
                 $(document).on('click', '.delete-product-btn', function() {
 

@@ -376,6 +376,36 @@
                     </div>
 
 
+                    {{-- Expected arrival Date --}}
+                    <div class="border-b border-gray-100 p-5 sm:border-r lg:border-b-0">
+
+                        <div class="flex items-center gap-3">
+
+                            <div
+                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600">
+
+                                <i class="bx bx-calendar text-xl"></i>
+
+                            </div>
+
+                            <div>
+
+                                <p class="text-xs font-medium text-gray-500">
+                                    Expected Delivery
+                                </p>
+
+                                <p class="mt-1 text-sm font-semibold text-gray-900">
+
+                                    {{ $purchaseOrder->purchaseRequest->due_date?->format('d M Y')??'_'}}
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                     {{-- Received Date --}}
                     <div class="p-5">
 
@@ -396,7 +426,7 @@
 
                                 <p class="mt-1 text-sm font-semibold text-gray-900">
 
-                                    {{ $purchaseOrder->received_date?->format('d M Y') ?? '—' }}
+                                    {{ $purchaseOrder->received_date?->format('d M Y') ?? '_' }}
 
                                 </p>
 

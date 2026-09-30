@@ -1,5 +1,14 @@
 <x-layouts.app title="Edit Request for quotation">
 
+
+
+    @push('head')
+        {{-- select2 cdn --}}
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+
+    @endpush
+
     <div class="mb-6 flex items-center justify-between">
 
         <div>
@@ -228,6 +237,9 @@
         {{-- Add Vendor Script  --}}
         <script>
             $(document).ready(function() {
+
+                $("#vendor_id").select2();
+                $(".raw-material-select").select2();
 
                 // Open modal
                 $('#openVendorModal').on('click', function() {

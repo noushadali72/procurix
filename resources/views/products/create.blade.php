@@ -1,5 +1,12 @@
 <x-layouts.app title="Create Product">
 
+    @push('head')
+    {{-- select2 cdn --}}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+    @endpush
+
+
     <div class="mb-6">
         <h2 class="text-xl font-semibold text-gray-900">
             Create Product
@@ -72,11 +79,7 @@
                 </button>
             </div>
 
-            <form
-                id="categoryForm"
-                action="{{ route('categories.store') }}"
-                method="POST"
-            >
+            <form id="categoryForm" action="{{ route('categories.store') }}" method="POST">
                 @csrf
 
                 <div class="space-y-5 p-5">
@@ -180,6 +183,10 @@
     @push('scripts')
         <script>
 
+    $(document).ready(function(){
+        $("#category_id").select2();
+        $("#unit_id").select2();
+    })
 
     function clearCategoryErrors() {
         $('#categoryNameErr, #categorySlugErr, #categoryDescriptionErr').text('');

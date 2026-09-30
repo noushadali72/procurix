@@ -24,6 +24,8 @@ class RawMaterial extends Model
 
     protected $casts = [
         'cost_price' => 'decimal:2',
+        'stock'=>'decimal:2',
+        'minimum_stock'=>'decimal:2'
     ];
 
     public function unit(): BelongsTo

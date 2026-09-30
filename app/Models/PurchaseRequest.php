@@ -17,6 +17,9 @@ class PurchaseRequest extends Model
         'vendor_id',
         'stage'
     ];
+    protected $casts = [
+        'due_date'=>'date'
+    ];
 
    protected static function booted(){
     static::creating(function($pr){
@@ -45,8 +48,7 @@ class PurchaseRequest extends Model
         {
             do {
 
-                $requestNumber =
-                    'PR-' . strtoupper(Str::random(7));
+                $requestNumber = 'PR-' . strtoupper(Str::random(7));
             } while (
                 PurchaseRequest::where(
                     'request_number',

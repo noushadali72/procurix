@@ -1,5 +1,13 @@
 <x-layouts.app title="Raw Materials">
 
+
+    @push('head')
+        {{-- select2 cdn --}}
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+
+    @endpush
+
     {{-- Page Header --}}
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
@@ -41,68 +49,68 @@
 
 
     {{-- Search & Filters --}}
-  
-        <form method="GET" action="{{ route('raw-materials.index') }}" class="mb-4">
-            <div class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-5">
 
-                {{-- Search --}}
-                <div class="lg:col-span-2">
-                    <label for="searchQuery" class="mb-1.5 block text-xs font-medium text-gray-600">
-                        Search
-                    </label>
+    <form method="GET" action="{{ route('raw-materials.index') }}" class="mb-4">
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-5">
 
-                    <div class="relative">
-                        <i class="bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            {{-- Search --}}
+            <div class="lg:col-span-2">
+                <label for="searchQuery" class="mb-1.5 block text-xs font-medium text-gray-600">
+                    Search
+                </label>
 
-                        <input type="text" id="searchQuery" name="searchQuery" value="{{ request('searchQuery') }}"
-                            placeholder="Search raw materials..."
-                            class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
-                    </div>
-                </div>
+                <div class="relative">
+                    <i class="bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
 
-                {{-- Category --}}
-                <div>
-                    <label for="category_id" class="mb-1.5 block text-xs font-medium text-gray-600">
-                        Category
-                    </label>
-
-                    <select id="category_id" name="category_id"
-                        class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
-                        <option value="">All Categories</option>
-
-                        @foreach ($categories as $category)
-                            <option value="{{ $category->id }}" @selected(request('category_id') == $category->id)>
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                {{-- Minimum Price --}}
-                <div>
-                    <label for="min_price" class="mb-1.5 block text-xs font-medium text-gray-600">
-                        Min Cost
-                    </label>
-
-                    <input type="number" id="min_price" name="min_price" value="{{ request('min_price') }}"
-                        min="0" step="0.01" placeholder="Min price"
-                        class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
-                </div>
-
-                {{-- Maximum Price --}}
-                <div>
-                    <label for="max_price" class="mb-1.5 block text-xs font-medium text-gray-600">
-                        Max Cost
-                    </label>
-
-                    <input type="number" id="max_price" name="max_price" value="{{ request('max_price') }}"
-                        min="0" step="0.01" placeholder="Max price"
-                        class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+                    <input type="text" id="searchQuery" name="searchQuery" value="{{ request('searchQuery') }}"
+                        placeholder="Search raw materials..."
+                        class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
                 </div>
             </div>
 
-            <div class="mt-3 flex items-center justify-end gap-2">
-               
+            {{-- Category --}}
+            <div>
+                <label for="category_id" class="mb-1.5 block text-xs font-medium text-gray-600">
+                    Category
+                </label>
+
+                <select id="category_id" name="category_id"
+                    class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+                    <option value="">All Categories</option>
+
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->id }}" @selected(request('category_id') == $category->id)>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Minimum Price --}}
+            <div>
+                <label for="min_price" class="mb-1.5 block text-xs font-medium text-gray-600">
+                    Min Cost
+                </label>
+
+                <input type="number" id="min_price" name="min_price" value="{{ request('min_price') }}" min="0"
+                    step="0.01" placeholder="Min price"
+                    class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+            </div>
+
+            {{-- Maximum Price --}}
+            <div>
+                <label for="max_price" class="mb-1.5 block text-xs font-medium text-gray-600">
+                    Max Cost
+                </label>
+
+                <input type="number" id="max_price" name="max_price" value="{{ request('max_price') }}" min="0"
+                    step="0.01" placeholder="Max price"
+                    class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+            </div>
+        </div>
+
+        <div class="mt-3 flex items-center justify-end gap-2">
+
             @if (request()->filled('searchQuery') ||
                     request()->filled('category_id') ||
                     request()->filled('min_price') ||
@@ -113,7 +121,7 @@
                     Reset
                 </a>
             @endif
-                <button type="submit"
+            <button type="submit"
                 class="inline-flex cursor-pointer items-center gap-2 rounded-lg
                 bg-gray-900 px-4 py-2 text-sm font-medium text-white
                 transition hover:bg-gray-800">
@@ -123,9 +131,9 @@
                 Apply Filters
 
             </button>
-            </div>
-        </form>
-  
+        </div>
+    </form>
+
 
     {{-- Raw Materials Card --}}
     <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
@@ -267,7 +275,7 @@
                                         class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600">
                                         <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
 
-                                        {{ number_format($rawMaterial->stock, 4) }}
+                                        {{ $rawMaterial->stock }}
                                         {{ $rawMaterial->unit->short_name ?? '' }}
 
                                         <span class="text-red-400">
@@ -279,7 +287,7 @@
                                         class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
                                         <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>
 
-                                        {{ number_format($rawMaterial->stock, 4) }}
+                                        {{ $rawMaterial->stock }}
                                         {{ $rawMaterial->unit->short_name ?? '' }}
                                     </span>
                                 @endif
@@ -291,7 +299,7 @@
                             <td class="px-5 py-4">
 
                                 <span class="text-gray-600">
-                                    {{ number_format($rawMaterial->minimum_stock, 4) }}
+                                    {{ $rawMaterial->minimum_stock }}
                                     {{ $rawMaterial->unit->short_name ?? '' }}
                                 </span>
 
@@ -376,6 +384,10 @@
 
     @push('scripts')
         <script>
+            $(document).ready(function() {
+                $("#category_id").select2();
+            })
+
             function deleteRawMaterial(button) {
                 const url = button.data('url');
                 const name = button.data('name');

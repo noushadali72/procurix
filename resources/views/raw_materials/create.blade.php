@@ -1,5 +1,14 @@
 <x-layouts.app title="Create Raw Material">
 
+
+
+    @push('head')
+        {{-- select2 cdn --}}
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+
+    @endpush
+
     <div class="mb-6">
         <h2 class="text-xl font-semibold text-gray-900">
             Create Raw Material
@@ -172,6 +181,11 @@
 
     @push('scripts')
         <script>
+
+        $(document).ready(function(){
+            $("#category_id").select2();
+            $("#unit_id").select2();
+        });
 
         // Cost price: positive whole numbers only (including 0)
         $('#cost_price').on('input', function() {
