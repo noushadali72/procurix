@@ -1,5 +1,13 @@
 <x-layouts.app title="Vendor Bills">
 
+
+
+    @push('head')
+        {{-- select2 cdn --}}
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+    @endpush
+
     {{-- Header --}}
     <div class="mb-6 flex items-center justify-between">
 
@@ -324,7 +332,6 @@
                             </option>
 
                             @foreach ($purchaseOrders as $purchaseOrder)
-                                
                                 <option value="{{ $purchaseOrder->id }}">
 
                                     {{ $purchaseOrder->order_number }}
@@ -385,120 +392,119 @@
     </div>
 
 
-@push('scripts')
+    @push('scripts')
+        <script>
+            $(document).ready(function() {
+                $("#purchase_order_id").select2();
 
-<script>
-    $(document).ready(function() {
-
-        const $modal = $('#vendorBillModal');
-        const $form = $('#vendorBillForm');
-        const $button = $('#createVendorBillBtn');
-        const $buttonText = $('#createVendorBillBtnText');
-
-
-        // Open modal
-        $('#openVendorBillModal').on('click', function() {
-            $modal.removeClass('hidden');
-        });
+                const $modal = $('#vendorBillModal');
+                const $form = $('#vendorBillForm');
+                const $button = $('#createVendorBillBtn');
+                const $buttonText = $('#createVendorBillBtnText');
 
 
-        // Close modal
-        function closeVendorBillModal() {
-            $modal.addClass('hidden');
-            $form[0].reset();
-            $('#purchaseOrderErr').text('');
-        }
+                // Open modal
+                $('#openVendorBillModal').on('click', function() {
+                    $modal.removeClass('hidden');
+                });
 
 
-        $('#closeVendorBillModal, #cancelVendorBillModal, #vendorBillModalOverlay')
-            .on('click', function() {
-                closeVendorBillModal();
-            });
+                // Close modal
+                function closeVendorBillModal() {
+                    $modal.addClass('hidden');
+                    $form[0].reset();
+                    $('#purchaseOrderErr').text('');
+                }
 
 
-        // Create vendor bill
-        $form.on('submit', function(e) {
-            e.preventDefault();
-            $('#purchaseOrderErr').text('');
-            const originalText = $buttonText.text();
-            $button.prop('disabled', true);
-            $buttonText.text('Creating...');
-
-            $.ajax({
-                url: $form.attr('action'),
-                type: 'POST',
-                data: $form.serialize(),
-                headers: {
-                    Accept: 'application/json'
-                },
-                success: function(response) {
-                    showToast(
-                        'success',
-                        response.message ||
-                        'Vendor bill generated successfully.'
-                    );
-
-                    closeVendorBillModal();
-                    setTimeout(function() {
-
-                        window.location.href =
-                            response.redirect;
-
-                    }, 800);
-
-                },
+                $('#closeVendorBillModal, #cancelVendorBillModal, #vendorBillModalOverlay')
+                    .on('click', function() {
+                        closeVendorBillModal();
+                    });
 
 
-                error: function(xhr) {
+                // Create vendor bill
+                $form.on('submit', function(e) {
+                    e.preventDefault();
+                    $('#purchaseOrderErr').text('');
+                    const originalText = $buttonText.text();
+                    $button.prop('disabled', true);
+                    $buttonText.text('Creating...');
 
-                    if (xhr.status === 422) {
+                    $.ajax({
+                        url: $form.attr('action'),
+                        type: 'POST',
+                        data: $form.serialize(),
+                        headers: {
+                            Accept: 'application/json'
+                        },
+                        success: function(response) {
+                            showToast(
+                                'success',
+                                response.message ||
+                                'Vendor bill generated successfully.'
+                            );
 
-                        const errors =
-                            xhr.responseJSON?.errors || {};
+                            closeVendorBillModal();
+                            setTimeout(function() {
 
-                        $('#purchaseOrderErr').text(
-                            errors.purchase_order_id?.[0] || ''
-                        );
+                                window.location.href =
+                                    response.redirect;
+
+                            }, 800);
+
+                        },
 
 
-                        if (!errors.purchase_order_id) {
+                        error: function(xhr) {
+
+                            if (xhr.status === 422) {
+
+                                const errors =
+                                    xhr.responseJSON?.errors || {};
+
+                                $('#purchaseOrderErr').text(
+                                    errors.purchase_order_id?.[0] || ''
+                                );
+
+
+                                if (!errors.purchase_order_id) {
+
+                                    showToast(
+                                        'error',
+                                        xhr.responseJSON?.message ||
+                                        'Unable to create vendor bill.'
+                                    );
+
+                                }
+
+                                return;
+                            }
+
 
                             showToast(
                                 'error',
                                 xhr.responseJSON?.message ||
-                                'Unable to create vendor bill.'
+                                'Something went wrong.'
                             );
+
+                        },
+
+
+                        complete: function() {
+
+                            $button.prop('disabled', false);
+
+                            $buttonText.text(originalText);
 
                         }
 
-                        return;
-                    }
+                    });
 
-
-                    showToast(
-                        'error',
-                        xhr.responseJSON?.message ||
-                        'Something went wrong.'
-                    );
-
-                },
-
-
-                complete: function() {
-
-                    $button.prop('disabled', false);
-
-                    $buttonText.text(originalText);
-
-                }
+                });
 
             });
-
-        });
-
-    });
-</script>
-
-@endpush
+        </script>
+    @endpush
 
 </x-layouts.app>

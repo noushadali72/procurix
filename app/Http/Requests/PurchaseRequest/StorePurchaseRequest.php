@@ -58,12 +58,12 @@ class StorePurchaseRequest extends FormRequest
                 'string',
                 'max:255'
             ],
-            'vendor_id' => [
-                'required',
-                'exists:vendors,id'
-            ],
-          
-
+            // 'vendor_id' => [
+            //     'required',
+            //     'exists:vendors,id'
+            // ],
+            'vendors' => ['required', 'array', 'min:1'],
+            'vendors.*' => ['required', 'integer', 'exists:vendors,id'],
             'items' => [
                 'required',
                 'array',

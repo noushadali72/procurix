@@ -144,37 +144,6 @@ class PurchaseRequestController extends Controller
         return view('purchase_requests.confirmation', compact('purchaseRequest'));
     }
 
-    // public function quotations(PurchaseRequest $pr)
-    // {
-    //     $pr->load([
-    //         'quotations.vendor',
-    //         'quotations.items',
-    //     ]);
-
-    //     return view('purchase_requests.quotations', compact('pr'));
-    // }
-
-
-    // public function compareQuotations(PurchaseRequest $pr)
-    // {
-    //     $quotationIds = request()->input('quotations', []);
-    //     abort_if(count($quotationIds) < 2, 422);
-    //     $pr->load([
-    //         'items.rawMaterial',
-    //         'items.unit',
-    //     ]);
-    //     $quotations = $pr->quotations()
-    //         ->whereIn('id', $quotationIds)
-    //         ->with([
-    //             'vendor',
-    //             'items.rawMaterial',
-    //             'items.unit',
-    //         ])->get();
-    //     return view(
-    //         'purchase_requests.quotation-comparison',
-    //         compact('pr', 'quotations')
-    //     );
-    // }
 
     public function resendRfq(PurchaseRequest $purchaseRequest): JsonResponse
     {
@@ -215,20 +184,24 @@ class PurchaseRequestController extends Controller
      * Show create form.
      */
     public function create(Request $request)
-    
+
     {
 
         // Came from replenishment
         $selectedMaterialIds = $request->input('raw_material_ids');
-        $selectedMaterials = RawMaterial::find($selectedMaterialIds)??null; 
-        
+        $selectedMaterials = RawMaterial::find($selectedMaterialIds) ?? null;
+
         $rawMaterials = RawMaterial::with('unit.unitCategory')->orderBy('name')->get();
         $units = Unit::with('unitCategory')->orderBy('name')->get();
         $vendors = Vendor::orderBy('name')->get();
-        $purchaseRequest = PurchaseRequest::where('status', 'draft')->latest()->first();
+        $purchaseRequest = null;
+        
+        if(!$selectedMaterials || !$selectedMaterials->isNotEmpty()){
+            $purchaseRequest = PurchaseRequest::where('status', 'draft')->latest()->first();
+        }
         return view(
             'purchase_requests.create',
-            compact('rawMaterials', 'units', 'vendors', 'purchaseRequest','selectedMaterials')
+            compact('rawMaterials', 'units', 'vendors', 'purchaseRequest', 'selectedMaterials')
         );
     }
 
@@ -264,11 +237,13 @@ class PurchaseRequestController extends Controller
             ], 500);
         }
     }
+
     public function saveDraft(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'purchase_request_id' => 'nullable|integer',
-            'vendor_id' => 'nullable|exists:vendors,id',
+            'vendors' => 'nullable|array',
+            'vendors.*' => 'exists:vendors,id',
             'delivery_address' => 'nullable|string',
             'notes' => 'nullable|string',
             'due_date' => 'nullable|date',
@@ -291,7 +266,7 @@ class PurchaseRequestController extends Controller
                     ->firstOrFail();
 
                 $purchaseRequest->update([
-                    'vendor_id' => $validated['vendor_id'] ?? null,
+                    'vendor_id' => $validated['vendors'][0] ?? null,
                     'notes' => $validated['notes'] ?? null,
                     'delivery_address' => $validated['delivery_address'] ?? null,
                     'due_date' => $validated['due_date'],
@@ -303,12 +278,15 @@ class PurchaseRequestController extends Controller
                 $purchaseRequest = PurchaseRequest::create([
                     'status' => 'draft',
                     'stage' => 'request',
-                    'vendor_id' => $validated['vendor_id'] ?? null,
+                    'vendor_id' => $validated['vendors'][0] ?? null,
                     'notes' => $validated['notes'] ?? null,
                     'delivery_address' => $validated['delivery_address'] ?? null,
                     'due_date' => $validated['due_date'],
                 ]);
 
+                $purchaseRequest->load([
+                    'vendor',
+                ]);
                 $action = 'Purchase Request Draft Created.';
                 $description = 'Purchase Request draft created by ' . Auth::user()->name . '.';
 
@@ -386,7 +364,7 @@ class PurchaseRequestController extends Controller
                 'exists:purchase_requests,id',
 
             ],
-            'selection_reason'=>['nullable','string','max:255']
+            'selection_reason' => ['nullable', 'string', 'max:255']
         ]);
 
         $selectedId = $validated['selected_purchase_request'];
@@ -428,12 +406,6 @@ class PurchaseRequestController extends Controller
             $total = 0;
 
             $order = PurchaseOrder::create([
-            // 'order_number' => 'PO-' . str_pad(
-            //         (PurchaseOrder::max('id') ?? 0) + 1,
-            //         5,
-            //         '0',
-            //         STR_PAD_LEFT
-            //     ),
                 'purchase_request_id' => $selectedRequest->id,
                 'vendor_id' => $selectedRequest->vendor_id,
                 'status' => 'placed',
@@ -444,9 +416,9 @@ class PurchaseRequestController extends Controller
 
             // Creating Comparison Records
             $comparison = RfqComparison::create([
-                'purchase_order_id'=>$order->id,
-                'purchase_request_id'=>$selectedRequest->id,
-                'selection_reason'=>$validated['selection_reason']
+                'purchase_order_id' => $order->id,
+                'purchase_request_id' => $selectedRequest->id,
+                'selection_reason' => $validated['selection_reason']
             ]);
 
 
@@ -495,16 +467,16 @@ class PurchaseRequestController extends Controller
                 ]);
 
                 $requestItem->load(['items']);
-                foreach($requestItem->items as $item){
+                foreach ($requestItem->items as $item) {
 
                     $comparison->items()->create([
-                    'purchase_request_id'=>$requestItem->id,
-                    'raw_material_id' => $item->raw_material_id,
-                    'qty' => $item->qty,
-                    'unit_id' => $item->unit_id,
-                    'unit_cost' => $item->unit_cost,
-                    'line_total' => $item->total,
-                ]);
+                        'purchase_request_id' => $requestItem->id,
+                        'raw_material_id' => $item->raw_material_id,
+                        'qty' => $item->qty,
+                        'unit_id' => $item->unit_id,
+                        'unit_cost' => $item->unit_cost,
+                        'line_total' => $item->total,
+                    ]);
                 }
 
 
@@ -581,85 +553,93 @@ class PurchaseRequestController extends Controller
     {
         $validated = $request->validated();
 
-        $purchaseRequest = DB::transaction(function () use ($validated) {
-
-            $purchaseRequest = null;
+        $purchaseRequests = DB::transaction(function () use ($validated) {
+            $purchaseRequests = collect();
+            $vendors = $validated['vendors'];
+            $draft = null;
 
             if (!empty($validated['purchase_request_id'])) {
-                $purchaseRequest = PurchaseRequest::where('id', $validated['purchase_request_id'])
+                $draft = PurchaseRequest::whereKey($validated['purchase_request_id'])
                     ->where('status', 'draft')
                     ->first();
             }
 
-            if (!$purchaseRequest) {
-                $purchaseRequest = PurchaseRequest::create([
-                    'status' => 'sent',
-                    'notes' => $validated['notes'] ?? null,
-                    'delivery_address' => $validated['delivery_address'] ?? null,
-                    'vendor_id' => $validated['vendor_id'],
-                    'due_date' => $validated['due_date'],
-                ]);
-            } else {
-                $purchaseRequest->update([
-                    'status' => 'sent',
-                    'notes' => $validated['notes'] ?? null,
-                    'delivery_address' => $validated['delivery_address'] ?? null,
-                    'vendor_id' => $validated['vendor_id'],
-                    'stage' => 'confirmation',
-                    'due_date' => $validated['due_date']
-                ]);
+            foreach ($vendors as $vendorId) {
 
-                $purchaseRequest->items()->delete();
+                if ($draft && $purchaseRequests->isEmpty()) {
+                    // Reuse the existing draft for the first vendor.
+                    $purchaseRequest = $draft;
+
+                    $purchaseRequest->update([
+                        'status' => 'sent',
+                        'stage' => 'confirmation',
+                        'vendor_id' => $vendorId,
+                        'notes' => $validated['notes'] ?? null,
+                        'delivery_address' => $validated['delivery_address'] ?? null,
+                        'due_date' => $validated['due_date'] ?? null,
+                    ]);
+
+                    $purchaseRequest->items()->delete();
+                } else {
+                    // Create another RFQ for each additional vendor.
+                    $purchaseRequest = PurchaseRequest::create([
+                        'status' => 'sent',
+                        'stage' => 'confirmation',
+                        'vendor_id' => $vendorId,
+                        'notes' => $validated['notes'] ?? null,
+                        'delivery_address' => $validated['delivery_address'] ?? null,
+                        'due_date' => $validated['due_date'] ?? null,
+                    ]);
+                }
+
+                foreach ($validated['items'] as $item) {
+                    $purchaseRequest->items()->create([
+                        'raw_material_id' => $item['raw_material_id'],
+                        'qty' => $item['qty'],
+                        'unit_id' => $item['unit_id'],
+                        'unit_cost' => $item['unit_cost'],
+                        'total' => $item['unit_cost'] * $item['qty'],
+                    ]);
+                }
+
+                $purchaseRequests->push($purchaseRequest);
             }
 
-            foreach ($validated['items'] as $item) {
-                $purchaseRequest->items()->create([
-                    'raw_material_id' => $item['raw_material_id'],
-                    'qty' => $item['qty'],
-                    'unit_id' => $item['unit_id'],
-                    'unit_cost' => $item['unit_cost'],
-                    'total' => $item['unit_cost'] * $item['qty'],
+            foreach ($purchaseRequests as $purchaseRequest) {
+
+                $purchaseRequest->load([
+                    'vendor',
+                    'items.rawMaterial',
+                    'items.unit',
                 ]);
+
+                $this->activity->log(
+                    $purchaseRequest,
+                    Auth::user(),
+                    $purchaseRequest->vendor,
+                    'Purchase Request sent.',
+                    'Purchase Request sent to ' .
+                        ($purchaseRequest->vendor->company_name
+                            ?: $purchaseRequest->vendor->name) . '.',
+                    $purchaseRequest
+                );
+
+                SendRfqMail::dispatch($purchaseRequest);
             }
 
-            $purchaseRequest->update([
-                'stage' => 'confirmation',
-            ]);
-
-            // Activity Logging
-            $this->activity->log(
-                $purchaseRequest,
-                Auth::user(),
-                $purchaseRequest->vendor,
-                "Purchase Request Created.",
-                "Purchased request created successfully.",
-                $purchaseRequest
-            );
-
-
-            return $purchaseRequest;
+            return $purchaseRequests;
         });
 
-        SendRfqMail::dispatch($purchaseRequest);
-
-        // Activity Logging
-        $this->activity->log(
-            $purchaseRequest,
-            Auth::user(),
-            $purchaseRequest->vendor,
-            "Purchase Request sent.",
-            "Purchase request mail sent to vendor: " . $purchaseRequest->vendor->name,
-            $purchaseRequest
-        );
+        $redirect = $purchaseRequests->count() > 1
+            ? route('purchase-requests.compare', $purchaseRequests->first())
+            : route('purchase-requests.confirmation', $purchaseRequests->first());
 
         return response()->json([
             'success' => true,
-            'message' => 'Purchase Request sent to vendor successfully.',
-            'id' => $purchaseRequest->id,
-            'redirect' => route(
-                'purchase-requests.confirmation',
-                $purchaseRequest
-            ),
+            'message' => $purchaseRequests->count() > 1
+                ? 'Purchase Requests sent to vendors successfully.'
+                : 'Purchase Request sent to vendor successfully.',
+            'redirect' => $redirect,
         ], 201);
     }
 
@@ -673,7 +653,6 @@ class PurchaseRequestController extends Controller
             'items.rawMaterial',
             'items.unit',
             'vendor',
-            // 'quotations.items',
             'activities'
         ]);
 
@@ -687,11 +666,9 @@ class PurchaseRequestController extends Controller
                     'vendors' => Vendor::orderBy('name')->get(),
                 ]
             ),
-
             'confirmation' => view('purchase_requests.confirmation', compact('purchaseRequest')),
             'cancelled' => view('purchase_requests.show', compact('purchaseRequest')),
-            'purchase_order',
-            'receiving' => view('purchase_orders.show', ['purchaseOrder' => $purchaseRequest->purchaseOrder]),
+            'purchase_order', 'receiving' => view('purchase_orders.show', ['purchaseOrder' => $purchaseRequest->purchaseOrder]),
             default => view('purchase_requests.show', compact('purchaseRequest')),
         };
     }

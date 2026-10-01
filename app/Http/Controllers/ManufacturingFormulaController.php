@@ -28,7 +28,7 @@ class ManufacturingFormulaController extends Controller
 
     public function create()
     {
-        $products = Product::orderBy('name')->get();
+        $products = Product::orderBy('name')->whereDoesntHave('manufacturingFormula')->get();
         $rawMaterials = RawMaterial::with('unit.unitCategory')->orderBy('name')->get();
         $units = Unit::with('unitCategory')->orderBy('name')->get();
         

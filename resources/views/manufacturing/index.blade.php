@@ -300,11 +300,20 @@
                 }
 
                 productSelect.on('change', function() {
-                    // resetManufacturing();
-
                     const productId = $(this).val();
 
+                    // Reset formula-related UI whenever product changes
+                    noFormula.addClass('hidden');
+                    materialsSection.addClass('hidden');
+                    materialsBody.empty();
+                    manufactureBtn.prop('disabled', true);
+                    replenishBtn.addClass('hidden').removeClass('inline-flex');
+
+                    quantityInput.prop('disabled', true);
+                    unitSelect.prop('disabled', true);
+
                     if (!productId) {
+                        selectedProduct = null;
                         return;
                     }
 
@@ -316,6 +325,7 @@
                         return;
                     }
 
+                    // No formula
                     if (!selectedProduct.manufacturing_formula) {
                         noFormula.removeClass('hidden');
 
@@ -329,6 +339,7 @@
                         return;
                     }
 
+                    // Formula exists
                     quantityInput.prop('disabled', false);
                     unitSelect.prop('disabled', false);
 

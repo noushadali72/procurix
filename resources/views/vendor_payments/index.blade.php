@@ -1,5 +1,13 @@
 <x-layouts.app title="Vendor Payments">
 
+
+
+    @push('head')
+        {{-- select2 cdn --}}
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+    @endpush
+
     {{-- Header --}}
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
@@ -656,6 +664,7 @@
     @push('scripts')
         <script>
             $(document).ready(function() {
+                $("#vendor_bill_id").select2();
 
                 const modal = $('#paymentModal');
                 const form = $('#paymentForm');

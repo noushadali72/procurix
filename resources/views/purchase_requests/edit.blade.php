@@ -1,12 +1,13 @@
 <x-layouts.app title="Edit Request for quotation">
-
+    @php
+        $isEdit = true;
+    @endphp
 
 
     @push('head')
         {{-- select2 cdn --}}
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
-
     @endpush
 
     <div class="mb-6 flex items-center justify-between">
@@ -158,7 +159,7 @@
                             <span id="vendorPhoneErr" class="mt-1 block text-sm text-red-600"></span>
                         </div>
 
-                          {{-- NTN --}}
+                        {{-- NTN --}}
                         <div>
                             <label for="vendor_ntn" class="mb-1 block text-sm font-medium text-gray-700">
                                 NTN
@@ -238,7 +239,6 @@
         <script>
             $(document).ready(function() {
 
-                $("#vendor_id").select2();
                 $(".raw-material-select").select2();
 
                 // Open modal

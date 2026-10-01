@@ -1,5 +1,7 @@
 <x-layouts.app title="Create Request for Quotation">
-
+@php
+    $isEdit = false;
+@endphp
 
 
     @push('head')
@@ -245,7 +247,9 @@
         <script>
             $(document).ready(function() {
 
-                $("#vendor_id").select2();
+                $("#vendors").select2({
+                    placeholder:"Choose one or more Vendors"
+                });
                 $(".raw-material-select").select2();
 
                 // Open modal

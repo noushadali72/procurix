@@ -17,7 +17,7 @@ class ManufacturingRecord extends Model
     ];
 
     protected $casts = [
-        'quantity' => 'decimal:4',
+        'quantity' => 'decimal:2',
         'manufactured_at' => 'datetime',
     ];
 

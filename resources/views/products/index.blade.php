@@ -317,7 +317,7 @@
 
 
                             {{-- Cost Price --}}
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-4 text-end">
 
                                 <span class="font-medium text-gray-700">
 
@@ -329,7 +329,7 @@
 
 
                             {{-- Sale Price --}}
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-4 text-end">
 
                                 <span class="font-medium text-gray-700">
 

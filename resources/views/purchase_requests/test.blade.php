@@ -81,6 +81,8 @@ $(document).ready(function () {
 
             // Re-render Select2 options state
             $select.trigger("change.select2");
+
+            
         });
     }
 

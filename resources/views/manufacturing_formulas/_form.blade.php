@@ -322,6 +322,7 @@
         $(document).ready(function() {
 
             $("#product_id").select2();
+            $(".raw-material").select2();
 
             const container = $("#items-container");
             const template = $("#item-template");
@@ -384,7 +385,8 @@
 
                 $(".raw-material").each(function() {
 
-                    const currentValue = $(this).val();
+                    $select = $(this);
+                    const currentValue = $select.val();
 
                     $(this).find("option").each(function() {
 
@@ -394,11 +396,17 @@
                             return;
                         }
 
-                        option.toggle(
-                            option.val() === currentValue ||
-                            !selected.includes(option.val())
-                        );
+
+                        const isSelected = option.val() === currentValue;
+                        const isTaken = selected.includes(option.val());
+
+                        // Disable options already chosen in other dropdowns
+                        option.prop("disabled", !isSelected && isTaken);
+
                     });
+
+                    // Re-render Select2 options state
+                    $select.trigger("change.select2");
                 });
             }
 
@@ -432,15 +440,12 @@
 
             // Add material
             addButton.on("click", function() {
-
-                const html = template
-                    .html()
-                    .replaceAll("INDEX", index);
-
-                container.append(html);
-
+                let templateHtml = $("#item-template").html();
+                templateHtml = templateHtml.replaceAll("INDEX", index);
+                const $newRow = $(templateHtml);
+                container.append($newRow);
+                $newRow.find(".raw-material").select2();
                 index++;
-
                 updateRawMaterials();
             });
 
@@ -458,10 +463,10 @@
                     return;
                 }
 
-                $(this)
-                    .closest(".formula-item")
-                    .remove();
-
+                const $row = $(this).closest(".formula-item");
+                // Destroy Select2 instance before removing DOM node to prevent memory leaks
+                $row.find(".raw-material-select").select2("destroy");
+                $row.remove();
                 updateRawMaterials();
             });
 

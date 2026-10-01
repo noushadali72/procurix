@@ -258,7 +258,7 @@
 
 
                             {{-- Cost --}}
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-4 text-end">
 
                                 <span class="font-medium text-gray-700">
                                     {{ number_format($rawMaterial->cost_price ?? 0, 2) }}
@@ -268,7 +268,7 @@
 
 
                             {{-- Stock --}}
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-4 text-end">
 
                                 @if ($rawMaterial->stock <= $rawMaterial->minimum_stock)
                                     <span
@@ -296,7 +296,7 @@
 
 
                             {{-- Minimum Stock --}}
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-4 text-end">
 
                                 <span class="text-gray-600">
                                     {{ $rawMaterial->minimum_stock }}

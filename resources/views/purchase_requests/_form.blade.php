@@ -1,3 +1,8 @@
+@php
+    $due_date = old('due_date', $purchaseRequest->due_date ?? '');
+    $due_date = $due_date ? \Carbon\Carbon::parse($due_date) : \Carbon\Carbon::now()->addDays(3);
+
+@endphp
 <input type="hidden" id="purchase_request_id" name="purchase_request_id" value="{{ $purchaseRequest?->id ?? '' }}" />
 
 {{-- Request Details --}}
@@ -19,38 +24,65 @@
         {{-- Vendor --}}
         <div>
             <div class="mb-1.5 flex items-center justify-between">
+                <label for="{{ $isEdit ? 'vendor_id' : 'vendors' }}" class="text-sm font-medium text-slate-700">
 
-                <label for="vendor_id" class="text-sm font-medium text-slate-700">
-                    Vendor <span class="text-red-500">*</span>
+                    Vendor{{ $isEdit ? '' : 's' }}
+
+                    <span class="text-red-500">*</span>
                 </label>
 
-                <button type="button" id="openVendorModal"
-                    class="text-xs font-medium text-slate-600 hover:text-slate-900">
-                    + Add Vendor
-                </button>
-
+                @if (!$isEdit)
+                    <button type="button" id="openVendorModal"
+                        class="text-xs font-medium text-slate-600 hover:text-slate-900">
+                        + Add Vendor
+                    </button>
+                @endif
             </div>
 
-            <select name="vendor_id" id="vendor_id"
-                class="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
+            @if ($isEdit)
 
-                <option value="">
-                    Select Vendor
-                </option>
+                {{-- Single vendor when editing --}}
+                <select name="vendor_id" id="vendor_id"
+                    class="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                    required>
 
-                @foreach ($vendors as $vendor)
-                    <option value="{{ $vendor->id }}"
-                        {{ old('vendor_id', $purchaseRequest->vendor_id ?? '') == $vendor->id ? 'selected' : '' }}>
+                    <option value="">Select Vendor</option>
 
-                        {{ $vendor->company_name ?: $vendor->name }}
+                    @foreach ($vendors as $vendor)
+                        <option value="{{ $vendor->id }}" @selected($purchaseRequest->vendor_id == $vendor->id)>
 
-                    </option>
-                @endforeach
+                            {{ $vendor->company_name ?: $vendor->name }}
 
-            </select>
+                        </option>
+                    @endforeach
 
-            <span id="vendorIdErr" class="mt-1 block text-xs text-red-600"></span>
+                </select>
+
+                <span id="vendorIdErr" class="mt-1 block text-xs text-red-600"></span>
+            @else
+                {{-- Multiple vendors when creating --}}
+                <select name="vendors[]" id="vendors" multiple
+                    class="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
+
+                    
+                    @foreach ($vendors as $vendor)
+                        <option value="{{ $vendor->id }}"
+                            {{ in_array($vendor->id, old('vendors', $purchaseRequest?->vendor_id ? [$purchaseRequest->vendor_id] : []))
+                                ? 'selected'
+                                : '' }}>
+
+                            {{ $vendor->company_name ?: $vendor->name }}
+
+                        </option>
+                    @endforeach
+
+                </select>
+
+                <span id="vendorIdErr" class="mt-1 block text-xs text-red-600"></span>
+
+            @endif
         </div>
+
 
 
         {{-- Due Date --}}
@@ -62,8 +94,7 @@
 
             </label>
 
-            <input type="date" name="due_date" id="due_date"
-                value="{{ old('due_date', $purchaseRequest->due_date ?? '') }}"
+            <input type="date" name="due_date" id="due_date" value="{{ $due_date->format('Y-m-d') }}"
                 class="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
 
         </div>
@@ -275,7 +306,9 @@
                         </tr>
                     @endforeach
 
-                {{-- Loads when we edit purchase request --}}
+
+
+                    {{-- Loads when we edit purchase request --}}
                 @elseif (isset($purchaseRequest) && $purchaseRequest->items->count())
                     @foreach ($purchaseRequest->items as $index => $item)
                         <tr class="item-row border-b border-slate-100 last:border-0 hover:bg-slate-50">
@@ -719,22 +752,25 @@
 
 
                 $(".raw-material-select").each(function() {
+                    const $select = $(this);
+                    const currentValue = $select.val();
 
-                    const currentValue = $(this).val();
-
-                    $(this).find("option").each(function() {
+                    $select.find("option").each(function() {
 
                         const option = $(this);
+                        if (!option.val()) return;
 
-                        if (!option.val()) {
-                            return;
-                        }
+                        const isSelected = option.val() === currentValue;
+                        const isTaken = selected.includes(option.val());
 
-                        option.toggle(
-                            option.val() === currentValue ||
-                            !selected.includes(option.val())
-                        );
+                        // Disable options already chosen in other dropdowns
+                        option.prop("disabled", !isSelected && isTaken);
+
+
                     });
+                    // Re-render Select2 options state
+                    $select.trigger("change.select2");
+
                 });
             }
 
@@ -802,13 +838,9 @@
                 const selected = $(this).find("option:selected");
 
                 filterUnits(item);
-
                 const unitId = selected.data("unit-id");
-
                 item.find(".unit-select").val(unitId);
-
                 const costPrice = selected.data("cost-price");
-
                 item.find(".cost-input").val(costPrice ?? "");
 
                 updateRawMaterials();
