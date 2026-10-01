@@ -617,6 +617,91 @@
 
             </div>
 
+            {{-- ================================================== --}}
+            {{-- ACCOUNTING --}}
+            {{-- ================================================== --}}
+
+            <div class="mb-5">
+
+                <p class="mb-2 px-3 text-[10px] font-semibold
+               uppercase tracking-[0.14em] text-gray-600">
+
+                    Accounting
+
+                </p>
+
+
+                <div class="space-y-0.5">
+
+
+                    {{-- Account Categories --}}
+                    <a href="{{ route('account-categories.index') }}"
+                        class="flex items-center gap-3 rounded-lg
+                   px-3 py-2.5 text-sm font-medium transition
+
+            {{ request()->routeIs('account-categories.*')
+                ? 'bg-white/10 text-white'
+                : 'text-gray-400 hover:bg-white/[0.06] hover:text-white' }}">
+
+                        <i class="bx bx-category w-5 text-center
+                       text-[19px]">
+                        </i>
+
+                        <span>
+                            Account Categories
+                        </span>
+
+                    </a>
+
+
+                    {{-- Accounts --}}
+                    <a href="{{ route('accounts.index') }}"
+                        class="flex items-center gap-3 rounded-lg
+                   px-3 py-2.5 text-sm font-medium transition
+
+            {{ request()->routeIs('accounts.*')
+                ? 'bg-white/10 text-white'
+                : 'text-gray-400 hover:bg-white/[0.06] hover:text-white' }}">
+
+                        <i class="bx bx-wallet w-5 text-center
+                       text-[19px]">
+                        </i>
+
+                        <span>
+                            Accounts
+                        </span>
+
+                    </a>
+
+
+                    {{-- Journal Entries --}}
+                    {{-- Add this when Journal Entry UI is implemented --}}
+                    {{--
+
+        <a href="{{ route('journal-entries.index') }}"
+            class="flex items-center gap-3 rounded-lg
+                   px-3 py-2.5 text-sm font-medium transition
+
+            {{ request()->routeIs('journal-entries.*')
+                ? 'bg-white/10 text-white'
+                : 'text-gray-400 hover:bg-white/[0.06] hover:text-white' }}">
+
+            <i class="bx bx-book-content w-5 text-center
+                       text-[19px]">
+            </i>
+
+            <span>
+                Journal Entries
+            </span>
+
+        </a>
+
+        --}}
+
+                </div>
+
+            </div>
+
 
             {{-- ================================================== --}}
             {{-- MANUFACTURING --}}

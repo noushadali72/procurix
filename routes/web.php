@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AccountCategoryController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GoodsReceiptController;
@@ -112,7 +114,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('vendor-credits/{vendorCredit}/refund', [VendorCreditController::class, 'refund'])->name('vendor-credits.refund');
 
     // Activiteis
-    Route::get('purchase-request-activities/{purchaseRequest}',[PurchaseRequestActivityController::class,'index'])->name('purchase-requests.activities.index');
+    Route::get('purchase-request-activities/{purchaseRequest}', [PurchaseRequestActivityController::class, 'index'])->name('purchase-requests.activities.index');
+
+    // Accounting
+    Route::resource('account-categories', AccountCategoryController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::resource('accounts', AccountController::class)->only(['index', 'store', 'update', 'destroy']);
+
     // Logout
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });

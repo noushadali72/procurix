@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
             RawMaterialSeeder::class,
             VendorSeeder::class,
             PaymentTermSeeder::class,
+            AccountCategorySeeder::class,
+            AccountSeeder::class,
         ]);
     }
 }
