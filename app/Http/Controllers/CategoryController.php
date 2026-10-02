@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Category\StoreCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
+use App\Models\Account;
 use App\Models\Category;
 use Exception;
 use Illuminate\Http\Request;
@@ -15,27 +16,46 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $categories = Category::withCount([
-            'products',
-            'rawMaterials',
-            ])->paginate(10);
+        $accounts = Account::orderBy('code')->get();
 
-        if(!$request->ajax()){
-            return view('categories.index',compact('categories'));
+        $categories = Category::with([
+            'inventoryAccount',
+            'purchaseAccount',
+        ])
+            ->withCount([
+                'products',
+                'rawMaterials',
+            ])
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+
+                $query->where(function ($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('slug', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        if (!$request->ajax()) {
+            return view('categories.index', compact(
+                'categories',
+                'accounts'
+            ));
         }
+
         return response()->json([
-            'success'=>true,
-            'categories'=>$categories
+            'success' => true,
+            'categories' => $categories,
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -43,24 +63,22 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request)
     {
         $validated = $request->validated();
-        try{
+        try {
 
-         $category = Category::create($validated);
+            $category = Category::create($validated);
 
-        return response()->json([
-            'success'=>true,
-            'category'=>$category,
-            'message'=>'Category created successfully!'
-        ],201);
-
-        }catch(Exception $e){
             return response()->json([
-                'success'=>false,
-                'message'=>'Unable to create category!',
-                'error'=>$e->getMessage()
-            ],500);
+                'success' => true,
+                'category' => $category,
+                'message' => 'Category created successfully!'
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to create category!',
+                'error' => $e->getMessage()
+            ], 500);
         }
-       
     }
 
     /**
@@ -85,18 +103,18 @@ class CategoryController extends Controller
     public function update(UpdateCategoryRequest $request, Category $category)
     {
         $validated = $request->validated();
-        try{
+        try {
             $category->update($validated);
             return response()->json([
-                'success'=>true,
-                'message'=>'Category updated successfully!'
-            ],200);
-        }catch(Exception $e){
+                'success' => true,
+                'message' => 'Category updated successfully!'
+            ], 200);
+        } catch (Exception $e) {
             return response()->json([
-                'success'=>false,
-                'message'=>'Unable to update the category!',
-                'error'=>$e->getMessage()
-            ],500);
+                'success' => false,
+                'message' => 'Unable to update the category!',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -105,18 +123,18 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        try{
+        try {
             $category->delete();
             return response()->json([
-                'success'=>true,
-                'message'=>'Category Deleted successfully!'
-            ],200);
-        }catch(Exception $e){
+                'success' => true,
+                'message' => 'Category Deleted successfully!'
+            ], 200);
+        } catch (Exception $e) {
             return response()->json([
-                'success'=>false,
-                'message'=>'Unable to delete Category!',
-                'error'=>$e->getMessage()
-            ],500);
+                'success' => false,
+                'message' => 'Unable to delete Category!',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }

@@ -13,4 +13,10 @@ class Category extends Model
     public function products(){
         return $this->hasMany(Product::class);
     }
+    public function inventoryAccount(){
+        return $this->belongsTo(Account::class,'inventory_account_id');
+    }
+    public function purchaseAccount(){
+        return $this->belongsTo(Account::class,'purchase_account_id');
+    }
 }

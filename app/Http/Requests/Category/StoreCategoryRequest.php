@@ -26,7 +26,9 @@ class StoreCategoryRequest extends FormRequest
         return [
             'name'=>'required|string|min:2|max:50',
             'slug'=>'nullable|string|min:2|max:100',
-            'description'=>'nullable|string|min:5|max:255'
+            'description'=>'nullable|string|min:5|max:255',
+            'purchase_account_id'=>'nullable|exists:accounts,id',
+            'inventory_account_id'=>'nullable|exists:accounts,id'
         ];
     }
    
