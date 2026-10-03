@@ -220,7 +220,10 @@
                                     <div class="min-w-0">
 
                                         <div class="truncate font-medium text-gray-900">
+                                            <a href="{{route('raw-materials.show',$rawMaterial)}}" class="hover:underline">
                                             {{ $rawMaterial->name }}
+                                            <i class="bx bx-link text-xs text-slate-400"></i>
+                                            </a>
                                         </div>
 
                                         @if ($rawMaterial->description)

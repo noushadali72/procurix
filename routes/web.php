@@ -49,7 +49,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     // Inventory routes
     Route::resource('products', ProductController::class);
-    Route::resource('raw-materials', RawMaterialController::class)->except(['show']);
+    Route::resource('raw-materials', RawMaterialController::class);
     Route::resource('units', UnitController::class);
     Route::resource('categories', CategoryController::class);
     Route::resource('warehouses', WarehouseController::class)->only(['index', 'store', 'update', 'destroy']);

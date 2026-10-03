@@ -280,7 +280,10 @@
                                     <div class="min-w-0">
 
                                         <div class="truncate font-medium text-gray-900">
-                                            {{ $product->name }}
+                                            <a href="{{route("products.show",$product)}}" class="hover:underline">
+                                                {{ $product->name }}
+                                                  <i class="bx bx-link text-xs text-slate-400"></i>
+                                            </a>
                                         </div>
 
                                         <div class="mt-0.5 max-w-xs truncate text-xs text-gray-500">

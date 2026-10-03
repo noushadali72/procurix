@@ -10,14 +10,12 @@ use App\Models\Category;
 use App\Services\StockMovementService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function __construct(private StockMovementService $movement)
-    {
-
-    }
+    public function __construct(private StockMovementService $movement) {}
     public function index(Request $request)
     {
 
@@ -74,28 +72,31 @@ class ProductController extends Controller
         $path = null;
         try {
 
-        // If Product has image
-            if ($request->hasFile('image')) {
-                $file = $request->file('image');
-                $path = $file->store('images/products', 'public');
-                $validated['image_path'] = $path;
-                unset($validated['image']);
-            }
+            DB::transaction(function () use ($request, $validated, &$path) {
+                // If Product has image
+                if ($request->hasFile('image')) {
+                    $file = $request->file('image');
+                    $path = $file->store('images/products', 'public');
+                    $validated['image_path'] = $path;
+                    unset($validated['image']);
+                }
 
-            $product = Product::create($validated);
+                $product = Product::create($validated);
+                $initialStock = (float)($validated['stock']??0);
 
-            // $this->movement->product($product, $product->unit, "")
-            
-
+                if ($initialStock > 0) {
+                    $product->load(['unit']);
+                    $this->movement->product($product, $product->unit, "in", "Initial Stock added.", $initialStock, null, 'Initial stock added upon product creation');
+                }
+            });
             return response()->json([
                 'success' => true,
                 'message' => 'Product created successfully.'
             ], 201);
-
         } catch (Exception $e) {
 
-        // deleting saved image if any error
-            if($path){
+            // deleting saved image if any error
+            if ($path) {
                 Storage::disk('public')->delete($path);
             }
 
@@ -108,21 +109,29 @@ class ProductController extends Controller
     }
 
 
-    public function show(Product $product)
-    {
-        return response()->json([
-            'id' => $product->id,
-            'name' => $product->name,
-            'sku' => $product->sku,
-            'cost_price' => $product->cost_price,
-            'sale_price' => $product->sale_price,
-            'stock' => $product->stock,
-            'minimum_stock' => $product->minimum_stock,
-            'unit_id' => $product->unit_id,
-            'category_id' => $product->category_id,
-            'description' => $product->description,
-            'image_path'=>$product->image_path
-        ], 200);
+    // public function show(Product $product)
+    // {
+    //     $product->load(['movements.created_by','movements.unit','unit',]);
+
+    //     return response()->json([
+    //         'id' => $product->id,
+    //         'name' => $product->name,
+    //         'sku' => $product->sku,
+    //         'cost_price' => $product->cost_price,
+    //         'sale_price' => $product->sale_price,
+    //         'stock' => $product->stock,
+    //         'minimum_stock' => $product->minimum_stock,
+    //         'unit_id' => $product->unit_id,
+    //         'category_id' => $product->category_id,
+    //         'description' => $product->description,
+    //         'image_path' => $product->image_path,
+            
+    //     ], 200);
+    // }
+
+    public function show(Product $product){
+       $product->load(['movements.creator','movements.unit','unit','category']);
+       return view('products.show',compact('product'));
     }
 
     public function edit(Product $product)
@@ -139,26 +148,47 @@ class ProductController extends Controller
         $validated = $request->validated();
         $existingImage = $product->image_path;
         $newImage = null;
+
         try {
 
-            if ($request->hasFile('image')) {
-                $newImage = $request->file('image')->store('images/products', 'public');
-                $validated['image_path'] = $newImage;
-                unset($validated['image']);
-            }
-            $product->update($validated);
+            DB::transaction(function () use ($request, $product, $validated, &$existingImage, &$newImage) {
+                
+                if ($request->hasFile('image')) {
+                    $newImage = $request->file('image')->store('images/products', 'public');
+                    $validated['image_path'] = $newImage;
+                    unset($validated['image']);
+                }
+                
+                // Updating stock movements
+                $difference = (float)$validated['stock'] - (float)($product->stock ?? 0); //qty and difference is same
+                $product->update($validated);
+
+                if (abs($difference) > 0) {
+                    $product->loadMissing('unit');
+                    $direction = $difference > 0 ? "in" : "out";
+                    $this->movement->product(
+                        $product,
+                        $product->unit,
+                        $direction,
+                        "Stock Adjusted via product update.",
+                        abs($difference),
+                        null,
+                        null
+                        );
+                }
+            });
 
             // Delete old image if exists
-            if($newImage && $existingImage){
-                    Storage::disk('public')->delete($existingImage);
-                }
+            if ($newImage && $existingImage) {
+                Storage::disk('public')->delete($existingImage);
+            }
             return response()->json([
                 'success' => true,
                 'message' => 'Product updated successfully.'
             ], 200);
         } catch (Exception $e) {
             //delete new image if unable to update
-            if($newImage){
+            if ($newImage) {
                 Storage::disk('public')->delete($newImage);
             }
             return response()->json([
@@ -174,7 +204,7 @@ class ProductController extends Controller
         try {
             $existingImage = $product->image_path;
             $product->delete();
-            if($existingImage){
+            if ($existingImage) {
                 Storage::disk('public')->delete($existingImage);
             }
             return response()->json([
