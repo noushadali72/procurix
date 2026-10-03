@@ -7,12 +7,17 @@ use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Product;
 use App\Models\Unit;
 use App\Models\Category;
+use App\Services\StockMovementService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
+    public function __construct(private StockMovementService $movement)
+    {
+
+    }
     public function index(Request $request)
     {
 
@@ -77,7 +82,10 @@ class ProductController extends Controller
                 unset($validated['image']);
             }
 
-            Product::create($validated);
+            $product = Product::create($validated);
+
+            // $this->movement->product($product, $product->unit, "")
+            
 
             return response()->json([
                 'success' => true,

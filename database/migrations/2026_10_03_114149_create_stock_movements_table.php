@@ -13,10 +13,16 @@ return new class extends Migration
     {
         Schema::create('stock_movements', function (Blueprint $table) {
             $table->id();
-            $table->string('type');
             $table->foreignId('raw_material_id')->nullable()->constrained('raw_materials')->cascadeOnDelete();
             $table->foreignId('product_id')->nullable()->constrained('products')->cascadeOnDelete();
-            $table->decimal('qty');
+            $table->string('type');
+            $table->enum('direction',['in','out'])->nullable();
+            $table->decimal('qty',15,2);
+            $table->foreignId('unit_id')->nullable()->constrained('units')->nullOnDelete();
+            $table->nullableMorphs('reference');
+            $table->text('notes')->nullable();
+            $table->index('type');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

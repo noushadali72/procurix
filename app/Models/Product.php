@@ -44,4 +44,7 @@ class Product extends Model
     {
         return $this->hasMany(ManufacturingRecord::class);
     }
+    public function movements(){
+        return $this->hasMany(StockMovement::class);
+    }
 }
