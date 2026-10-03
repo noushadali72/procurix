@@ -230,19 +230,24 @@
 
 
             function clearProductErrors() {
-                $("#nameErr, #skuErr, #unitIdErr, #costPriceErr, #salePriceErr, #stockErr, #minimumStockErr, #descriptionErr")
-                    .text("");
+                $(
+                    "#nameErr, #skuErr, #unitIdErr, #categoryIdErr, " +
+                    "#costPriceErr, #salePriceErr, #stockErr, " +
+                    "#minimumStockErr, #imageErr, #descriptionErr"
+                ).text("");
             }
 
             function showProductErrors(errors) {
-                $("#nameErr").text(errors.name || "");
-                $("#skuErr").text(errors.sku || "");
-                $("#unitIdErr").text(errors.unit_id || "");
-                $("#costPriceErr").text(errors.cost_price || "");
-                $("#salePriceErr").text(errors.sale_price || "");
-                $("#stockErr").text(errors.stock || "");
-                $("#minimumStockErr").text(errors.minimum_stock || "");
-                $("#descriptionErr").text(errors.description || "");
+                $("#nameErr").text(errors.name?.[0] || "");
+                $("#skuErr").text(errors.sku?.[0] || "");
+                $("#unitIdErr").text(errors.unit_id?.[0] || "");
+                $("#categoryIdErr").text(errors.category_id?.[0] || "");
+                $("#costPriceErr").text(errors.cost_price?.[0] || "");
+                $("#salePriceErr").text(errors.sale_price?.[0] || "");
+                $("#stockErr").text(errors.stock?.[0] || "");
+                $("#minimumStockErr").text(errors.minimum_stock?.[0] || "");
+                $("#imageErr").text(errors.image?.[0] || "");
+                $("#descriptionErr").text(errors.description?.[0] || "");
             }
 
             function updateProduct() {
@@ -251,10 +256,14 @@
 
                 button.prop('disabled', true);
 
+                const formData = new FormData(form[0]);
+
                 $.ajax({
                     url: form.attr('action'),
                     type: 'POST',
-                    data: form.serialize(),
+                    data: formData,
+                    processData: false,
+                    contentType: false,
                     headers: {
                         'Accept': 'application/json'
                     },
@@ -269,7 +278,7 @@
 
                     error: function(xhr) {
                         if (xhr.status === 422) {
-                            showProductErrors(xhr.responseJSON.errors);
+                            showProductErrors(xhr.responseJSON.errors || {});
                             return;
                         }
 

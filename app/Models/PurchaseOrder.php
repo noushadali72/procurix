@@ -14,7 +14,8 @@ class PurchaseOrder extends Model
         'order_date',
         'received_date',
         'notes',
-        'total'
+        'total',
+      
     ];
 
     protected $casts = [

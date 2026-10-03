@@ -18,21 +18,22 @@ class Product extends Model
         'stock',
         'minimum_stock',
         'description',
-       
+        'image_path'
+
     ];
 
     protected $casts = [
         'cost_price' => 'decimal:2',
         'sale_price' => 'decimal:2',
-       
-    ];
 
+    ];
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
     }
-    
-    public function category(){
+
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
     public function manufacturingFormula()
@@ -43,5 +44,4 @@ class Product extends Model
     {
         return $this->hasMany(ManufacturingRecord::class);
     }
-  
 }

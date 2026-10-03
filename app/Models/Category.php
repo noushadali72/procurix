@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
-#[Fillable(['name','slug','description'])]
+#[Fillable(['name','slug','description','inventory_account_id','purchase_account_id'])]
 class Category extends Model
 {
     public function rawMaterials(){

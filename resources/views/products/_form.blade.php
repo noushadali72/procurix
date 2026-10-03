@@ -6,15 +6,9 @@
             Product Name<sup>*</sup>
         </label>
 
-        <input
-            type="text"
-            id="name"
-            name="name"
-            value="{{ old('name', $product->name ?? '') }}"
+        <input type="text" id="name" name="name" value="{{ old('name', $product->name ?? '') }}"
             placeholder="Enter product name"
-            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-            
-        >
+            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
 
         <span id="nameErr" class="mt-1.5 block text-xs text-red-600"></span>
     </div>
@@ -26,14 +20,9 @@
             SKU
         </label>
 
-        <input
-            type="text"
-            id="sku"
-            name="sku"
-            value="{{ old('sku', $product->sku ?? '') }}"
+        <input type="text" id="sku" name="sku" value="{{ old('sku', $product->sku ?? '') }}"
             placeholder="Enter SKU"
-            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-        >
+            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
 
         <span id="skuErr" class="mt-1.5 block text-xs text-red-600"></span>
     </div>
@@ -45,19 +34,12 @@
             Unit<sup>*</sup>
         </label>
 
-        <select
-            id="unit_id"
-            name="unit_id"
-            
-            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-        >
+        <select id="unit_id" name="unit_id"
+            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
             <option value="">Select unit</option>
 
             @foreach ($units as $unit)
-                <option
-                    value="{{ $unit->id }}"
-                    @selected(old('unit_id', $product->unit_id ?? '') == $unit->id)
-                >
+                <option value="{{ $unit->id }}" @selected(old('unit_id', $product->unit_id ?? '') == $unit->id)>
                     {{ $unit->name }}
                 </option>
             @endforeach
@@ -74,28 +56,19 @@
                 Category
             </label>
 
-            <button
-                type="button"
-                id="openCategoryModal"
-                class="inline-flex cursor-pointer items-center gap-1 text-xs font-medium text-gray-700 transition hover:text-gray-900"
-            >
+            <button type="button" id="openCategoryModal"
+                class="inline-flex cursor-pointer items-center gap-1 text-xs font-medium text-gray-700 transition hover:text-gray-900">
                 <i class="bx bx-plus"></i>
                 Add Category
             </button>
         </div>
 
-        <select
-            id="category_id"
-            name="category_id"
-            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-        >
+        <select id="category_id" name="category_id"
+            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
             <option value="">Select Category</option>
 
             @foreach ($categories as $category)
-                <option
-                    value="{{ $category->id }}"
-                    @selected(old('category_id', $product->category_id ?? '') == $category->id)
-                >
+                <option value="{{ $category->id }}" @selected(old('category_id', $product->category_id ?? '') == $category->id)>
                     {{ $category->name }}
                 </option>
             @endforeach
@@ -111,16 +84,9 @@
             Cost Price
         </label>
 
-        <input
-            type="number"
-            step="0.01"
-            min="0"
-            id="cost_price"
-            name="cost_price"
-            value="{{ old('cost_price', $product->cost_price ?? '') }}"
-            placeholder="Enter cost price"
-            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-        >
+        <input type="number" step="0.01" min="0" id="cost_price" name="cost_price"
+            value="{{ old('cost_price', $product->cost_price ?? '') }}" placeholder="Enter cost price"
+            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
 
         <span id="costPriceErr" class="mt-1.5 block text-xs text-red-600"></span>
     </div>
@@ -132,16 +98,9 @@
             Sale Price
         </label>
 
-        <input
-            type="number"
-            step="0.01"
-            min="0"
-            id="sale_price"
-            name="sale_price"
-            value="{{ old('sale_price', $product->sale_price ?? '') }}"
-            placeholder="Enter sale price"
-            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-        >
+        <input type="number" step="0.01" min="0" id="sale_price" name="sale_price"
+            value="{{ old('sale_price', $product->sale_price ?? '') }}" placeholder="Enter sale price"
+            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
 
         <span id="salePriceErr" class="mt-1.5 block text-xs text-red-600"></span>
     </div>
@@ -153,16 +112,9 @@
             Stock<sup>*</sup>
         </label>
 
-        <input
-            type="number"
-            min="0"
-            id="stock"
-            name="stock"
-            value="{{ old('stock', $product->stock ?? 0) }}"
-            placeholder="Enter stock quantity"
-            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-            
-        >
+        <input type="number" min="0" id="stock" name="stock"
+            value="{{ old('stock', $product->stock ?? 0) }}" placeholder="Enter stock quantity"
+            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
 
         <span id="stockErr" class="mt-1.5 block text-xs text-red-600"></span>
     </div>
@@ -174,18 +126,41 @@
             Minimum Stock<sup>*</sup>
         </label>
 
-        <input
-            type="number"
-            min="0"
-            id="minimum_stock"
-            name="minimum_stock"
-            value="{{ old('minimum_stock', $product->minimum_stock ?? 5) }}"
-            placeholder="Enter minimum stock level"
-            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-            
-        >
+        <input type="number" min="0" id="minimum_stock" name="minimum_stock"
+            value="{{ old('minimum_stock', $product->minimum_stock ?? 5) }}" placeholder="Enter minimum stock level"
+            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
 
         <span id="minimumStockErr" class="mt-1.5 block text-xs text-red-600"></span>
+    </div>
+
+
+    {{-- Image --}}
+    <div>
+        <label for="image" class="mb-1.5 block text-sm font-medium text-gray-700">
+            Product Image
+        </label>
+
+        <div class="rounded-lg border border-gray-300 bg-gray-50 p-3">
+
+            <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/jpg,image/webp"
+                class="block w-full cursor-pointer text-sm text-gray-600 file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-gray-900 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-gray-800">
+
+            <p class="mt-1.5 text-xs text-gray-500">
+                JPG, JPEG, PNG or WEBP.
+            </p>
+
+            <span id="imageErr" class="mt-1.5 block text-xs text-red-600"></span>
+
+            {{-- Preview --}}
+            <div id="imagePreviewWrapper" class="{{ !empty($product?->image_path) ? '' : 'hidden' }} mt-3">
+                <div class="relative h-32 w-32 overflow-hidden rounded-lg border border-gray-200 bg-white">
+                    <img id="imagePreview"
+                        src="{{ !empty($product?->image_path) ? asset('storage/' . $product->image_path) : '' }}"
+                        alt="Product image preview" class="h-full w-full object-cover">
+                </div>
+            </div>
+
+        </div>
     </div>
 
 
@@ -195,15 +170,55 @@
             Description
         </label>
 
-        <textarea
-            id="description"
-            name="description"
-            rows="4"
-            placeholder="Enter product description"
-            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-        >{{ old('description', $product->description ?? '') }}</textarea>
+        <textarea id="description" name="description" rows="4" placeholder="Enter product description"
+            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200">{{ old('description', $product->description ?? '') }}</textarea>
 
         <span id="descriptionErr" class="mt-1.5 block text-xs text-red-600"></span>
     </div>
 
 </div>
+
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+
+            // Image preview
+            $('#image').on('change', function(event) {
+                const file = event.target.files[0];
+
+                if (!file) {
+                    return;
+                }
+
+                const allowedTypes = [
+                    'image/jpeg',
+                    'image/png',
+                    'image/jpg',
+                    'image/webp'
+                ];
+
+                if (!allowedTypes.includes(file.type)) {
+                    $('#imageErr').text('Please select a valid image file.');
+                    $(this).val('');
+                    return;
+                }
+
+                $('#imageErr').text('');
+
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    $('#imagePreview')
+                        .attr('src', e.target.result);
+
+                    $('#imagePreviewWrapper')
+                        .removeClass('hidden');
+                };
+
+                reader.readAsDataURL(file);
+            });
+
+        });
+    </script>
+@endpush

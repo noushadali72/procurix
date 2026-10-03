@@ -208,8 +208,13 @@
                                 <div class="flex items-center gap-3">
 
                                     <div
-                                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
+                                        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
+                                        
+                                        @if ($rawMaterial->image_path)
+                                            <img src="{{Storage::url($rawMaterial->image_path)}}"  alt="material image">
+                                        @else
                                         <i class="bx bx-cube text-lg"></i>
+                                        @endif
                                     </div>
 
                                     <div class="min-w-0">

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
             $table->decimal('minimum_stock',15,3)->default(5);
             $table->text('description')->nullable();
+            $table->text('image_path')->nullable();
             $table->timestamps();
             
         });

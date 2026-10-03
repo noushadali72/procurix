@@ -7,8 +7,10 @@ use App\Http\Requests\RawMaterial\UpdateRawMaterialRequest;
 use App\Models\RawMaterial;
 use App\Models\Unit;
 use App\Models\Category;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class RawMaterialController extends Controller
@@ -67,13 +69,32 @@ class RawMaterialController extends Controller
      */
     public function store(StoreRawMaterialRequest $request): JsonResponse
     {
-        RawMaterial::create(
-            $request->validated()
-        );
+        $validated = $request->validated();
+        $imagePath = null;
+        try{
 
-        return response()->json([
-            'message' => 'Raw material created successfully.',
-        ]);
+            if($request->hasFile('image')){
+                $imagePath = $request->file('image')->store('images/materials','public');
+                $validated['image_path'] = $imagePath;
+                unset($validated['image']);
+                }
+                RawMaterial::create($validated);
+                
+                return response()->json([
+                    'success'=>true,
+                    'message' => 'Raw material created successfully.',
+                    ],201);
+        }catch(Exception $e){
+            // Delete image if create failed
+            if($imagePath){
+                Storage::disk('public')->delete($imagePath);
+            }
+            return response()->json([
+                'success'=>false,
+                'message'=>'Unable to create material.',
+                'error'=>$e->getMessage()
+            ],500);
+        }
     }
 
 
@@ -100,13 +121,40 @@ class RawMaterialController extends Controller
         UpdateRawMaterialRequest $request,
         RawMaterial $rawMaterial
     ): JsonResponse {
-        $rawMaterial->update(
-            $request->validated()
-        );
 
+        $newImage = null;
+        $oldImage = $rawMaterial->image_path;
+        $validated = $request->validated();
+
+        try{
+        if($request->hasFile('image')){
+            $newImage = $request->file('image')->store('images/materials','public');
+            $validated['image_path'] = $newImage;
+            unset($validated['image']);
+        }
+        $rawMaterial->update($validated);
+        // Delete old image
+        if($oldImage && $newImage){
+            Storage::disk('public')->delete($oldImage);
+        }
         return response()->json([
+            'success'=>true,
             'message' => 'Raw material updated successfully.',
-        ]);
+        ],200);
+
+        }catch(Exception $e){
+
+        // In case update failed then deleted new saved image
+        if($newImage){
+            Storage::disk('public')->delete($newImage);
+        }
+
+            return response()->json([
+                'success'=>false,
+                'message'=>'Unable to update the material.',
+                'error'=>$e->getMessage()
+            ],500);
+        }
     }
 
 
@@ -117,16 +165,22 @@ class RawMaterialController extends Controller
     {
         try {
 
+            $image = $rawMaterial->image_path;
             $rawMaterial->delete();
-
+            if($image){
+                Storage::disk('public')->delete($image);
+            }
             return response()->json([
+                'success'=>true,
                 'message' => 'Raw material deleted successfully.',
             ]);
         } catch (\Throwable $e) {
 
             return response()->json([
+                'success'=>false,
                 'message' => 'Raw material cannot be deleted because it may be used in other records.',
-            ], 409);
+                'error'=>$e->getMessage()
+            ], 500);
         }
     }
 }

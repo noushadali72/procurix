@@ -140,7 +140,7 @@
 
     @push('scripts')
         <script>
-            $(document).(function(){
+            $(document).ready(function() {
                 $("#category_id").select2();
                 $("#unit_id").select2();
             })
@@ -261,20 +261,24 @@
             });
 
             function clearRawMaterialErrors() {
+
                 $(
-                    "#nameErr, #skuErr, #unitIdErr, #costPriceErr, #stockErr, #minimumStockErr, #descriptionErr"
+                    "#nameErr, #skuErr, #unitIdErr, #categoryIdErr, #costPriceErr, #stockErr, #minimumStockErr, #imageErr, #descriptionErr"
                 ).text("");
             }
 
 
             function showRawMaterialErrors(errors) {
-                $("#nameErr").text(errors.name || "");
-                $("#skuErr").text(errors.sku || "");
-                $("#unitIdErr").text(errors.unit_id || "");
-                $("#costPriceErr").text(errors.cost_price || "");
-                $("#stockErr").text(errors.stock || "");
-                $("#minimumStockErr").text(errors.minimum_stock || "");
-                $("#descriptionErr").text(errors.description || "");
+
+                $("#nameErr").text(errors.name?.[0] || "");
+                $("#skuErr").text(errors.sku?.[0] || "");
+                $("#unitIdErr").text(errors.unit_id?.[0] || "");
+                $("#categoryIdErr").text(errors.category_id?.[0] || "");
+                $("#costPriceErr").text(errors.cost_price?.[0] || "");
+                $("#stockErr").text(errors.stock?.[0] || "");
+                $("#minimumStockErr").text(errors.minimum_stock?.[0] || "");
+                $("#imageErr").text(errors.image?.[0] || "");
+                $("#descriptionErr").text(errors.description?.[0] || "");
             }
 
 
@@ -285,12 +289,15 @@
 
                 button.prop('disabled', true);
 
+                const formData = new FormData(form[0]);
+
                 $.ajax({
                     url: form.attr('action'),
-
                     type: 'POST',
+                    data: formData,
 
-                    data: form.serialize(),
+                    processData: false,
+                    contentType: false,
 
                     headers: {
                         'Accept': 'application/json'
@@ -298,43 +305,45 @@
 
                     success: function(response) {
 
-                        showToast('success', response.message);
+                        showToast(
+                            'success',
+                            response.message
+                        );
 
                         setTimeout(function() {
                             window.location.href = "{{ route('raw-materials.index') }}";
                         }, 800);
-
                     },
 
                     error: function(xhr) {
 
                         if (xhr.status === 422) {
-                            showRawMaterialErrors(xhr.responseJSON.errors);
+
+                            showRawMaterialErrors(
+                                xhr.responseJSON.errors || {}
+                            );
+
                             return;
                         }
 
                         showToast(
                             'error',
-                            xhr.responseJSON?.message || 'Unable to update raw material.'
+                            xhr.responseJSON?.message ||
+                            'Unable to update raw material.'
                         );
-
                     },
 
                     complete: function() {
+
                         button.prop('disabled', false);
                     }
-
                 });
-
             }
 
 
             $('#editRawMaterialForm').on('submit', function(e) {
-
                 e.preventDefault();
-
                 clearRawMaterialErrors();
-
                 updateRawMaterial();
 
             });

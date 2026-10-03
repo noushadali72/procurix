@@ -1,9 +1,9 @@
 <x-layouts.app title="Create Product">
 
     @push('head')
-    {{-- select2 cdn --}}
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+        {{-- select2 cdn --}}
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
     @endpush
 
 
@@ -19,11 +19,7 @@
 
     <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
 
-        <form
-            id="createProductForm"
-            method="POST"
-            action="{{ route('products.store') }}"
-        >
+        <form id="createProductForm" method="POST" action="{{ route('products.store') }}">
             @csrf
 
             <div class="p-6">
@@ -32,18 +28,13 @@
 
             <div class="flex justify-end gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4">
 
-                <a
-                    href="{{ route('products.index') }}"
-                    class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-                >
+                <a href="{{ route('products.index') }}"
+                    class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
                     Cancel
                 </a>
 
-                <button
-                    type="submit"
-                    id="createProductBtn"
-                    class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
-                >
+                <button type="submit" id="createProductBtn"
+                    class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
                     <i class="bx bx-plus text-lg"></i>
                     <span>Create Product</span>
                 </button>
@@ -55,8 +46,7 @@
     </div>
 
     {{-- Category modal --}}
-    <div id="categoryModal"
-        class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 px-4">
+    <div id="categoryModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 px-4">
         <div class="w-full max-w-md rounded-xl bg-white shadow-xl">
 
             <div class="flex items-center justify-between border-b border-gray-200 px-5 py-4">
@@ -70,11 +60,8 @@
                     </p>
                 </div>
 
-                <button
-                    type="button"
-                    id="closeCategoryModal"
-                    class="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-gray-500 transition hover:bg-gray-100 hover:text-gray-900"
-                >
+                <button type="button" id="closeCategoryModal"
+                    class="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-gray-500 transition hover:bg-gray-100 hover:text-gray-900">
                     <i class="bx bx-x text-xl"></i>
                 </button>
             </div>
@@ -86,90 +73,51 @@
 
                     {{-- Name --}}
                     <div>
-                        <label
-                            for="category_name"
-                            class="mb-1.5 block text-sm font-medium text-gray-700"
-                        >
+                        <label for="category_name" class="mb-1.5 block text-sm font-medium text-gray-700">
                             Category Name<sup>*</sup>
                         </label>
 
-                        <input
-                            type="text"
-                            id="category_name"
-                            name="name"
-                            placeholder="Enter category name"
-                            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-                        >
+                        <input type="text" id="category_name" name="name" placeholder="Enter category name"
+                            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
 
-                        <span
-                            id="categoryNameErr"
-                            class="mt-1.5 block text-xs text-red-600"
-                        ></span>
+                        <span id="categoryNameErr" class="mt-1.5 block text-xs text-red-600"></span>
                     </div>
 
                     {{-- Slug --}}
                     <div>
-                        <label
-                            for="category_slug"
-                            class="mb-1.5 block text-sm font-medium text-gray-700"
-                        >
+                        <label for="category_slug" class="mb-1.5 block text-sm font-medium text-gray-700">
                             Slug
                         </label>
 
-                        <input
-                            type="text"
-                            id="category_slug"
-                            name="slug"
-                            placeholder="Enter category slug"
-                            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-                        >
+                        <input type="text" id="category_slug" name="slug" placeholder="Enter category slug"
+                            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
 
-                        <span
-                            id="categorySlugErr"
-                            class="mt-1.5 block text-xs text-red-600"
-                        ></span>
+                        <span id="categorySlugErr" class="mt-1.5 block text-xs text-red-600"></span>
                     </div>
 
                     {{-- Description --}}
                     <div>
-                        <label
-                            for="category_description"
-                            class="mb-1.5 block text-sm font-medium text-gray-700"
-                        >
+                        <label for="category_description" class="mb-1.5 block text-sm font-medium text-gray-700">
                             Description
                         </label>
 
-                        <textarea
-                            id="category_description"
-                            name="description"
-                            rows="3"
-                            placeholder="Enter category description"
-                            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
-                        ></textarea>
+                        <textarea id="category_description" name="description" rows="3" placeholder="Enter category description"
+                            class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"></textarea>
 
-                        <span
-                            id="categoryDescriptionErr"
-                            class="mt-1.5 block text-xs text-red-600"
-                        ></span>
+                        <span id="categoryDescriptionErr" class="mt-1.5 block text-xs text-red-600"></span>
                     </div>
 
                 </div>
 
                 <div class="flex justify-end gap-3 border-t border-gray-200 bg-gray-50 px-5 py-4">
 
-                    <button
-                        type="button"
-                        id="cancelCategoryModal"
-                        class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-                    >
+                    <button type="button" id="cancelCategoryModal"
+                        class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
                         Cancel
                     </button>
 
-                    <button
-                        type="submit"
-                        id="createCategoryBtn"
-                        class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
+                    <button type="submit" id="createCategoryBtn"
+                        class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50">
                         <i class="bx bx-plus text-lg"></i>
                         <span id="createCategoryBtnText">Create Category</span>
                     </button>
@@ -182,178 +130,188 @@
     </div>
     @push('scripts')
         <script>
+            $(document).ready(function() {
+                $("#category_id").select2();
+                $("#unit_id").select2();
+            })
 
-    $(document).ready(function(){
-        $("#category_id").select2();
-        $("#unit_id").select2();
-    })
+            function clearCategoryErrors() {
+                $('#categoryNameErr, #categorySlugErr, #categoryDescriptionErr').text('');
+            }
 
-    function clearCategoryErrors() {
-        $('#categoryNameErr, #categorySlugErr, #categoryDescriptionErr').text('');
-    }
+            function showCategoryErrors(errors) {
+                $('#categoryNameErr').text(errors.name?.[0] || '');
+                $('#categorySlugErr').text(errors.slug?.[0] || '');
+                $('#categoryDescriptionErr').text(errors.description?.[0] || '');
+            }
 
-    function showCategoryErrors(errors) {
-        $('#categoryNameErr').text(errors.name?.[0] || '');
-        $('#categorySlugErr').text(errors.slug?.[0] || '');
-        $('#categoryDescriptionErr').text(errors.description?.[0] || '');
-    }
+            function openCategoryModal() {
+                clearCategoryErrors();
 
-    function openCategoryModal() {
-        clearCategoryErrors();
+                $('#categoryForm')[0].reset();
+                $('#categoryModal').removeClass('hidden');
+                $('#category_name').trigger('focus');
+            }
 
-        $('#categoryForm')[0].reset();
-        $('#categoryModal').removeClass('hidden');
-        $('#category_name').trigger('focus');
-    }
+            function closeCategoryModal() {
+                $('#categoryModal').addClass('hidden');
+                $('#categoryForm')[0].reset();
+                clearCategoryErrors();
+            }
 
-    function closeCategoryModal() {
-        $('#categoryModal').addClass('hidden');
-        $('#categoryForm')[0].reset();
-        clearCategoryErrors();
-    }
+            function createCategory() {
+                const form = $('#categoryForm');
+                const button = $('#createCategoryBtn');
+                const buttonText = $('#createCategoryBtnText');
 
-    function createCategory() {
-        const form = $('#categoryForm');
-        const button = $('#createCategoryBtn');
-        const buttonText = $('#createCategoryBtnText');
+                button.prop('disabled', true);
+                buttonText.text('Creating...');
 
-        button.prop('disabled', true);
-        buttonText.text('Creating...');
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    headers: {
+                        'Accept': 'application/json'
+                    },
 
-        $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            data: form.serialize(),
-            headers: {
-                'Accept': 'application/json'
-            },
+                    success: function(response) {
+                        const category = response.category;
 
-            success: function (response) {
-                const category = response.category;
+                        $('#category_id').append(
+                            $('<option>', {
+                                value: category.id,
+                                text: category.name
+                            })
+                        );
 
-                $('#category_id').append(
-                    $('<option>', {
-                        value: category.id,
-                        text: category.name
-                    })
-                );
+                        $('#category_id').val(category.id);
 
-                $('#category_id').val(category.id);
+                        closeCategoryModal();
 
+                        showToast(
+                            'success',
+                            response.message || 'Category created successfully.'
+                        );
+                    },
+
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            showCategoryErrors(xhr.responseJSON.errors || {});
+                            return;
+                        }
+
+                        showToast(
+                            'error',
+                            xhr.responseJSON?.message || 'Unable to create category.'
+                        );
+                    },
+
+                    complete: function() {
+                        button.prop('disabled', false);
+                        buttonText.text('Create Category');
+                    }
+                });
+            }
+
+            $('#openCategoryModal').on('click', function() {
+                openCategoryModal();
+            });
+
+            $('#closeCategoryModal, #cancelCategoryModal').on('click', function() {
                 closeCategoryModal();
+            });
 
-                showToast(
-                    'success',
-                    response.message || 'Category created successfully.'
-                );
-            },
+            $('#categoryForm').on('submit', function(e) {
+                e.preventDefault();
 
-            error: function (xhr) {
-                if (xhr.status === 422) {
-                    showCategoryErrors(xhr.responseJSON.errors || {});
-                    return;
-                }
+                clearCategoryErrors();
+                createCategory();
+            });
 
-                showToast(
-                    'error',
-                    xhr.responseJSON?.message || 'Unable to create category.'
-                );
-            },
 
-            complete: function () {
-                button.prop('disabled', false);
-                buttonText.text('Create Category');
+            function clearProductErrors() {
+                $(
+                    "#nameErr, #skuErr, #unitIdErr, #categoryIdErr, " +
+                    "#costPriceErr, #salePriceErr, #stockErr, " +
+                    "#minimumStockErr, #imageErr, #descriptionErr"
+                ).text("");
             }
-        });
-    }
 
-    $('#openCategoryModal').on('click', function () {
-        openCategoryModal();
-    });
-
-    $('#closeCategoryModal, #cancelCategoryModal').on('click', function () {
-        closeCategoryModal();
-    });
-
-    $('#categoryForm').on('submit', function (e) {
-        e.preventDefault();
-
-        clearCategoryErrors();
-        createCategory();
-    });
-        
-
-    function clearProductErrors() {
-        $("#nameErr, #skuErr, #unitIdErr, #costPriceErr, #salePriceErr, #stockErr, #minimumStockErr, #descriptionErr")
-            .text("");
-    }
-
-    function showProductErrors(errors) {
-        $("#nameErr").text(errors.name || "");
-        $("#skuErr").text(errors.sku || "");
-        $("#unitIdErr").text(errors.unit_id || "");
-        $("#costPriceErr").text(errors.cost_price || "");
-        $("#salePriceErr").text(errors.sale_price || "");
-        $("#stockErr").text(errors.stock || "");
-        $("#minimumStockErr").text(errors.minimum_stock || "");
-        $("#descriptionErr").text(errors.description || "");
-    }
-
-    function createProduct() {
-        const form = $('#createProductForm');
-        const button = $('#createProductBtn');
-
-        button.prop('disabled', true);
-
-        $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            data: form.serialize(),
-            headers: {
-                'Accept': 'application/json'
-            },
-
-            success: function (response) {
-                showToast('success', response.message);
-
-                setTimeout(function () {
-                    window.location.href = "{{ route('products.index') }}";
-                }, 800);
-            },
-
-            error: function (xhr) {
-                if (xhr.status === 422) {
-                    showProductErrors(xhr.responseJSON.errors);
-                    return;
-                }
-
-                showToast(
-                    'error',
-                    xhr.responseJSON?.message || 'Unable to create product.'
-                );
-            },
-
-            complete: function () {
-                button.prop('disabled', false);
+            function showProductErrors(errors) {
+                $("#nameErr").text(errors.name?.[0] || "");
+                $("#skuErr").text(errors.sku?.[0] || "");
+                $("#unitIdErr").text(errors.unit_id?.[0] || "");
+                $("#categoryIdErr").text(errors.category_id?.[0] || "");
+                $("#costPriceErr").text(errors.cost_price?.[0] || "");
+                $("#salePriceErr").text(errors.sale_price?.[0] || "");
+                $("#stockErr").text(errors.stock?.[0] || "");
+                $("#minimumStockErr").text(errors.minimum_stock?.[0] || "");
+                $("#imageErr").text(errors.image?.[0] || "");
+                $("#descriptionErr").text(errors.description?.[0] || "");
             }
-        });
-    }
-
-    $('#createProductForm').on('submit', function (e) {
-        e.preventDefault();
-
-        clearProductErrors();
-        createProduct();
-    });
 
 
-    $(document).on(
-        'input',
-        '#cost_price, #sale_price, #stock, #minimum_stock',
-        function () {
-            this.value = this.value.replace(/\D/g, '');
-        }
-    );
+
+            function createProduct() {
+                const form = $('#createProductForm');
+                const formData = new FormData(form[0]);
+                const button = $('#createProductBtn');
+
+                button.prop('disabled', true);
+
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    // data: form.serialize(),
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+
+                    success: function(response) {
+                        showToast('success', response.message);
+
+                        setTimeout(function() {
+                            window.location.href = "{{ route('products.index') }}";
+                        }, 800);
+                    },
+
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            showProductErrors(xhr.responseJSON.errors);
+                            return;
+                        }
+
+                        showToast(
+                            'error',
+                            xhr.responseJSON?.message || 'Unable to create product.'
+                        );
+                    },
+
+                    complete: function() {
+                        button.prop('disabled', false);
+                    }
+                });
+            }
+
+            $('#createProductForm').on('submit', function(e) {
+                e.preventDefault();
+
+                clearProductErrors();
+                createProduct();
+            });
+
+
+            $(document).on(
+                'input',
+                '#cost_price, #sale_price, #stock, #minimum_stock',
+                function() {
+                    this.value = this.value.replace(/\D/g, '');
+                }
+            );
         </script>
     @endpush
 

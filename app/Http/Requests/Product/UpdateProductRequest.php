@@ -38,6 +38,7 @@ class UpdateProductRequest extends FormRequest
             'stock' => ['required', 'integer', 'min:0'],
             'minimum_stock' => ['required', 'integer', 'min:0'],
             'description' => ['nullable', 'string'],
+            'image_path'=>['nullable','image','max:4096','mimes:png,jpg,jpeg']
         ];
     }
     
@@ -59,6 +60,9 @@ class UpdateProductRequest extends FormRequest
             'minimum_stock.required' => 'The minimum stock level is required.',
             'minimum_stock.integer' => 'The minimum stock level must be an integer.',
             'minimum_stock.min' => 'The minimum stock level must be at least 0.',
+            'image_path.image'=>'Product image must be valid image.',
+            'image.max'=>'Product image size must be less then 4MB.',
+            'image.mimes'=>'Product image must be jpg, jpeg, or png.'
         ];
     }
 }

@@ -644,34 +644,19 @@
             $(document).on('click', '.edit-category', function() {
 
                 const button = $(this);
-
                 $('#categoryId').val(button.data('id'));
-
                 $('#categoryName').val(button.data('name'));
-
-                $('#categorySlug').val(
-                    button.data('slug') || ''
-                );
-
-                $('#categoryDescription').val(
-                    button.data('description') || ''
-                );
-
-                $('#categoryInventoryAccount').val(
-                    button.data('inventory-account-id') || ''
-                );
-
-                $('#categoryPurchaseAccount').val(
-                    button.data('purchase-account-id') || ''
-                );
-
+                $('#categorySlug').val(button.data('slug') || '');
+                $('#categoryDescription').val(button.data('description') || '');
+                $('#categoryInventoryAccount').val(button.data('inventory-account-id') || '');
+                $('#categoryPurchaseAccount').val(button.data('purchase-account-id') || '');
+                
                 editingCategory = true;
-
+                
                 $('#categoryModalTitle').text('Edit Category');
                 $('#saveCategoryBtnText').text('Update Category');
 
                 clearCategoryErrors();
-
                 openCategoryModal();
             });
 

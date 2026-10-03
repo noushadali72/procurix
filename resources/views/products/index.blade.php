@@ -268,8 +268,12 @@
                                         class="flex h-9 w-9 shrink-0 items-center justify-center
                                         rounded-lg bg-gray-100 text-gray-500">
 
+                                        @if ($product->image_path)
+                                            
+                                        <img src="{{Storage::url($product->image_path)}}" alt="product image">
+                                        @else
                                         <i class="bx bx-package text-lg"></i>
-
+                                        @endif
                                     </div>
 
 

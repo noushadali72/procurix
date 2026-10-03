@@ -20,12 +20,13 @@ class RawMaterial extends Model
         'category_id',
         'minimum_stock',
         'description',
+        'image_path'
     ];
 
     protected $casts = [
         'cost_price' => 'decimal:2',
-        'stock'=>'decimal:2',
-        'minimum_stock'=>'decimal:2'
+        'stock' => 'decimal:2',
+        'minimum_stock' => 'decimal:2'
     ];
 
     public function unit(): BelongsTo

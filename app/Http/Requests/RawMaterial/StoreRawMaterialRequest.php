@@ -34,9 +34,11 @@ class StoreRawMaterialRequest extends FormRequest
             'cost_price' => ['required', 'numeric', 'min:0',],
             'stock' => ['required', 'numeric', 'min:0',],
             'unit_id' => ['required', 'exists:units,id'],
-            'category_id'=>['nullable', 'exists:categories,id'],
+            'category_id' => ['nullable', 'exists:categories,id'],
             'minimum_stock' => ['required', 'numeric', 'min:0'],
             'description' => ['nullable', 'string'],
+            'image_path' => ['nullable', 'image', 'max:4096', 'mimes:png,jpg,jpeg']
+
         ];
     }
 
@@ -58,11 +60,15 @@ class StoreRawMaterialRequest extends FormRequest
             'unit_id.required' => 'The unit is required.',
             'unit_id.exists' => 'The selected unit is invalid.',
 
-            'category_id.exists'=>'The selected category is invalid.',
+            'category_id.exists' => 'The selected category is invalid.',
 
             'minimum_stock.required' => 'The minimum stock level is required.',
             'minimum_stock.numeric' => 'The minimum stock level must be a number.',
             'minimum_stock.min' => 'The minimum stock level must be at least 0.',
+
+            'image_path.image' => 'Material image must be valid image.',
+            'image.max' => 'Material image size must be less then 4MB.',
+            'image.mimes' => 'Material image must be jpg, jpeg, or png.'
         ];
     }
 }
