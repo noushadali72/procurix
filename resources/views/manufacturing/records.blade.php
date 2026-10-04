@@ -12,12 +12,13 @@
         </div>
 
         <a href="{{ route('manufacturing.index') }}"
-           class="rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white">
+            class="rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white">
             Manufacture Product
         </a>
     </div>
 
-    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
+    <div
+        class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
@@ -37,7 +38,6 @@
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
 
                     @forelse ($records as $record)
-
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
 
                             <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
@@ -45,8 +45,11 @@
                             </td>
 
                             <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                                
-                                {{ $record->product->name }}
+                                <a href="{{ route('products.show', $record->product) }}" class="hover:underline">
+                                    {{ $record->product->name }}
+                                    <i class="bx bx-link text-xs text-slate-400"></i>
+
+                                </a>
                             </td>
 
                             <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
@@ -65,7 +68,7 @@
                                 {{ $record->manufactured_at?->format('d M Y, h:i A') }}
                             </td>
 
-                             <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
+                            <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
                                 {{ strtoupper($record->status) }}
                             </td>
 
@@ -74,12 +77,10 @@
                     @empty
 
                         <tr>
-                            <td colspan="6"
-                                class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="6" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
                                 No manufacturing records found.
                             </td>
                         </tr>
-
                     @endforelse
 
                 </tbody>

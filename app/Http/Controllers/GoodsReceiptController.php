@@ -9,6 +9,7 @@ use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
 use App\Models\RawMaterial;
 use App\Models\Unit;
+use App\Services\JournalEntryService;
 use App\Services\PurchaseRequestActivityService as ServicesPurchaseRequestActivityService;
 use App\Services\StockMovementService;
 use App\Services\UnitConversionService;
@@ -20,7 +21,7 @@ use PurchaseRequestActivityService;
 
 class GoodsReceiptController extends Controller
 {
-    public function __construct(private ServicesPurchaseRequestActivityService $activity, private StockMovementService $movement) {}
+    public function __construct(private ServicesPurchaseRequestActivityService $activity, private StockMovementService $movement, private JournalEntryService $journalEntryService) {}
     public function index()
     {
         $goodsReceipts = GoodsReceipt::with([
@@ -160,7 +161,7 @@ class GoodsReceiptController extends Controller
                     $unit,
                     $orderItem->rawMaterial->unit
                 );
-                $rawMaterial = RawMaterial::with('unit')->lockForUpdate()->findOrFail($orderItem->raw_material_id);
+                $rawMaterial = RawMaterial::with(['unit','category.inventoryAccount'])->lockForUpdate()->findOrFail($orderItem->raw_material_id);
                 $rawMaterial->increment('stock', $stockQty);
 
                 // Recording Stock movement
@@ -173,6 +174,17 @@ class GoodsReceiptController extends Controller
                     $purchaseOrder,
                     "Materials received from purchase order."
                 );
+
+                
+                // $account = $rawMaterial->category->inventoryAccount;
+                // $this->journalEntryService->post([
+                //     'entry_date'=>now()->toDateString(),
+                //     'description'=>'Materials received.'
+                // ], [
+                //     'account_id'=>$account,
+                //     'debit'=>
+                // ]);
+
             }
 
             /*

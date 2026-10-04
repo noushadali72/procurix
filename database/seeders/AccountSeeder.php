@@ -33,6 +33,11 @@ class AccountSeeder extends Seeder
                 'name' => 'Accounts Payable',
                 'code' => '2100',
             ],
+             [
+                'category' => 'liability',
+                'name' => 'Stock Clearing',
+                'code' => '2200',
+            ],
             [
                 'category' => 'equity',
                 'name' => 'Owner Equity',
