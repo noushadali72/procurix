@@ -10,6 +10,7 @@ use App\Models\RawMaterial;
 use App\Models\VendorBill;
 use App\Models\VendorCredit;
 use App\Services\PurchaseRequestActivityService;
+use App\Services\StockMovementService;
 use App\Services\UnitConversionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseReturnController extends Controller
 {
-    public function __construct(private PurchaseRequestActivityService $activity) {}
+    public function __construct(private PurchaseRequestActivityService $activity, private StockMovementService $movement) {}
     public function index()
     {
         $purchaseReturns = PurchaseReturn::with([
@@ -198,7 +199,7 @@ class PurchaseReturnController extends Controller
                         $rawMaterial->unit
                     );
 
-                    $lockedRawMaterial = RawMaterial::query()
+                    $lockedRawMaterial = RawMaterial::with('unit')
                         ->lockForUpdate()
                         ->findOrFail($rawMaterial->id);
 
@@ -222,6 +223,17 @@ class PurchaseReturnController extends Controller
                         'stock',
                         $stockQty
                     );
+
+                    $this->movement->material(
+                        $lockedRawMaterial,
+                        $lockedRawMaterial->unit,
+                        "out",
+                        "purchase_return",
+                        $stockQty,
+                        $purchaseReturn,
+                        "Stock deducted and Material returned"
+                    );
+
 
                     $returnTotal += $lineTotal;
                 }
