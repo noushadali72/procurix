@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\ManufacturingFormula;
 use App\Models\ManufacturingRecord;
 use App\Models\Product;
+use App\Models\RawMaterial;
 use App\Models\Unit;
+use App\Services\StockMovementService;
 use App\Services\UnitConversionService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 class ManufacturingController extends Controller
 {
 
+    public function __construct(private StockMovementService $movement) {}
 
     public function index()
     {
@@ -24,9 +27,7 @@ class ManufacturingController extends Controller
             'manufacturingFormula.items.unit',
         ])->get();
         $units = Unit::with('unitCategory')->get();
-
-        $draft = ManufacturingRecord::where('status','draft')->latest()->first();
-        
+        $draft = ManufacturingRecord::where('status', 'draft')->latest()->first();
         return view('manufacturing.index', compact(
             'products',
             'units',
@@ -51,17 +52,18 @@ class ManufacturingController extends Controller
             'product_id' => ['required', 'exists:products,id'],
             'quantity'   => ['required', 'numeric', 'gt:0'],
             'unit_id'    => ['required', 'exists:units,id'],
-            
+
         ]);
         try {
             DB::transaction(function () use ($validated, $conversionService) {
 
                 $product = Product::with([
                     'unit',
-                    'manufacturingFormula.items.rawMaterial.unit',
                     'manufacturingFormula.items.unit',
                 ])->findOrFail($validated['product_id']);
+
                 $formula = $product->manufacturingFormula;
+
                 if (!$formula) {
                     throw new \Exception(
                         'This product does not have a manufacturing formula.'
@@ -75,8 +77,18 @@ class ManufacturingController extends Controller
                     $product->unit
                 );
 
+                $record = ManufacturingRecord::create([
+                    'product_id' => $product->id,
+                    'manufacturing_formula_id' => $formula->id,
+                    'quantity' => $validated['quantity'],
+                    'unit_id' => $manufacturingUnit->id,
+                    'status' => 'completed',
+                    'manufactured_at' => now(),
+                ]);
+
                 foreach ($formula->items as $item) {
-                    $rawMaterial = $item->rawMaterial;
+                    // Lock raw material row to prevent concurrent race conditions
+                    $rawMaterial = RawMaterial::with('unit')->lockForUpdate()->find($item->raw_material_id);
                     if (!$rawMaterial) {
                         continue;
                     }
@@ -98,6 +110,16 @@ class ManufacturingController extends Controller
                         'stock',
                         $requiredInStockUnit
                     );
+
+                    $this->movement->material(
+                        $rawMaterial,
+                        $rawMaterial->unit,
+                        'out',
+                        'production_consumption',
+                        $requiredInStockUnit,
+                        $record,
+                        "Material consumed for product of product."
+                    );
                 }
 
                 $product->increment(
@@ -109,16 +131,18 @@ class ManufacturingController extends Controller
              * Save manufacturing history.
              */
 
-                ManufacturingRecord::create([
-                    'product_id' => $product->id,
-                    'manufacturing_formula_id' => $formula->id,
-                    'quantity' => $validated['quantity'],
-                    'unit_id' => $manufacturingUnit->id,
-                    'status'=>'completed',
-                    'manufactured_at' => now(),
-                ]);
 
-                ManufacturingRecord::where('status','draft')->first()?->delete();
+
+                ManufacturingRecord::where('status', 'draft')->first()?->delete();
+                $this->movement->product(
+                    $product,
+                    $product->unit,
+                    "in",
+                    "production_output",
+                    $productQuantity,
+                    $record,
+                    "Finished goods produced from production."
+                );
             });
 
             return response()->json([
@@ -132,48 +156,47 @@ class ManufacturingController extends Controller
         }
     }
 
-    public function autoSave(Request $request){
-        try{
+    public function autoSave(Request $request)
+    {
+        try {
 
-             $validated = $request->validate([
+            $validated = $request->validate([
                 'product_id' => ['required', 'exists:products,id'],
                 'quantity'   => ['nullable', 'numeric', 'gt:0'],
                 'unit_id'    => ['nullable', 'exists:units,id'],
             ]);
-            $manufacturing_formula_id = ManufacturingFormula::where('product_id',$validated['product_id'])->get('id')->first();
+            $manufacturing_formula_id = ManufacturingFormula::where('product_id', $validated['product_id'])->get('id')->first();
 
-            $draft = ManufacturingRecord::where('status','draft')->first();
-            
-            if($draft){
-                
+            $draft = ManufacturingRecord::where('status', 'draft')->first();
+
+            if ($draft) {
+
                 $draft->update([
-                    'product_id'=>$validated['product_id'],
-                    'manufacturing_formula_id'=>$manufacturing_formula_id->id,
-                    'unit_id'=>$validated['unit_id'],
-                    'quantity'=>$validated['quantity'],
-                    'status'=>'draft',
+                    'product_id' => $validated['product_id'],
+                    'manufacturing_formula_id' => $manufacturing_formula_id->id,
+                    'unit_id' => $validated['unit_id'],
+                    'quantity' => $validated['quantity'],
+                    'status' => 'draft',
                 ]);
-            }else{    
+            } else {
                 ManufacturingRecord::create([
-                    'product_id'=>$validated['product_id'],
-                    'unit_id'=>$validated['unit_id'],
-                    'quantity'=>$validated['quantity'],
-                    'status'=>'draft',
-                    ]);
+                    'product_id' => $validated['product_id'],
+                    'unit_id' => $validated['unit_id'],
+                    'quantity' => $validated['quantity'],
+                    'status' => 'draft',
+                ]);
             }
             return response()->json([
-                'success'=>true,
-                'message'=>'Auto saved successfully!',
-               
-            ]);
+                'success' => true,
+                'message' => 'Auto saved successfully!',
 
-        }catch(Exception $e){
+            ]);
+        } catch (Exception $e) {
             return response()->json([
-                'success'=>false,
-                'message'=>'Unable to Auto Save!',
-                'error'=>$e->getMessage()
-            ],500);
+                'success' => false,
+                'message' => 'Unable to Auto Save!',
+                'error' => $e->getMessage()
+            ], 500);
         }
-        
     }
 }
