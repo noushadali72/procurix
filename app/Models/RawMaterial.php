@@ -15,6 +15,7 @@ class RawMaterial extends Model
         'name',
         'sku',
         'cost_price',
+        'sale_price',
         'stock',
         'unit_id',
         'category_id',
@@ -25,6 +26,7 @@ class RawMaterial extends Model
 
     protected $casts = [
         'cost_price' => 'decimal:2',
+        'sale_price' => 'decimal:2',
         'stock' => 'decimal:2',
         'minimum_stock' => 'decimal:2'
     ];

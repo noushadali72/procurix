@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::table('categories', function (Blueprint $table) {
             $table->foreignId('inventory_account_id')->nullable()->constrained('accounts')->nullOnDelete();
             $table->foreignId('purchase_account_id')->nullable()->constrained('accounts')->nullOnDelete();
+            $table->foreignId('sales_account_id')->nullable()->constrained('accounts')->nullOnDelete();
         });
     }
 

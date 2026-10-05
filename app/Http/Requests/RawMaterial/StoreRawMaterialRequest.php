@@ -32,6 +32,7 @@ class StoreRawMaterialRequest extends FormRequest
                 'unique:raw_materials,sku',
             ],
             'cost_price' => ['required', 'numeric', 'min:0',],
+            'sale_price' => ['nullable', 'numeric', 'min:0',],
             'stock' => ['required', 'numeric', 'min:0',],
             'unit_id' => ['required', 'exists:units,id'],
             'category_id' => ['nullable', 'exists:categories,id'],

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\GoodsReceipt\StoreGoodsReceiptRequest;
+use App\Models\Account;
 use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptAttachment;
 use App\Models\PurchaseOrder;
@@ -92,6 +93,8 @@ class GoodsReceiptController extends Controller
             $conversion,
 
         ) {
+            $journalLines = [];
+
             $goodsReceipt = GoodsReceipt::create([
                 'purchase_order_id' => $purchaseOrder->id,
                 'grn_number' => $this->generateGrnNumber(),
@@ -161,7 +164,7 @@ class GoodsReceiptController extends Controller
                     $unit,
                     $orderItem->rawMaterial->unit
                 );
-                $rawMaterial = RawMaterial::with(['unit','category.inventoryAccount'])->lockForUpdate()->findOrFail($orderItem->raw_material_id);
+                $rawMaterial = RawMaterial::with(['unit', 'category.inventoryAccount'])->lockForUpdate()->findOrFail($orderItem->raw_material_id);
                 $rawMaterial->increment('stock', $stockQty);
 
                 // Recording Stock movement
@@ -175,17 +178,48 @@ class GoodsReceiptController extends Controller
                     "Materials received from purchase order."
                 );
 
-                
-                // $account = $rawMaterial->category->inventoryAccount;
-                // $this->journalEntryService->post([
-                //     'entry_date'=>now()->toDateString(),
-                //     'description'=>'Materials received.'
-                // ], [
-                //     'account_id'=>$account,
-                //     'debit'=>
-                // ]);
 
+                // Journal Entry for Inventory Account
+                $inventoryAccount = $rawMaterial->category?->inventoryAccount;
+
+                if (!$inventoryAccount) {
+                    throw new \RuntimeException(
+                        "Inventory account is not configured for category: {$rawMaterial->category->name}"
+                    );
+                }
+
+                $receivedValue = round(
+                    $currentReceivedQty * (float) $orderItem->unit_cost,
+                    2
+                );
+
+                $journalLines[] = [
+                    'account_id' => $inventoryAccount->id,
+                    'debit' => $receivedValue,
+                    'credit' => 0,
+                    'description' => "Inventory received: {$rawMaterial->name}",
+                ];
             }
+
+            $stockClearingAccount = Account::where('code', '2200')->firstOrFail();
+
+            $totalReceivedValue = collect($journalLines)->sum('debit');
+
+            $journalLines[] = [
+                'account_id' => $stockClearingAccount->id,
+                'debit' => 0,
+                'credit' => $totalReceivedValue,
+                'description' => "Stock clearing for GRN {$goodsReceipt->grn_number}",
+            ];
+
+            $this->journalEntryService->post(
+                [
+                    'entry_date' => $validated['received_date'],
+                    'description' => "Materials received for GRN {$goodsReceipt->grn_number}.",
+                    'reference' => $goodsReceipt->grn_number,
+                ],
+                $journalLines
+            );
 
             /*
              * Store attachments.

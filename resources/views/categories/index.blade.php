@@ -214,7 +214,9 @@
                                                 data-slug="{{ $category->slug }}"
                                                 data-description="{{ $category->description }}"
                                                 data-inventory-account-id="{{ $category->inventory_account_id }}"
-                                                data-purchase-account-id="{{ $category->purchase_account_id }}">
+                                                data-purchase-account-id="{{ $category->purchase_account_id }}"
+                                                data-sales-account-id="{{ $category->sales_account_id }}"
+                                                data-costing-method="{{ $category->costing_method }}">
                                                 <i class="bx bx-edit-alt"></i>
                                                 Edit
                                             </button>
@@ -334,11 +336,15 @@
                                 Accounts
                             </button>
 
+                            <button type="button"
+                                class="category-tab border-b-2 border-transparent pb-3 text-sm font-medium text-gray-500 transition hover:text-gray-900"
+                                data-tab="inventory">
+                                Inventory
+                            </button>
+
                         </div>
 
                     </div>
-
-
                     <div class="px-5 py-5">
 
                         {{-- ================================================= --}}
@@ -464,6 +470,33 @@
 
                             </div>
 
+                            {{-- Sales Account --}}
+                            <div>
+
+                                <label for="categorySalesAccount"
+                                    class="mb-1.5 block text-sm font-medium text-gray-700">
+                                    Sales Account
+                                </label>
+
+                                <select id="categorySalesAccount" name="sales_account_id"
+                                    class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+
+                                    <option value="">
+                                        Select sales account
+                                    </option>
+
+                                    @foreach ($accounts as $account)
+                                        <option value="{{ $account->id }}">
+                                            {{ $account->code }} - {{ $account->name }}
+                                        </option>
+                                    @endforeach
+
+                                </select>
+
+                                <p id="categorySalesAccountError" class="mt-1.5 hidden text-xs text-red-500"></p>
+
+                            </div>
+
 
                             <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
 
@@ -472,9 +505,82 @@
                                     <i class="bx bx-info-circle mt-0.5 text-gray-500"></i>
 
                                     <p class="text-xs leading-5 text-gray-500">
-                                        These accounts determine where inventory and purchase
+                                        These accounts determine where inventory, sales, and purchase
                                         transactions for this category are recorded.
                                     </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- ================================================= --}}
+                        {{-- INVENTORY TAB --}}
+                        {{-- ================================================= --}}
+
+                        <div id="categoryInventoryTab" class="category-tab-content hidden space-y-5">
+
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-900">
+                                    Inventory Configuration
+                                </h3>
+
+                                <p class="mt-1 text-xs text-gray-500">
+                                    Configure how inventory costs are calculated for this category.
+                                </p>
+                            </div>
+
+
+                            {{-- Costing Method --}}
+                            <div>
+
+                                <label for="categoryCostingMethod"
+                                    class="mb-1.5 block text-sm font-medium text-gray-700">
+                                    Costing Method
+                                    <span class="text-red-500">*</span>
+                                </label>
+
+                                <select id="categoryCostingMethod" name="costing_method"
+                                    class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-900 focus:ring-1 focus:ring-gray-900">
+
+                                    <option value="">
+                                        Select costing method
+                                    </option>
+
+                                    @foreach ($costingMethods as $method)
+                                        <option value="{{ $method->value }}">
+                                            {{ str($method->value)->replace('_', ' ')->title() }}
+                                        </option>
+                                    @endforeach
+
+                                </select>
+
+                                <p id="categoryCostingMethodError" class="mt-1.5 hidden text-xs text-red-500">
+                                </p>
+
+                            </div>
+
+
+                            {{-- Information --}}
+                            <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+
+                                <div class="flex gap-2">
+
+                                    <i class="bx bx-info-circle mt-0.5 shrink-0 text-gray-500"></i>
+
+                                    <div>
+                                        <p class="text-xs font-medium text-gray-700">
+                                            Inventory Costing
+                                        </p>
+
+                                        <p class="mt-1 text-xs leading-5 text-gray-500">
+                                            The selected costing method determines how the cost of
+                                            inventory is calculated when stock is purchased, consumed,
+                                            or sold.
+                                        </p>
+                                    </div>
 
                                 </div>
 
@@ -577,9 +683,14 @@
 
                     if (
                         field === 'inventory_account_id' ||
-                        field === 'purchase_account_id'
+                        field === 'purchase_account_id' ||
+                        field === 'sales_account_id'
                     ) {
                         setCategoryTab('accounts');
+                    }
+
+                    if (field === 'costing_method') {
+                        setCategoryTab('inventory');
                     }
                 });
             }
@@ -588,7 +699,6 @@
             /* =====================================================
              * TABS
              * ===================================================== */
-
             function setCategoryTab(tab) {
 
                 $('.category-tab')
@@ -607,6 +717,10 @@
 
                 if (tab === 'accounts') {
                     $('#categoryAccountsTab').removeClass('hidden');
+                }
+
+                if (tab === 'inventory') {
+                    $('#categoryInventoryTab').removeClass('hidden');
                 }
             }
 
@@ -640,19 +754,29 @@
             /* =====================================================
              * EDIT
              * ===================================================== */
-
             $(document).on('click', '.edit-category', function() {
 
                 const button = $(this);
+
                 $('#categoryId').val(button.data('id'));
                 $('#categoryName').val(button.data('name'));
                 $('#categorySlug').val(button.data('slug') || '');
                 $('#categoryDescription').val(button.data('description') || '');
-                $('#categoryInventoryAccount').val(button.data('inventory-account-id') || '');
-                $('#categoryPurchaseAccount').val(button.data('purchase-account-id') || '');
-                
+
+                $('#categoryInventoryAccount')
+                    .val(button.data('inventory-account-id') || '');
+
+                $('#categoryPurchaseAccount')
+                    .val(button.data('purchase-account-id') || '');
+
+                $('#categorySalesAccount')
+                    .val(button.data('sales-account-id') || '');
+
+                $('#categoryCostingMethod')
+                    .val(button.data('costing-method') || '');
+
                 editingCategory = true;
-                
+
                 $('#categoryModalTitle').text('Edit Category');
                 $('#saveCategoryBtnText').text('Update Category');
 

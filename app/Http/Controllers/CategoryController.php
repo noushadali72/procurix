@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CostingMethod;
 use App\Http\Requests\Category\StoreCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Models\Account;
@@ -17,6 +18,7 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         $accounts = Account::orderBy('code')->get();
+        $costingMethods = CostingMethod::cases();
 
         $categories = Category::with([
             'inventoryAccount',
@@ -42,13 +44,16 @@ class CategoryController extends Controller
         if (!$request->ajax()) {
             return view('categories.index', compact(
                 'categories',
-                'accounts'
+                'accounts',
+                'costingMethods'
             ));
         }
 
         return response()->json([
             'success' => true,
             'categories' => $categories,
+            'accounts' => $accounts,
+            'costingMethods' => $costingMethods,
         ]);
     }
 
