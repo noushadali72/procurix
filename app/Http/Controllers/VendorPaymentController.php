@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\VendorPayment\StoreVendorPaymentRequest;
+use App\Models\Account;
 use App\Models\VendorBill;
 use App\Models\VendorPayment;
+use App\Services\JournalEntryService;
 use App\Services\PurchaseRequestActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +15,8 @@ use Illuminate\Support\Facades\DB;
 class VendorPaymentController extends Controller
 {
     public function __construct(
-        private PurchaseRequestActivityService $activity
+        private PurchaseRequestActivityService $activity,
+        private JournalEntryService $journalEntryService
     ) {}
 
     public function index()
@@ -43,10 +46,8 @@ class VendorPaymentController extends Controller
         );
     }
 
-    public function store(
-        StoreVendorPaymentRequest $request,
-        VendorBill $vendorBill
-    ) {
+    public function store(StoreVendorPaymentRequest $request, VendorBill $vendorBill)
+    {
         $validated = $request->validated();
 
         $dueAmount = (float) $vendorBill->due_amount;
@@ -141,6 +142,36 @@ class VendorPaymentController extends Controller
                     ]);
                 }
 
+
+
+                // Journal Entry
+                $bankAccount = Account::where('code', '1200')->firstOrFail();
+                $accountsPayable = Account::where('code', '2100')->firstOrFail();
+
+                $paymentAmount = round((float) $payment->amount, 2);
+
+                $this->journalEntryService->post(
+                    [
+                        'entry_date' => $payment->payment_date,
+                        'description' => "Vendor payment for Bill {$bill->bill_number}.",
+                        // 'reference' => $payment->transaction_id ?? $bill->bill_number,
+                    ],
+                    [
+                        [
+                            'account_id' => $accountsPayable->id,
+                            'debit' => $paymentAmount,
+                            'credit' => 0,
+                            'description' => "Payment against Vendor Bill {$bill->bill_number}.",
+                        ],
+                        [
+                            'account_id' => $bankAccount->id,
+                            'debit' => 0,
+                            'credit' => $paymentAmount,
+                            'description' => "Bank payment for Vendor Bill {$bill->bill_number}.",
+                        ],
+                    ]
+                );
+
                 /*
                  * Payment activity.
                  */
@@ -187,14 +218,12 @@ class VendorPaymentController extends Controller
                 'success' => true,
                 'message' => 'Payment recorded successfully.',
             ], 201);
-
         } catch (\RuntimeException $e) {
 
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
             ], 422);
-
         } catch (\Throwable $e) {
 
             report($e);

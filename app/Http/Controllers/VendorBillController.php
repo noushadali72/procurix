@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Account;
 use App\Models\PurchaseOrder;
 use App\Models\VendorBill;
+use App\Services\JournalEntryService;
 use App\Services\PurchaseRequestActivityService;
 use App\Services\UnitConversionService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -13,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class VendorBillController extends Controller
 {
-    public function __construct(private PurchaseRequestActivityService $activity) {}
+    public function __construct(private PurchaseRequestActivityService $activity, private JournalEntryService $journalEntryService) {}
 
     /**
      * Display vendor bills and purchase orders
@@ -61,9 +63,7 @@ class VendorBillController extends Controller
             ],
         ]);
 
-        $purchaseOrder = PurchaseOrder::findOrFail(
-            $request->purchase_order_id
-        );
+        $purchaseOrder = PurchaseOrder::findOrFail($request->purchase_order_id);
 
         return $this->createVendorBill(
             $purchaseOrder,
@@ -71,24 +71,6 @@ class VendorBillController extends Controller
         );
     }
 
-
-    // public function show(VendorBill $vendorBill)
-    // {
-    //     $vendorBill->load([
-    //         'vendor',
-    //         'items',
-    //         'items.rawMaterial',
-    //         'items.unit',
-    //         'purchaseOrder',
-    //         'vendorPayments',
-    //         'creditApplications',
-    //     ]);
-
-    //     return view(
-    //         'vendor_bills.show',
-    //         compact('vendorBill')
-    //     );
-    // }
 
     public function show(VendorBill $vendorBill)
     {
@@ -114,14 +96,9 @@ class VendorBillController extends Controller
     /**
      * Generate vendor bill directly from purchase order.
      */
-    public function generate(
-        PurchaseOrder $purchaseOrder,
-        UnitConversionService $conversion
-    ) {
-        return $this->createVendorBill(
-            $purchaseOrder,
-            $conversion
-        );
+    public function generate(PurchaseOrder $purchaseOrder, UnitConversionService $conversion)
+    {
+        return $this->createVendorBill($purchaseOrder, $conversion);
     }
 
 
@@ -152,8 +129,6 @@ class VendorBillController extends Controller
                 'Vendor bill already exists for this purchase order.'
             ], 422);
         }
-
-
 
         $purchaseOrder->load([
             'items.unit',
@@ -327,6 +302,33 @@ class VendorBillController extends Controller
                     'subtotal' => round($subtotal, 2),
                     'total' => round($subtotal, 2),
                 ]);
+
+                $stockClearingAccount = Account::where('code', '2200')->firstOrFail();
+                $accountsPayableAccount = Account::where('code', '2100')->firstOrFail();
+
+                $total = round($subtotal, 2);
+
+                $this->journalEntryService->post(
+                    [
+                        'entry_date' => $vendorBill->bill_date,
+                        'description' => "Vendor bill {$vendorBill->bill_number}.",
+                        // 'reference' => $vendorBill->bill_number,
+                    ],
+                    [
+                        [
+                            'account_id' => $stockClearingAccount->id,
+                            'debit' => $total,
+                            'credit' => 0,
+                            'description' => "Clear stock clearing for vendor bill {$vendorBill->bill_number}.",
+                        ],
+                        [
+                            'account_id' => $accountsPayableAccount->id,
+                            'debit' => 0,
+                            'credit' => $total,
+                            'description' => "Accounts payable for vendor bill {$vendorBill->bill_number}.",
+                        ],
+                    ]
+                );
 
                 $this->activity->log(
                     $purchaseOrder->purchaseRequest,

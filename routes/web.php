@@ -4,11 +4,13 @@ use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BalanceSheetController;
 use App\Http\Controllers\GoodsReceiptController;
 use App\Http\Controllers\ManufacturingController;
 use App\Http\Controllers\ManufacturingFormulaController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OpeningBalanceController;
 use App\Http\Controllers\PaymentTermController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PurchaseOrderController;
@@ -105,7 +107,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('vendor-payments', VendorPaymentController::class)->except('store');
     Route::post('vendor-payments/{vendorBill}', [VendorPaymentController::class, 'store'])->name('vendor-payments.store');
     Route::resource('payment-terms', PaymentTermController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::get('/balance-sheet', [BalanceSheetController::class, 'index'])
+        ->name('balance-sheet.index');
+    Route::get('/opening-balances', [OpeningBalanceController::class, 'create'])
+        ->name('opening-balances.create');
 
+    Route::post('/opening-balances', [OpeningBalanceController::class, 'store'])
+        ->name('opening-balances.store');
 
     // Vendor Credits
     Route::get('vendor-credits', [VendorCreditController::class, 'index'])->name('vendor-credits.index');

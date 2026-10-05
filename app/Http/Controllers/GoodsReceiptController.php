@@ -188,10 +188,7 @@ class GoodsReceiptController extends Controller
                     );
                 }
 
-                $receivedValue = round(
-                    $currentReceivedQty * (float) $orderItem->unit_cost,
-                    2
-                );
+                $receivedValue = round($currentReceivedQty * (float) $orderItem->unit_cost, 2);
 
                 $journalLines[] = [
                     'account_id' => $inventoryAccount->id,

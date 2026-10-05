@@ -620,83 +620,136 @@
             {{-- ================================================== --}}
             {{-- ACCOUNTING --}}
             {{-- ================================================== --}}
-
             <div class="mb-5">
 
                 <p class="mb-2 px-3 text-[10px] font-semibold
-               uppercase tracking-[0.14em] text-gray-600">
-
+        uppercase tracking-[0.14em] text-gray-600">
                     Accounting
-
                 </p>
-
 
                 <div class="space-y-0.5">
 
+                    {{-- Accounting Menu --}}
+                    <button type="button" id="accountingMenuBtn"
+                        class="group flex w-full cursor-pointer
+                items-center justify-between rounded-lg
+                px-3 py-2.5 text-sm font-medium
+                text-gray-400 transition
+                hover:bg-white/[0.06] hover:text-white">
 
-                    {{-- Account Categories --}}
-                    <a href="{{ route('account-categories.index') }}"
-                        class="flex items-center gap-3 rounded-lg
-                   px-3 py-2.5 text-sm font-medium transition
+                        <span class="flex min-w-0 items-center gap-3">
 
-            {{ request()->routeIs('account-categories.*')
-                ? 'bg-white/10 text-white'
-                : 'text-gray-400 hover:bg-white/[0.06] hover:text-white' }}">
+                            <i class="bx bx-calculator w-5 text-center text-[19px]"></i>
 
-                        <i class="bx bx-category w-5 text-center
-                       text-[19px]">
-                        </i>
+                            <span>
+                                Accounting
+                            </span>
 
-                        <span>
-                            Account Categories
                         </span>
 
-                    </a>
-
-
-                    {{-- Accounts --}}
-                    <a href="{{ route('accounts.index') }}"
-                        class="flex items-center gap-3 rounded-lg
-                   px-3 py-2.5 text-sm font-medium transition
-
-            {{ request()->routeIs('accounts.*')
-                ? 'bg-white/10 text-white'
-                : 'text-gray-400 hover:bg-white/[0.06] hover:text-white' }}">
-
-                        <i class="bx bx-wallet w-5 text-center
-                       text-[19px]">
+                        <i id="accountingMenuIcon"
+                            class="bx bx-chevron-down text-base
+                    transition-transform duration-200">
                         </i>
 
-                        <span>
-                            Accounts
-                        </span>
-
-                    </a>
+                    </button>
 
 
-                    {{-- Journal Entries --}}
-                    {{-- Add this when Journal Entry UI is implemented --}}
-                    {{--
+                    {{-- Accounting Submenu --}}
+                    <div id="accountingMenu"
+                        class="mt-1 hidden space-y-0.5
+                border-l border-gray-800
+                pl-3 ml-5">
 
-        <a href="{{ route('journal-entries.index') }}"
-            class="flex items-center gap-3 rounded-lg
-                   px-3 py-2.5 text-sm font-medium transition
+                        {{-- Account Categories --}}
+                        <a href="{{ route('account-categories.index') }}"
+                            class="flex items-center gap-2.5 rounded-lg
+                    px-3 py-2 text-[13px] font-medium transition
+                    {{ request()->routeIs('account-categories.*')
+                        ? 'bg-white/10 text-white'
+                        : 'text-gray-500 hover:bg-white/[0.06] hover:text-gray-200' }}">
 
-            {{ request()->routeIs('journal-entries.*')
-                ? 'bg-white/10 text-white'
-                : 'text-gray-400 hover:bg-white/[0.06] hover:text-white' }}">
+                            <i class="bx bx-category text-base"></i>
 
-            <i class="bx bx-book-content w-5 text-center
-                       text-[19px]">
-            </i>
+                            <span>
+                                Account Categories
+                            </span>
 
-            <span>
-                Journal Entries
-            </span>
+                        </a>
 
-        </a>
 
-        --}}
+                        {{-- Accounts --}}
+                        <a href="{{ route('accounts.index') }}"
+                            class="flex items-center gap-2.5 rounded-lg
+                    px-3 py-2 text-[13px] font-medium transition
+                    {{ request()->routeIs('accounts.*')
+                        ? 'bg-white/10 text-white'
+                        : 'text-gray-500 hover:bg-white/[0.06] hover:text-gray-200' }}">
+
+                            <i class="bx bx-wallet text-base"></i>
+
+                            <span>
+                                Accounts
+                            </span>
+
+                        </a>
+
+
+                        {{-- Opening Balances --}}
+                        <a href="{{ route('opening-balances.create') }}"
+                            class="flex items-center gap-2.5 rounded-lg
+                    px-3 py-2 text-[13px] font-medium transition
+                    {{ request()->routeIs('opening-balances.*')
+                        ? 'bg-white/10 text-white'
+                        : 'text-gray-500 hover:bg-white/[0.06] hover:text-gray-200' }}">
+
+                            <i class="bx bx-transfer-alt text-base"></i>
+
+                            <span>
+                                Opening Balances
+                            </span>
+
+                        </a>
+
+
+                        {{-- Balance Sheet --}}
+                        <a href="{{ route('balance-sheet.index') }}"
+                            class="flex items-center gap-2.5 rounded-lg
+                    px-3 py-2 text-[13px] font-medium transition
+                    {{ request()->routeIs('balance-sheet.*')
+                        ? 'bg-white/10 text-white'
+                        : 'text-gray-500 hover:bg-white/[0.06] hover:text-gray-200' }}">
+
+                            <i class="bx bx-bar-chart-alt-2 text-base"></i>
+
+                            <span>
+                                Balance Sheet
+                            </span>
+
+                        </a>
+
+
+                        {{-- Journal Entries --}}
+                        {{-- Enable when Journal Entry UI is implemented --}}
+                        {{--
+            <a
+                href="{{ route('journal-entries.index') }}"
+                class="flex items-center gap-2.5 rounded-lg
+                    px-3 py-2 text-[13px] font-medium transition
+                    {{ request()->routeIs('journal-entries.*')
+                        ? 'bg-white/10 text-white'
+                        : 'text-gray-500 hover:bg-white/[0.06] hover:text-gray-200' }}">
+
+                <i class="bx bx-book-content text-base"></i>
+
+                <span>
+                    Journal Entries
+                </span>
+
+            </a>
+            --}}
+
+                    </div>
 
                 </div>
 
@@ -930,52 +983,53 @@
     {{-- SIDEBAR --}}
     {{-- ====================================================== --}}
 
-    <script>
-        $(document).ready(function() {
+<script>
+    $(document).ready(function () {
 
-            const inventoryMenu =
-                $('#inventoryMenu');
+        /*
+         * ==================================================
+         * INVENTORY MENU
+         * ==================================================
+         */
+        const inventoryMenu = $('#inventoryMenu');
+        const inventoryMenuIcon = $('#inventoryMenuIcon');
 
-            const inventoryMenuIcon =
-                $('#inventoryMenuIcon');
+        @if (request()->routeIs('products.*', 'raw-materials.*'))
+            inventoryMenu.removeClass('hidden');
+            inventoryMenuIcon.addClass('rotate-180');
+        @endif
 
-
-            const inventoryActive =
-                @json(request()->routeIs('products.*', 'raw-materials.*'));
-
-
-            /*
-             * Automatically open submenu
-             * when current page belongs to it.
-             */
-            if (inventoryActive) {
-
-                inventoryMenu
-                    .removeClass('hidden');
-
-                inventoryMenuIcon
-                    .addClass('rotate-180');
-
-            }
-
-
-            /*
-             * Toggle inventory submenu
-             */
-            $('#inventoryMenuBtn')
-                .on('click', function() {
-
-                    inventoryMenu
-                        .toggleClass('hidden');
-
-                    inventoryMenuIcon
-                        .toggleClass('rotate-180');
-
-                });
-
+        $('#inventoryMenuBtn').on('click', function () {
+            inventoryMenu.toggleClass('hidden');
+            inventoryMenuIcon.toggleClass('rotate-180');
         });
-    </script>
 
+
+        /*
+         * ==================================================
+         * ACCOUNTING MENU
+         * ==================================================
+         */
+        const accountingMenu = $('#accountingMenu');
+        const accountingMenuIcon = $('#accountingMenuIcon');
+
+        @if (request()->routeIs(
+            'account-categories.*',
+            'accounts.*',
+            'opening-balances.*',
+            'balance-sheet.*'
+        ))
+            accountingMenu.removeClass('hidden');
+            accountingMenuIcon.addClass('rotate-180');
+        @endif
+
+        $('#accountingMenuBtn').on('click', function () {
+            accountingMenu.toggleClass('hidden');
+            accountingMenuIcon.toggleClass('rotate-180');
+        });
+
+    });
+</script>
 
     {{-- ====================================================== --}}
     {{-- GLOBAL TOAST --}}
