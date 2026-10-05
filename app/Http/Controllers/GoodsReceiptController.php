@@ -221,6 +221,8 @@ class GoodsReceiptController extends Controller
                 $journalLines
             );
 
+
+            
             /*
              * Store attachments.
              */
