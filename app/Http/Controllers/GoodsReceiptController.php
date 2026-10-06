@@ -213,7 +213,8 @@ class GoodsReceiptController extends Controller
                 [
                     'entry_date' => $validated['received_date'],
                     'description' => "Materials received for GRN {$goodsReceipt->grn_number}.",
-                    'reference' => $goodsReceipt->grn_number,
+                    'reference' => $goodsReceipt,
+                    
                 ],
                 $journalLines
             );

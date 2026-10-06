@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->text('description')->nullable();
             $table->date('entry_date');
-            $table->string('reference')->nullable();
+            $table->nullableMorphs('reference');
+            $table->string('reference_no')->nullable();
             $table->timestamps();
         });
     }

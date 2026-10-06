@@ -696,7 +696,9 @@
 
 
                         {{-- Opening Balances --}}
-                        <a href="{{ route('opening-balances.create') }}"
+
+
+                        {{-- <a href="{{ route('opening-balances.create') }}"
                             class="flex items-center gap-2.5 rounded-lg
                     px-3 py-2 text-[13px] font-medium transition
                     {{ request()->routeIs('opening-balances.*')
@@ -709,6 +711,16 @@
                                 Opening Balances
                             </span>
 
+                        </a> --}}
+
+                        {{-- Journal Entries --}}
+                        <a href="{{ route('journal-entries.index') }}"
+                            class="{{ request()->routeIs('journal-entries.*')
+                                ? 'bg-gray-800 text-white'
+                                : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}
+            flex items-center rounded-lg px-3 py-2 text-sm font-medium transition">
+                            <i class="bx bx-book-open mr-3 text-lg"></i>
+                            Journal Entries
                         </a>
 
 
@@ -983,53 +995,48 @@
     {{-- SIDEBAR --}}
     {{-- ====================================================== --}}
 
-<script>
-    $(document).ready(function () {
+    <script>
+        $(document).ready(function() {
 
-        /*
-         * ==================================================
-         * INVENTORY MENU
-         * ==================================================
-         */
-        const inventoryMenu = $('#inventoryMenu');
-        const inventoryMenuIcon = $('#inventoryMenuIcon');
+            /*
+             * ==================================================
+             * INVENTORY MENU
+             * ==================================================
+             */
+            const inventoryMenu = $('#inventoryMenu');
+            const inventoryMenuIcon = $('#inventoryMenuIcon');
 
-        @if (request()->routeIs('products.*', 'raw-materials.*'))
-            inventoryMenu.removeClass('hidden');
-            inventoryMenuIcon.addClass('rotate-180');
-        @endif
+            @if (request()->routeIs('products.*', 'raw-materials.*'))
+                inventoryMenu.removeClass('hidden');
+                inventoryMenuIcon.addClass('rotate-180');
+            @endif
 
-        $('#inventoryMenuBtn').on('click', function () {
-            inventoryMenu.toggleClass('hidden');
-            inventoryMenuIcon.toggleClass('rotate-180');
+            $('#inventoryMenuBtn').on('click', function() {
+                inventoryMenu.toggleClass('hidden');
+                inventoryMenuIcon.toggleClass('rotate-180');
+            });
+
+
+            /*
+             * ==================================================
+             * ACCOUNTING MENU
+             * ==================================================
+             */
+            const accountingMenu = $('#accountingMenu');
+            const accountingMenuIcon = $('#accountingMenuIcon');
+
+            @if (request()->routeIs('account-categories.*', 'accounts.*', 'opening-balances.*', 'balance-sheet.*'))
+                accountingMenu.removeClass('hidden');
+                accountingMenuIcon.addClass('rotate-180');
+            @endif
+
+            $('#accountingMenuBtn').on('click', function() {
+                accountingMenu.toggleClass('hidden');
+                accountingMenuIcon.toggleClass('rotate-180');
+            });
+
         });
-
-
-        /*
-         * ==================================================
-         * ACCOUNTING MENU
-         * ==================================================
-         */
-        const accountingMenu = $('#accountingMenu');
-        const accountingMenuIcon = $('#accountingMenuIcon');
-
-        @if (request()->routeIs(
-            'account-categories.*',
-            'accounts.*',
-            'opening-balances.*',
-            'balance-sheet.*'
-        ))
-            accountingMenu.removeClass('hidden');
-            accountingMenuIcon.addClass('rotate-180');
-        @endif
-
-        $('#accountingMenuBtn').on('click', function () {
-            accountingMenu.toggleClass('hidden');
-            accountingMenuIcon.toggleClass('rotate-180');
-        });
-
-    });
-</script>
+    </script>
 
     {{-- ====================================================== --}}
     {{-- GLOBAL TOAST --}}

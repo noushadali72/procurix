@@ -154,7 +154,7 @@ class VendorPaymentController extends Controller
                     [
                         'entry_date' => $payment->payment_date,
                         'description' => "Vendor payment for Bill {$bill->bill_number}.",
-                        // 'reference' => $payment->transaction_id ?? $bill->bill_number,
+                        'reference' => $bill,
                     ],
                     [
                         [

@@ -10,6 +10,7 @@ use App\Http\Controllers\ManufacturingController;
 use App\Http\Controllers\ManufacturingFormulaController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\JournalEntryController;
 use App\Http\Controllers\OpeningBalanceController;
 use App\Http\Controllers\PaymentTermController;
 use App\Http\Controllers\PermissionController;
@@ -114,6 +115,16 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::post('/opening-balances', [OpeningBalanceController::class, 'store'])
         ->name('opening-balances.store');
+
+    Route::prefix('journal-entries')
+        ->name('journal-entries.')
+        ->group(function () {
+            Route::get('/', [JournalEntryController::class, 'index'])
+                ->name('index');
+
+            Route::get('/{journalEntry}', [JournalEntryController::class, 'show'])
+                ->name('show');
+        });
 
     // Vendor Credits
     Route::get('vendor-credits', [VendorCreditController::class, 'index'])->name('vendor-credits.index');

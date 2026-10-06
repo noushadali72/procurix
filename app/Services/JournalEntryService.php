@@ -18,6 +18,10 @@ class JournalEntryService
                 'entry_date' => $headerData['entry_date'] ?? now()->toDateString(),
                 'description' => $headerData['description'] ?? "",
             ]);
+            if(isset($headerData['reference'])){
+                $entry->reference()->associate($headerData['reference']);
+                $entry->saveQuietly();
+            }
             $entryLines = collect($lines)->map(function ($line) {
                 return [
 
@@ -52,7 +56,10 @@ class JournalEntryService
             $newEntry =  JournalEntry::create([
                 'description' => 'Journal entry reversed. Reason: ' . ($reason ?: 'not provided'),
                 'entry_date' => now()->toDateString(),
+                'reference' => $entry,
             ]);
+
+         
 
             $newEntry->lines()->createMany($newLines);
             $newEntry->load('lines.account');

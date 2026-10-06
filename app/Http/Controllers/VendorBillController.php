@@ -312,7 +312,7 @@ class VendorBillController extends Controller
                     [
                         'entry_date' => $vendorBill->bill_date,
                         'description' => "Vendor bill {$vendorBill->bill_number}.",
-                        // 'reference' => $vendorBill->bill_number,
+                        'reference' => $vendorBill,
                     ],
                     [
                         [
