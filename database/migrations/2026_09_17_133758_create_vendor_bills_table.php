@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('vendor_bills', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_order_id')->constrained('purchase_orders')->restrictOnDelete();
+            $table->foreignId('purchase_order_id')->nullable()->constrained('purchase_orders')->restrictOnDelete();
             $table->foreignId('vendor_id')->constrained('vendors')->restrictOnDelete();
             $table->string('bill_number')->nullable();
             $table->date('bill_date')->nullable();
