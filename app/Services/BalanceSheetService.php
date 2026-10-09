@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Account;
 use App\Models\JournalEntryLine;
 use Illuminate\Support\Collection;
 
@@ -13,22 +14,22 @@ class BalanceSheetService
             ->whereHas('journalEntry', function ($query) use ($asOfDate) {
                 $query->whereDate('entry_date', '<=', $asOfDate);
             })
-            ->with('account.category')
             ->get();
 
-        $accountBalances = $this->calculateAccountBalances($lines);
+        $accounts = Account::with('category')->get();
+
+        $accountBalances = $this->calculateAccountBalances($accounts, $lines);
 
         $assets = $this->getAccountsByType($accountBalances, 'asset');
         $liabilities = $this->getAccountsByType($accountBalances, 'liability');
         $equity = $this->getAccountsByType($accountBalances, 'equity');
-
         $income = $this->getAccountsByType($accountBalances, 'income');
         $expenses = $this->getAccountsByType($accountBalances, 'expense');
 
-        $totalIncome = $income->sum('balance');
-        $totalExpenses = $expenses->sum('balance');
-
-        $currentEarnings = round($totalIncome - $totalExpenses, 2);
+        $currentEarnings = round(
+            $income->sum('balance') - $expenses->sum('balance'),
+            2
+        );
 
         $totalAssets = round($assets->sum('balance'), 2);
         $totalLiabilities = round($liabilities->sum('balance'), 2);
@@ -48,53 +49,51 @@ class BalanceSheetService
             'assets' => $assets,
             'liabilities' => $liabilities,
             'equity' => $equity,
-
             'current_earnings' => $currentEarnings,
-
             'total_assets' => $totalAssets,
             'total_liabilities' => $totalLiabilities,
             'total_equity' => $totalEquity,
             'total_liabilities_and_equity' => $totalLiabilitiesAndEquity,
-
             'difference' => $difference,
             'is_balanced' => abs($difference) < 0.01,
         ];
     }
 
-    protected function calculateAccountBalances(Collection $lines): Collection
-    {
-        return $lines
-            ->groupBy('account_id')
-            ->map(function (Collection $accountLines) {
-                $account = $accountLines->first()->account;
+    protected function calculateAccountBalances(
+        Collection $accounts,
+        Collection $lines
+    ): Collection {
+        $linesByAccount = $lines->groupBy('account_id');
 
-                $debit = $accountLines->sum(function ($line) {
-                    return (float) $line->debit;
-                });
+        return $accounts->map(function ($account) use ($linesByAccount) {
+            $accountLines = $linesByAccount->get($account->id, collect());
 
-                $credit = $accountLines->sum(function ($line) {
-                    return (float) $line->credit;
-                });
+            $debit = $accountLines->sum(
+                fn($line) => (float) $line->debit
+            );
 
-                $type = $account->category->type;
+            $credit = $accountLines->sum(
+                fn($line) => (float) $line->credit
+            );
 
-                $balance = match ($type) {
-                    'asset', 'expense' => $debit - $credit,
-                    'liability', 'equity', 'income' => $credit - $debit,
-                    default => 0,
-                };
+            $type = $account->category->type;
 
-                return [
-                    'account_id' => $account->id,
-                    'code' => $account->code,
-                    'name' => $account->name,
-                    'type' => $type,
-                    'debit' => round($debit, 2),
-                    'credit' => round($credit, 2),
-                    'balance' => round($balance, 2),
-                ];
-            })
-            ->values();
+            $balance = match ($type) {
+                'asset', 'expense' => $debit - $credit,
+                'liability', 'equity', 'income' => $credit - $debit,
+                default => 0,
+            };
+
+            return [
+                'account_id' => $account->id,
+                'code' => $account->code,
+                'name' => $account->name,
+                'type' => $type,
+                'debit' => round($debit, 2),
+                'credit' => round($credit, 2),
+                'balance' => round($balance, 2),
+            ];
+        });
     }
 
     protected function getAccountsByType(
@@ -103,7 +102,6 @@ class BalanceSheetService
     ): Collection {
         return $accounts
             ->where('type', $type)
-            ->filter(fn($account) => abs($account['balance']) >= 0.01)
             ->sortBy('code')
             ->values();
     }

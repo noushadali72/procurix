@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Account;
 use App\Models\PurchaseOrder;
+use App\Models\RawMaterial;
+use App\Models\Unit;
+use App\Models\Vendor;
 use App\Models\VendorBill;
 use App\Services\JournalEntryService;
 use App\Services\PurchaseRequestActivityService;
@@ -49,6 +52,41 @@ class VendorBillController extends Controller
     }
 
 
+    public function storeWithoutPO(array $data, array $materials){
+
+            $vendor = Vendor::with('paymentTerms')->where('id',$data['vendor_id'])->first();
+
+            $due_days = ($vendor->paymentTerm->due_days)??3;
+
+            $vendorBill = VendorBill::create([
+                'vendor_id'=>$data['vendor_id'],
+                'bill_date'=>$data['bill_date']??now()->toDateString(),
+                'due_date'=> now()->addDays($due_days),
+                'notes'=>$data['notes']??"",
+            ]);
+
+            foreach($materials as $material){
+
+                $vendorBill->items()->createMany($materials);
+            }
+
+        
+    }
+
+    public function create(){
+
+        $vendors = Vendor::all();
+        $purchaseOrders = PurchaseOrder::with(['vendor','items','items.rawMaterial','items.unit'])->where('status','received')->whereDoesntHave('vendorBill')->get()->filter(fn($purchaseOrder) => $purchaseOrder->returnable_qty > 0)->values();
+        $rawMaterials = RawMaterial::all();
+        $units = Unit::all();
+        
+
+        
+        return view('vendor_bills.create', compact('vendors','purchaseOrders','rawMaterials','units'));
+
+    }
+
+
     /**
      * Generate vendor bill from selected purchase order.
      */
@@ -56,19 +94,36 @@ class VendorBillController extends Controller
         Request $request,
         UnitConversionService $conversion
     ) {
-        $request->validate([
-            'purchase_order_id' => [
-                'required',
-                'exists:purchase_orders,id',
-            ],
-        ]);
 
-        $purchaseOrder = PurchaseOrder::findOrFail($request->purchase_order_id);
+        // $request->validate([
+        //     'purchase_order_id' => [
+        //         'required',
+        //         'exists:purchase_orders,id',
+        //     ],
+        // ]);
 
-        return $this->createVendorBill(
-            $purchaseOrder,
-            $conversion
-        );
+        $purchaseOrder = null;
+
+        if($request->has('purchase_order_id')){
+            $purchaseOrder = PurchaseOrder::findOrFail($request->purchase_order_id);
+        }
+
+        if($purchaseOrder){    
+            return $this->createVendorBill($purchaseOrder, $conversion);
+        }
+
+        $data = [
+            'vendor_id'=>$request->input('vendor_id'),
+            'bill_date'=>$request->input('bill_date'),
+            'due_date'=>$request->input('due_date'),
+            'notes'=>$request->input('notes')
+        ];
+        $materials = [];
+        foreach($request->input('items') as $item){
+            $materials[] = $item;
+        }
+
+        return $this->storeWithoutPO($data, $materials);
     }
 
 

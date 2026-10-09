@@ -100,7 +100,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('goods-receipts/{goodsReceipt}/returns', [PurchaseReturnController::class, 'store'])->name('purchase-returns.store');
 
     // Finance
-    Route::resource('vendor-bills', VendorBillController::class)->except('create', 'show');
+    Route::resource('vendor-bills', VendorBillController::class)->except('show');
     Route::get('vendor-bills/{purchaseOrder}/create', [VendorBillController::class, 'create'])->name('vendor-bills.create');
     Route::get('vendor-bills/{vendorBill}', [VendorBillController::class, 'show'])->name('vendor-bills.show');
     Route::post('vendors-bills/generate/{purchaseOrder}', [VendorBillController::class, 'generate'])->name('vendor-bills.generate');
@@ -108,22 +108,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('vendor-payments', VendorPaymentController::class)->except('store');
     Route::post('vendor-payments/{vendorBill}', [VendorPaymentController::class, 'store'])->name('vendor-payments.store');
     Route::resource('payment-terms', PaymentTermController::class)->only(['index', 'store', 'update', 'destroy']);
-    Route::get('/balance-sheet', [BalanceSheetController::class, 'index'])
-        ->name('balance-sheet.index');
-    Route::get('/opening-balances', [OpeningBalanceController::class, 'create'])
-        ->name('opening-balances.create');
-
-    Route::post('/opening-balances', [OpeningBalanceController::class, 'store'])
-        ->name('opening-balances.store');
-
-    Route::prefix('journal-entries')
-        ->name('journal-entries.')
+    
+    Route::get('/balance-sheet', [BalanceSheetController::class, 'index'])->name('balance-sheet.index');
+    Route::get('/opening-balances', [OpeningBalanceController::class, 'create'])->name('opening-balances.create');
+    Route::post('/opening-balances', [OpeningBalanceController::class, 'store'])->name('opening-balances.store');
+    Route::prefix('journal-entries')->name('journal-entries.')
         ->group(function () {
-            Route::get('/', [JournalEntryController::class, 'index'])
-                ->name('index');
-
-            Route::get('/{journalEntry}', [JournalEntryController::class, 'show'])
-                ->name('show');
+            Route::get('/', [JournalEntryController::class, 'index'])->name('index');
+            Route::get('/{journalEntry}', [JournalEntryController::class, 'show'])->name('show');
         });
 
     // Vendor Credits

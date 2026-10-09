@@ -183,9 +183,7 @@ class GoodsReceiptController extends Controller
                 $inventoryAccount = $rawMaterial->category?->inventoryAccount;
 
                 if (!$inventoryAccount) {
-                    throw new \RuntimeException(
-                        "Inventory account is not configured for category: {$rawMaterial->category->name}"
-                    );
+                    $inventoryAccount = Account::where('code', '1100')->first();
                 }
 
                 $receivedValue = round($currentReceivedQty * (float) $orderItem->unit_cost, 2);
