@@ -160,4 +160,12 @@ class DashboardController extends Controller
             'recentActivities',
         ));
     }
+
+    public function dynamicForm(){
+        
+    $materials = RawMaterial::with('unit')->get();
+
+
+        return view('dynamic-form',compact('materials'));
+    }
 }

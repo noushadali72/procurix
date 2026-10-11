@@ -30,6 +30,9 @@ use App\Http\Controllers\VendorCreditController;
 use App\Http\Controllers\VendorPaymentController;
 use Illuminate\Support\Facades\Route;
 
+
+Route::get('/dynamic-form',[DashboardController::class,'dynamicForm']);
+
 // Auth Routes
 Route::middleware(['guest'])->prefix('auth')->group(function () {
     Route::get('/login', [AuthController::class, 'loginView'])->name('login');
