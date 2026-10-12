@@ -17,4 +17,5 @@ class VendorPayment extends Model
     }    
     
     
+    
 }

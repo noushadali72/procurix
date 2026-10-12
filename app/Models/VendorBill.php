@@ -80,4 +80,8 @@ class VendorBill extends Model
     {
         return $this->hasMany(VendorCreditApplication::class);
     }
+
+    public function activities(){
+        return $this->morphMany(Activity::class,'subject');
+    }
 }

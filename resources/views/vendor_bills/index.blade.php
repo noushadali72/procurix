@@ -22,14 +22,14 @@
         </div>
 
 
-        <button type="button" id="openVendorBillModal"
+        <a href="{{ route('vendor-bills.create') }}"
             class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800">
 
             <i class="bx bx-plus text-lg"></i>
 
             Create Vendor Bill
 
-        </button>
+        </a>
 
     </div>
 
@@ -161,10 +161,14 @@
                             {{-- PO Number --}}
                             <td class="px-6 py-4">
 
+                                @if($vendorBill->purchaseOrder)
                                 <a href="{{ route('purchase-orders.show', $vendorBill->purchaseOrder) }}"
                                     class="font-medium text-blue-900 underline">
                                     {{ $vendorBill->purchaseOrder->order_number ?? '-' }}
                                 </a>
+                                @else
+                                    <p>Direct Bill</p>
+                                @endif
 
                             </td>
 
@@ -269,242 +273,5 @@
         @endif
 
     </div>
-
-
-    {{-- Create Vendor Bill Modal --}}
-    <div id="vendorBillModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-
-        <div class="flex min-h-screen items-center justify-center px-4 py-8">
-
-            {{-- Overlay --}}
-            <div id="vendorBillModalOverlay" class="fixed inset-0 bg-black/50">
-            </div>
-
-
-            {{-- Modal --}}
-            <div class="relative z-10 w-full max-w-lg rounded-xl bg-white shadow-xl">
-
-                {{-- Header --}}
-                <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-
-                    <div>
-                        <h2 class="text-lg font-semibold text-gray-900">
-                            Create Vendor Bill
-                        </h2>
-
-                        <p class="mt-1 text-sm text-gray-500">
-                            Select a received purchase order to generate a vendor bill.
-                        </p>
-                    </div>
-
-
-                    <button type="button" id="closeVendorBillModal"
-                        class="rounded-lg p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900">
-
-                        <i class="bx bx-x text-2xl"></i>
-
-                    </button>
-
-                </div>
-
-
-                {{-- Form --}}
-                <form id="vendorBillForm" action="{{ route('vendor-bills.store') }}" method="POST" novalidate>
-
-                    @csrf
-
-
-                    <div class="p-6">
-
-                        <label for="purchase_order_id" class="mb-2 block text-sm font-medium text-gray-700">
-
-                            Purchase Order
-                            <span class="text-red-500">*</span>
-
-                        </label>
-
-
-                        <select name="purchase_order_id" id="purchase_order_id"
-                            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 shadow-sm outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
-
-                            <option value="">
-                                Select Purchase Order
-                            </option>
-
-                            @foreach ($purchaseOrders as $purchaseOrder)
-                                <option value="{{ $purchaseOrder->id }}">
-
-                                    {{ $purchaseOrder->order_number }}
-
-                                    -
-                                    {{ $purchaseOrder->vendor->company_name ?: $purchaseOrder->vendor->name }}
-
-                                    - {{ $purchaseOrder->total }}
-                                </option>
-                            @endforeach
-
-                        </select>
-
-
-                        <span id="purchaseOrderErr" class="mt-1 block text-xs text-red-600">
-                        </span>
-
-
-                        @if ($purchaseOrders->isEmpty())
-                            <p class="mt-2 text-xs text-gray-500">
-                                No received purchase orders are available for vendor bill generation.
-                            </p>
-                        @endif
-
-                    </div>
-
-
-                    {{-- Footer --}}
-                    <div class="flex justify-end gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4">
-
-                        <button type="button" id="cancelVendorBillModal"
-                            class="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100">
-
-                            Cancel
-
-                        </button>
-
-
-                        <button type="submit" id="createVendorBillBtn"
-                            class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60">
-
-                            <i class="bx bx-receipt"></i>
-
-                            <span id="createVendorBillBtnText">
-                                Create Vendor Bill
-                            </span>
-
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    @push('scripts')
-        <script>
-            $(document).ready(function() {
-                $("#purchase_order_id").select2();
-
-                const $modal = $('#vendorBillModal');
-                const $form = $('#vendorBillForm');
-                const $button = $('#createVendorBillBtn');
-                const $buttonText = $('#createVendorBillBtnText');
-
-
-                // Open modal
-                $('#openVendorBillModal').on('click', function() {
-                    $modal.removeClass('hidden');
-                });
-
-
-                // Close modal
-                function closeVendorBillModal() {
-                    $modal.addClass('hidden');
-                    $form[0].reset();
-                    $('#purchaseOrderErr').text('');
-                }
-
-
-                $('#closeVendorBillModal, #cancelVendorBillModal, #vendorBillModalOverlay')
-                    .on('click', function() {
-                        closeVendorBillModal();
-                    });
-
-
-                // Create vendor bill
-                $form.on('submit', function(e) {
-                    e.preventDefault();
-                    $('#purchaseOrderErr').text('');
-                    const originalText = $buttonText.text();
-                    $button.prop('disabled', true);
-                    $buttonText.text('Creating...');
-
-                    $.ajax({
-                        url: $form.attr('action'),
-                        type: 'POST',
-                        data: $form.serialize(),
-                        headers: {
-                            Accept: 'application/json'
-                        },
-                        success: function(response) {
-                            showToast(
-                                'success',
-                                response.message ||
-                                'Vendor bill generated successfully.'
-                            );
-
-                            closeVendorBillModal();
-                            setTimeout(function() {
-
-                                window.location.href =
-                                    response.redirect;
-
-                            }, 800);
-
-                        },
-
-
-                        error: function(xhr) {
-
-                            if (xhr.status === 422) {
-
-                                const errors =
-                                    xhr.responseJSON?.errors || {};
-
-                                $('#purchaseOrderErr').text(
-                                    errors.purchase_order_id?.[0] || ''
-                                );
-
-
-                                if (!errors.purchase_order_id) {
-
-                                    showToast(
-                                        'error',
-                                        xhr.responseJSON?.message ||
-                                        'Unable to create vendor bill.'
-                                    );
-
-                                }
-
-                                return;
-                            }
-
-
-                            showToast(
-                                'error',
-                                xhr.responseJSON?.message ||
-                                'Something went wrong.'
-                            );
-
-                        },
-
-
-                        complete: function() {
-
-                            $button.prop('disabled', false);
-
-                            $buttonText.text(originalText);
-
-                        }
-
-                    });
-
-                });
-
-            });
-        </script>
-    @endpush
 
 </x-layouts.app>

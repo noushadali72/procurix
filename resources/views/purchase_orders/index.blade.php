@@ -78,9 +78,6 @@
                             Bill Status
                         </th>
 
-                        <th class="px-6 py-3.5 text-right">
-                            Actions
-                        </th>
 
                     </tr>
                 </thead>
@@ -122,9 +119,9 @@
                                     </div>
 
                                     <div>
-                                        <p class="font-semibold text-gray-900">
+                                        <a href="{{ route('purchase-orders.show', $order) }}" class="font-semibold text-gray-900 hover:underline">
                                             {{ $order->order_number }}
-                                        </p>
+                                        </a>
                                     </div>
 
                                 </div>
@@ -205,46 +202,7 @@
 
                             </td>
 
-                            {{-- Actions --}}
-                            <td class="px-5 py-4">
-
-                                <div class="flex items-center justify-end gap-2">
-
-                                    <a href="{{ route('purchase-orders.show', $order) }}"
-                                        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white">
-                                        <i class="bx bx-show"></i>
-                                        View
-                                    </a>
-
-                                    @if ($order->vendorBill)
-                                        <a href="{{ route('vendor-bills.show', $order->vendorBill) }}"
-                                           
-                                            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white">
-                                            <i class="bx bx-file"></i>
-                                            Bill
-                                        </a>
-                                    @elseif ($order->status === 'received')
-                                        <button type="button"
-                                            class="generate-bill inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
-                                            data-url="{{ route('vendor-bills.generate', $order) }}">
-
-                                            <i class="bx bx-receipt"></i>
-                                            Generate Bill
-
-                                        </button>
-                                    @endif
-
-                                    <button type="button"
-                                        class="delete-order inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-500 hover:text-white"
-                                        data-url="{{ route('purchase-orders.destroy', $order) }}">
-                                        <i class="bx bx-trash"></i>
-                                        Delete
-                                    </button>
-
-                                </div>
-
-                            </td>
-
+                       
                         </tr>
 
                     @empty

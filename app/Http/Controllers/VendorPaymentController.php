@@ -7,7 +7,7 @@ use App\Models\Account;
 use App\Models\VendorBill;
 use App\Models\VendorPayment;
 use App\Services\JournalEntryService;
-use App\Services\PurchaseRequestActivityService;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\DB;
 class VendorPaymentController extends Controller
 {
     public function __construct(
-        private PurchaseRequestActivityService $activity,
         private JournalEntryService $journalEntryService
     ) {}
 
@@ -175,11 +174,9 @@ class VendorPaymentController extends Controller
                 /*
                  * Payment activity.
                  */
-                $this->activity->log(
-                    $bill->purchaseOrder->purchaseRequest,
-                    Auth::user(),
-                    $bill->vendor,
-                    'Vendor payment recorded',
+                recordActivity(
+                    "payment_created",
+                    $bill,
                     "Payment of Rs. {$payment->amount} was recorded against Vendor Bill {$bill->bill_number}.",
                     $payment
                 );
@@ -193,22 +190,18 @@ class VendorPaymentController extends Controller
                 if ($previousStatus !== $newStatus) {
 
                     if ($newStatus === 'paid') {
-                        $this->activity->log(
-                            $bill->purchaseOrder->purchaseRequest,
-                            Auth::user(),
-                            $bill->vendor,
-                            'Vendor bill paid',
+                        recordActivity(
+                            "fully_paid",
+                            $bill,
                             "Vendor Bill {$bill->bill_number} was fully paid.",
-                            $bill
+                            $payment
                         );
                     } elseif ($newStatus === 'partially_paid') {
-                        $this->activity->log(
-                            $bill->purchaseOrder->purchaseRequest,
-                            Auth::user(),
-                            $bill->vendor,
-                            'Vendor bill partially paid',
+                        recordActivity(
+                            "partially_paid",
+                            $bill,
                             "Vendor Bill {$bill->bill_number} was partially paid.",
-                            $bill
+                            $payment
                         );
                     }
                 }
@@ -233,25 +226,5 @@ class VendorPaymentController extends Controller
                 'message' => 'Unable to make payment.',
             ], 500);
         }
-    }
-
-    public function show(VendorPayment $vendorPayment)
-    {
-        //
-    }
-
-    public function edit(VendorPayment $vendorPayment)
-    {
-        //
-    }
-
-    public function update(Request $request, VendorPayment $vendorPayment)
-    {
-        //
-    }
-
-    public function destroy(VendorPayment $vendorPayment)
-    {
-        //
     }
 }

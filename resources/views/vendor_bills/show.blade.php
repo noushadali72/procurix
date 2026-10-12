@@ -1,7 +1,8 @@
 <x-layouts.app title="Vendor Bill">
 
     @php
-        $purchaseRequest = $vendorBill->purchaseOrder->purchaseRequest;
+        
+        $purchaseRequest = $vendorBill?->purchaseOrder?->purchaseRequest;
         $activities = $purchaseRequest?->activities ?? collect();
     @endphp
 
@@ -132,10 +133,14 @@
                             Purchase Order
                         </p>
 
+                        @if($vendorBill->purchaseOrder)
                         <a href="{{ route('purchase-orders.show', $vendorBill->purchaseOrder) }}"
                             class="mt-1.5 font-semibold text-blue-900 underline">
                             {{ $vendorBill->purchaseOrder->order_number ?? '-' }}
                         </a>
+                        @else
+                            <p>Direct Bill</p>
+                        @endif
                     </div>
 
                     {{-- Bill Date --}}

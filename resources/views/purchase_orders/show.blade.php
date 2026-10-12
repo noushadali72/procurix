@@ -117,15 +117,8 @@
                     View Vendor Bill
 
                 </a>
-            @elseif($purchaseOrder->status === 'received')
-                <button type="button" id="generateBill" data-url="{{ route('vendor-bills.generate', $purchaseOrder) }}"
-                    class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60">
-
-                    <i class="bx bx-receipt text-lg"></i>
-
-                    Generate Bill
-
-                </button>
+            
+            
             @endif
 
         </div>

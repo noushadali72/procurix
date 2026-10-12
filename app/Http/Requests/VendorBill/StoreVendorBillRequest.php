@@ -31,7 +31,6 @@ class StoreVendorBillRequest extends FormRequest
             'vendor_id'=>['required','exists:vendors,id'],
             'bill_date'=>['nullable','date'],
             'due_date'=>['nullable','date'],
-            
             'tax'=>['nullable','numeric','gt:0'],
             'status'=>[
                 'nullable',
@@ -39,9 +38,10 @@ class StoreVendorBillRequest extends FormRequest
             ],
             'notes'=>['nullable','string','max:255'],
 
-            'items.*'=>['required','array','min:1'],
+            'items'=>['required','array','min:1'],
             'items.*.raw_material_id'=>['required','exists:raw_materials,id'],
             'items.*.qty'=>['required','numeric','gt:0'],
+            'items.*.unit_id'=>['required','exists:units,id'],
             'items.*.unit_cost'=>['required','numeric','gt:0'],
             
         ];
